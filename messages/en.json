@@ -1,0 +1,24 @@
+{
+    "Navbar": {
+        "home": "Home",
+        "recipes": "Recipes",
+        "regions": "Regions",
+        "favorites": "Favorites",
+        "about": "About",
+        "login": "Login",
+        "signup": "Sign Up",
+        "logout": "Logout",
+        "admin": "Admin"
+    },
+    "Home": {
+        "heroTitle": "Taste the Legend",
+        "heroSubtitle": "Discover authentic Greek recipes passed down through generations.",
+        "cta": "Explore Recipes",
+        "featured": "Featured Recipes"
+    },
+    "Common": {
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "search": "Search..."
+    }
+}
