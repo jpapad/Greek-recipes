@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { addReview } from "@/lib/api";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { getUser } from "@/lib/auth";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface ReviewFormProps {
     recipeId: string;
@@ -14,6 +15,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
+    const { t } = useTranslations();
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [hoveredRating, setHoveredRating] = useState(0);
@@ -25,7 +27,7 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
         setError(null);
 
         if (rating === 0) {
-            setError("Please select a rating");
+            setError(t('Reviews.selectRating'));
             return;
         }
 
@@ -33,7 +35,7 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
         try {
             const user = await getUser();
             if (!user) {
-                setError("You must be logged in to review");
+                setError(t('Reviews.mustBeLoggedIn'));
                 return;
             }
 
@@ -49,10 +51,10 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
                 setComment("");
                 onReviewAdded();
             } else {
-                setError("Failed to submit review");
+                setError(t('Reviews.failed'));
             }
         } catch (err) {
-            setError("An error occurred");
+            setError(t('Reviews.error'));
         } finally {
             setIsSubmitting(false);
         }
@@ -60,7 +62,7 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
 
     return (
         <GlassPanel className="p-6 space-y-4 bg-white/40">
-            <h3 className="text-xl font-semibold">Write a Review</h3>
+            <h3 className="text-xl font-semibold">{t('Reviews.writeReview')}</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="flex gap-1">
@@ -84,7 +86,7 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
                 </div>
 
                 <Textarea
-                    placeholder="Share your thoughts about this recipe..."
+                    placeholder={t('Reviews.shareThoughts')}
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     className="min-h-[100px] bg-white/60"
@@ -93,7 +95,7 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
                 {error && <p className="text-red-500 text-sm">{error}</p>}
 
                 <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Submitting..." : "Post Review"}
+                    {isSubmitting ? t('Reviews.submitting') : t('Reviews.postReview')}
                 </Button>
             </form>
         </GlassPanel>

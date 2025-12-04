@@ -5,6 +5,7 @@ import { deleteRecipe } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface DeleteRecipeButtonProps {
     id: string;
@@ -12,11 +13,12 @@ interface DeleteRecipeButtonProps {
 }
 
 export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
+    const { t } = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        if (!confirm(`Are you sure you want to delete "${title}"?`)) {
+        if (!confirm(t('Admin.confirmDelete') + ` "${title}"?`)) {
             return;
         }
 
@@ -26,7 +28,7 @@ export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
         if (success) {
             router.refresh();
         } else {
-            alert("Failed to delete recipe");
+            alert(t('Admin.error'));
             setIsDeleting(false);
         }
     };

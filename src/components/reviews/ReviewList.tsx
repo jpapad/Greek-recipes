@@ -4,16 +4,19 @@ import { Star, User } from "lucide-react";
 import { Review } from "@/lib/types";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { formatDistanceToNow } from "date-fns";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface ReviewListProps {
     reviews: Review[];
 }
 
 export function ReviewList({ reviews }: ReviewListProps) {
+    const { t } = useTranslations();
+    
     if (reviews.length === 0) {
         return (
             <div className="text-center py-8 text-muted-foreground">
-                No reviews yet. Be the first to review!
+                {t('Reviews.noReviews')}
             </div>
         );
     }
@@ -29,7 +32,7 @@ export function ReviewList({ reviews }: ReviewListProps) {
                             </div>
                             <div>
                                 <p className="font-medium text-sm">
-                                    {review.user?.email?.split("@")[0] || "Anonymous"}
+                                    {review.user?.email?.split("@")[0] || t('Reviews.anonymous')}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
                                     {formatDistanceToNow(new Date(review.created_at), { addSuffix: true })}

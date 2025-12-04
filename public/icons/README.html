@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Greek Recipes - Icon Generator</title>
+</head>
+<body>
+    <h1>PWA Icon Generation Instructions</h1>
+    
+    <p>To create proper PWA icons for your Greek Recipes app, follow these steps:</p>
+    
+    <h2>Option 1: Use RealFaviconGenerator (Recommended)</h2>
+    <ol>
+        <li>Go to <a href="https://realfavicongenerator.net/">https://realfavicongenerator.net/</a></li>
+        <li>Upload a 512x512 PNG image with your logo/icon</li>
+        <li>Configure settings for iOS, Android, etc.</li>
+        <li>Download the generated package</li>
+        <li>Extract files to <code>public/icons/</code> directory</li>
+    </ol>
+    
+    <h2>Option 2: Manual Creation</h2>
+    <p>Create square PNG images with these exact sizes:</p>
+    <ul>
+        <li>icon-72x72.png</li>
+        <li>icon-96x96.png</li>
+        <li>icon-128x128.png</li>
+        <li>icon-144x144.png</li>
+        <li>icon-152x152.png</li>
+        <li>icon-192x192.png</li>
+        <li>icon-384x384.png</li>
+        <li>icon-512x512.png</li>
+    </ul>
+    
+    <h2>Temporary Solution</h2>
+    <p>For now, you can create a simple colored square using any image editor:</p>
+    <ol>
+        <li>Create a 512x512 image with a blue background</li>
+        <li>Add white text "GR" (for Greek Recipes) in the center</li>
+        <li>Save as PNG</li>
+        <li>Use an online tool like <a href="https://www.iloveimg.com/resize-image">iloveimg.com</a> to create all sizes</li>
+        <li>Place all files in <code>public/icons/</code></li>
+    </ol>
+    
+    <h2>Quick PowerShell Command (Creates placeholder icons)</h2>
+    <pre>
+# This creates temporary 1x1 placeholder icons to stop the errors
+# Replace with real icons later!
+
+$sizes = @(72, 96, 128, 144, 152, 192, 384, 512)
+foreach ($size in $sizes) {
+    # Creates a simple SVG that can be converted
+    @"
+<svg width="$size" height="$size" xmlns="http://www.w3.org/2000/svg">
+  <rect width="$size" height="$size" fill="#1e40af"/>
+  <text x="50%" y="50%" font-size="$([int]($size/2))" fill="white" text-anchor="middle" dominant-baseline="middle">GR</text>
+</svg>
+"@ | Out-File -FilePath "public/icons/icon-${size}x${size}.svg" -Encoding UTF8
+}
+    </pre>
+    
+    <p><strong>Note:</strong> The warnings will disappear once you add proper PNG icons to <code>public/icons/</code></p>
+</body>
+</html>

@@ -93,68 +93,498 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.65 0.22 35);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Modern Professional Dark Mode */
+  --background: oklch(0.12 0.01 240); /* Deep blue-black */
+  --foreground: oklch(0.98 0.005 220); /* Soft white */
+  
+  --card: oklch(0.16 0.015 240); /* Slightly lighter card */
+  --card-foreground: oklch(0.98 0.005 220);
+  
+  --popover: oklch(0.18 0.015 240);
+  --popover-foreground: oklch(0.98 0.005 220);
+  
+  --primary: oklch(0.7 0.24 35); /* Brighter orange for contrast */
+  --primary-foreground: oklch(0.99 0 0);
+  
+  --secondary: oklch(0.22 0.02 240);
+  --secondary-foreground: oklch(0.95 0.005 220);
+  
+  --muted: oklch(0.2 0.015 240);
+  --muted-foreground: oklch(0.65 0.01 220);
+  
+  --accent: oklch(0.24 0.02 240);
+  --accent-foreground: oklch(0.98 0.005 220);
+  
+  --destructive: oklch(0.65 0.22 25);
+  --border: oklch(0.25 0.02 240);
+  --input: oklch(0.2 0.02 240);
+  --ring: oklch(0.7 0.24 35); /* Match bright primary */
+  
+  --chart-1: oklch(0.6 0.25 280);
+  --chart-2: oklch(0.65 0.2 160);
+  --chart-3: oklch(0.7 0.22 70);
+  --chart-4: oklch(0.6 0.28 310);
+  --chart-5: oklch(0.65 0.26 25);
+  
+  --sidebar: oklch(0.14 0.012 240);
+  --sidebar-foreground: oklch(0.98 0.005 220);
+  --sidebar-primary: oklch(0.7 0.24 35);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.22 0.02 240);
+  --sidebar-accent-foreground: oklch(0.98 0.005 220);
+  --sidebar-border: oklch(0.25 0.02 240);
+  --sidebar-ring: oklch(0.7 0.24 35);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  
+  html {
+    @apply scroll-smooth;
+  }
+  
   body {
     @apply bg-background text-foreground min-h-screen antialiased;
-    /* Vibrant Gradient Background for Glassmorphism */
-    background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-    background-image: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-    /* Overriding with a lighter, fresh food/weather vibe */
-    background-image: 
-        radial-gradient(at 0% 0%, oklch(0.95 0.05 200) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, oklch(0.95 0.1 50) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, oklch(0.9 0.1 240) 0px, transparent 50%),
-        radial-gradient(at 0% 100%, oklch(0.95 0.05 300) 0px, transparent 50%);
+    /* Greek-inspired subtle blue gradient background */
+    background: linear-gradient(135deg, 
+      oklch(0.97 0.015 220) 0%, 
+      oklch(0.99 0.008 200) 40%, 
+      oklch(0.98 0.01 210) 70%, 
+      oklch(0.96 0.018 225) 100%
+    );
     background-attachment: fixed;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    position: relative;
+  }
+
+  /* Subtle Greek pattern overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(to right, oklch(0.92 0.02 220 / 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.92 0.02 220 / 0.15) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .dark body {
+    /* Modern professional dark mode gradient */
+    background: 
+      radial-gradient(ellipse at top, oklch(0.18 0.08 240) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, oklch(0.16 0.12 35) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom left, oklch(0.15 0.08 280) 0%, transparent 50%),
+      oklch(0.11 0.01 240);
+    background-attachment: fixed;
+  }
+  
+  .dark body::after {
+    background-image: 
+      linear-gradient(to right, oklch(0.25 0.02 240 / 0.3) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.25 0.02 240 / 0.3) 1px, transparent 1px);
+    opacity: 0.3;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-white/30 backdrop-blur-xl border border-white/40 shadow-lg;
+    @apply bg-white/40 backdrop-blur-2xl border border-white/50 shadow-xl;
+    box-shadow: 
+      0 8px 32px 0 rgba(31, 38, 135, 0.1),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
   }
+  
   .glass-card {
-    @apply bg-white/40 backdrop-blur-md border border-white/30 shadow-sm hover:bg-white/50 transition-all duration-300;
+    @apply bg-white/50 backdrop-blur-xl border border-white/40;
+    box-shadow: 
+      0 4px 24px 0 rgba(16, 45, 99, 0.15),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
+  
+  .glass-card:hover {
+    @apply bg-white/60;
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px 0 rgba(16, 45, 99, 0.4),
+      0 8px 30px 0 rgba(16, 45, 99, 0.3),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+  }
+  
   .glass-dark {
-    @apply bg-black/30 backdrop-blur-xl border border-white/10 shadow-lg;
+    @apply bg-black/40 backdrop-blur-2xl border border-white/20 shadow-2xl;
+    box-shadow: 
+      0 8px 32px 0 rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   }
+  
+  .dark .glass {
+    @apply bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl;
+    box-shadow: 
+      0 8px 32px 0 rgba(0, 0, 0, 0.7),
+      0 4px 16px 0 rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+  }
+  
+  .dark .glass-card {
+    @apply bg-white/8 backdrop-blur-xl border border-white/12 shadow-lg;
+    box-shadow: 
+      0 4px 24px 0 rgba(0, 0, 0, 0.5),
+      0 2px 8px 0 rgba(255, 255, 255, 0.03),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  }
+  
+  .dark .glass-card:hover {
+    @apply bg-white/12 shadow-2xl;
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px 0 rgba(0, 0, 0, 0.7),
+      0 6px 20px 0 rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+  }
+  
+  /* Gradient text effect */
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, oklch(0.65 0.22 35), oklch(0.7 0.18 60));
+  }
+  
+  /* Shimmer effect for loading */
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+  
+  .shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 1000px 100%;
+  }
+  
+  /* Floating animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  /* Pulse glow effect */
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(249, 115, 22, 0.8); }
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  /* Gradient border animation */
+  @keyframes gradient-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  .gradient-border {
+    position: relative;
+    background: linear-gradient(90deg, #f97316, #ec4899, #8b5cf6, #3b82f6);
+    background-size: 300% 300%;
+    animation: gradient-rotate 3s ease infinite;
+  }
+  
+  /* Smooth reveal animations */
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .slide-up {
+    animation: slide-up 0.6s ease-out forwards;
+  }
+  
+  /* Text shimmer effect */
+  @keyframes text-shimmer {
+    0% { background-position: -500px 0; }
+    100% { background-position: 500px 0; }
+  }
+  
+  .text-shimmer {
+    background: linear-gradient(
+      90deg,
+      currentColor 0%,
+      rgba(255, 255, 255, 0.8) 50%,
+      currentColor 100%
+    );
+    background-size: 500px 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: text-shimmer 3s ease-in-out infinite;
+  }
+
+  /* Slide in up animation */
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Gradient text animation */
+  @keyframes gradient-text {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient-text {
+    background-size: 200% 200%;
+    animation: gradient-text 8s ease infinite;
+  }
+
+  /* Hero grid pattern */
+  .hero-grid {
+    background-image: 
+      linear-gradient(to right, oklch(from var(--primary) l c h / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(from var(--primary) l c h / 0.1) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Print styles */
+  @media print {
+    /* Hide non-essential elements */
+    nav, footer, [class*="print:hidden"], 
+    .snowfall, 
+    [class*="AIRecipeAssistant"],
+    button[class*="floating"],
+    .fixed,
+    button,
+    [role="button"] {
+      display: none !important;
+    }
+
+    /* Page setup */
+    @page {
+      margin: 2cm;
+      size: A4;
+    }
+
+    /* Remove backgrounds but keep readability */
+    body {
+      background: white !important;
+      padding-top: 0 !important;
+      color: black !important;
+    }
+
+    /* Show all content */
+    main {
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+      max-width: 100% !important;
+    }
+
+    /* Recipe cards - clean white background with subtle border */
+    .glass-card, [class*="GlassPanel"] {
+      background: white !important;
+      box-shadow: none !important;
+      border: 1px solid #e0e0e0 !important;
+      border-radius: 8px !important;
+      padding: 1.5rem !important;
+      margin-bottom: 1rem !important;
+      page-break-inside: avoid;
+    }
+
+    /* Recipe title */
+    h1 {
+      font-size: 28pt !important;
+      font-weight: bold !important;
+      color: #2c3e50 !important;
+      margin-bottom: 0.5rem !important;
+      border-bottom: 3px solid #e67e22 !important;
+      padding-bottom: 0.5rem !important;
+    }
+
+    /* Section headings */
+    h2, h3 {
+      font-size: 16pt !important;
+      font-weight: 600 !important;
+      color: #34495e !important;
+      margin-top: 1rem !important;
+      margin-bottom: 0.75rem !important;
+      border-left: 4px solid #e67e22 !important;
+      padding-left: 0.5rem !important;
+    }
+
+    /* Paragraphs and lists */
+    p, li {
+      font-size: 11pt !important;
+      line-height: 1.6 !important;
+      color: #2c3e50 !important;
+    }
+
+    /* Recipe details grid */
+    .grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 1rem !important;
+      margin: 1rem 0 !important;
+      padding: 1rem !important;
+      background: #f8f9fa !important;
+      border-radius: 8px !important;
+    }
+
+    /* Icons and decorative elements */
+    svg {
+      display: inline !important;
+      width: 16px !important;
+      height: 16px !important;
+    }
+
+    /* Ingredients list */
+    ul li {
+      margin-bottom: 0.5rem !important;
+      padding-left: 1.5rem !important;
+      position: relative !important;
+    }
+
+    ul li::before {
+      content: "•" !important;
+      position: absolute !important;
+      left: 0.5rem !important;
+      color: #e67e22 !important;
+      font-weight: bold !important;
+    }
+
+    /* Steps numbering */
+    ol {
+      counter-reset: step-counter !important;
+      list-style: none !important;
+    }
+
+    ol li {
+      counter-increment: step-counter !important;
+      margin-bottom: 1rem !important;
+      padding-left: 3rem !important;
+      position: relative !important;
+    }
+
+    ol li::before {
+      content: counter(step-counter) !important;
+      position: absolute !important;
+      left: 0.5rem !important;
+      top: 0 !important;
+      width: 2rem !important;
+      height: 2rem !important;
+      background: #e67e22 !important;
+      color: white !important;
+      border-radius: 50% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      font-weight: bold !important;
+      font-size: 12pt !important;
+    }
+
+    /* Images */
+    img {
+      max-width: 100% !important;
+      height: auto !important;
+      page-break-inside: avoid !important;
+      border-radius: 8px !important;
+      margin: 1rem 0 !important;
+    }
+
+    /* Hero image */
+    [class*="h-[400px]"], [class*="h-[500px]"] {
+      height: 200px !important;
+      max-height: 200px !important;
+    }
+
+    /* Badges and tags */
+    [class*="badge"], [class*="Badge"] {
+      display: inline-block !important;
+      padding: 0.25rem 0.75rem !important;
+      background: #ecf0f1 !important;
+      border: 1px solid #bdc3c7 !important;
+      border-radius: 12px !important;
+      font-size: 9pt !important;
+      margin-right: 0.5rem !important;
+    }
+
+    /* Difficulty and time indicators */
+    [class*="difficulty"], [class*="time"] {
+      font-weight: 600 !important;
+      color: #e67e22 !important;
+    }
+
+    /* Page breaks */
+    .page-break-before {
+      page-break-before: always !important;
+    }
+
+    .page-break-after {
+      page-break-after: always !important;
+    }
+
+    .page-break-inside-avoid, 
+    [class*="GlassPanel"],
+    .recipe-section {
+      page-break-inside: avoid !important;
+    }
+
+    /* Footer info */
+    footer {
+      display: block !important;
+      text-align: center !important;
+      margin-top: 2rem !important;
+      padding-top: 1rem !important;
+      border-top: 1px solid #e0e0e0 !important;
+      font-size: 9pt !important;
+      color: #95a5a6 !important;
+    }
+
+    /* Remove all transform and animation effects */
+    * {
+      transform: none !important;
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/* Christmas animations */
+@keyframes swing {
+  0%, 100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.animate-swing {
+  animation: swing 2s ease-in-out infinite;
 }

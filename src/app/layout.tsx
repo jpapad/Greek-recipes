@@ -3,6 +3,15 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import StyleInjector from "@/components/layout/StyleInjector";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { ShoppingListProvider } from "@/context/ShoppingListContext";
+import { MealPlanProvider } from "@/context/MealPlanContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { ToastProvider } from "@/components/ui/toast";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { Snowfall } from "@/components/ui/Snowfall";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,26 +25,69 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Traditional Greek Recipes",
+    default: "Greek Recipes - Authentic Traditional Greek Cuisine",
     template: "%s | Greek Recipes",
   },
-  description: "Discover authentic Greek cuisine with our curated collection of recipes.",
+  description: "Discover authentic Greek cuisine with our curated collection of traditional recipes from all regions of Greece. Moussaka, Souvlaki, Spanakopita and more!",
+  keywords: ["Greek recipes", "traditional Greek food", "Mediterranean cuisine", "Greek cooking", "authentic recipes", "Moussaka", "Souvlaki", "Greek diet"],
+  authors: [{ name: "Greek Recipes" }],
+  creator: "Greek Recipes",
+  publisher: "Greek Recipes",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Greek Recipes",
+  },
   openGraph: {
-    title: "Traditional Greek Recipes",
-    description: "Discover authentic Greek cuisine with our curated collection of recipes.",
+    title: "Greek Recipes - Authentic Traditional Greek Cuisine",
+    description: "Discover authentic Greek cuisine with our curated collection of traditional recipes from all regions of Greece.",
     url: "https://greek-recipes.com",
     siteName: "Greek Recipes",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Greek Recipes - Traditional Cuisine",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Traditional Greek Recipes",
-    description: "Discover authentic Greek cuisine with our curated collection of recipes.",
+    title: "Greek Recipes - Authentic Traditional Greek Cuisine",
+    description: "Discover authentic Greek cuisine with our curated collection of traditional recipes.",
+    images: ["/twitter-image.jpg"],
+    creator: "@greekrecipes",
   },
+  alternates: {
+    canonical: "https://greek-recipes.com",
+    languages: {
+      'en-US': '/en',
+      'el-GR': '/el',
+    },
+  },
+  verification: {
+    google: "your-google-verification-code",
+    // yandex: "your-yandex-verification-code",
+    // bing: "your-bing-verification-code",
+  },
+  category: "food",
 };
-
-import { ShoppingListProvider } from "@/context/ShoppingListContext";
 
 export default function RootLayout({
   children,
@@ -43,17 +95,52 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <ShoppingListProvider>
-          <Navbar />
-          <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
-            {children}
-          </main>
-          <Footer />
-        </ShoppingListProvider>
+        <StyleInjector />
+        <LoadingScreen />
+        <Snowfall />
+        <ThemeProvider>
+          <ToastProvider>
+            <ShoppingListProvider>
+              <MealPlanProvider>
+                <Navbar />
+                <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
+                  {children}
+                </main>
+                <Footer />
+                <PWAInstallPrompt />
+              </MealPlanProvider>
+            </ShoppingListProvider>
+          </ToastProvider>
+        </ThemeProvider>
+        
+        {/* Service Worker Registration */}
+        <Script id="register-sw" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                  .then((registration) => {
+                    console.log('SW registered: ', registration);
+                  })
+                  .catch((error) => {
+                    console.log('SW registration failed: ', error);
+                  });
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   );

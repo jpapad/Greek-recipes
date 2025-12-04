@@ -1,14 +1,33 @@
 import { getRecipeBySlug, getReviews } from "@/lib/api";
 import { Metadata } from "next";
 import { GlassPanel } from "@/components/ui/GlassPanel";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Clock, Users, ChefHat, MapPin } from "lucide-react";
+import { Clock, Users, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RecipeReviews } from "@/components/reviews/RecipeReviews";
 import { ShoppingListButton } from "@/components/shopping/ShoppingListButton";
+import { RecipeShareButton } from "@/components/recipes/RecipeShareButton";
+import { RecipePrintButton } from "@/components/recipes/RecipePrintButton";
+import { NutritionFacts } from "@/components/recipes/NutritionFacts";
+import { EquipmentList } from "@/components/recipes/EquipmentList";
+import { ServingsCalculator } from "@/components/recipes/ServingsCalculator";
+import { VideoEmbed } from "@/components/recipes/VideoEmbed";
+import { RelatedRecipes } from "@/components/recipes/RelatedRecipes";
+import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
+import { DifficultyIcon } from "@/components/ui/DifficultyIcon";
+import { StarRating } from "@/components/ui/StarRating";
+import { PhotoUploadButton } from "@/components/recipes/PhotoUploadButton";
+import { IngredientSubstitutions } from "@/components/recipes/IngredientSubstitutions";
+import { RecentlyViewedWidget } from "@/components/recipes/RecentlyViewedWidget";
+import { RecentlyViewedTracker } from "@/components/recipes/RecentlyViewedTracker";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { generateRecipeSchema, generateBreadcrumbSchema } from "@/lib/schema";
+import { UnitConverter } from "@/components/recipes/UnitConverter";
+import { SimilarRecipes } from "@/components/recipes/SimilarRecipes";
+import { AllergenBadges } from "@/components/recipes/AllergenBadges";
+import { AIRecipeAssistant } from "@/components/recipes/AIRecipeAssistant";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
@@ -52,11 +71,35 @@ export default async function RecipeDetailPage({ params }: PageProps) {
 
     const reviews = await getReviews(recipe.id);
 
+    // Generate structured data schemas
+    const recipeSchema = generateRecipeSchema(recipe);
+    const breadcrumbItems = [
+        { name: "Συνταγές", url: "/recipes" },
+        ...(recipe.region ? [{ name: recipe.region.name, url: `/regions/${recipe.region.slug}` }] : []),
+        { name: recipe.title, url: `/recipes/${recipe.slug}` }
+    ];
+    const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 pt-24">
+            {/* JSON-LD Schema */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+            />
+
+            <RecentlyViewedTracker recipe={recipe} />
+            
+            {/* Breadcrumbs */}
+            <Breadcrumbs items={breadcrumbItems.slice(0, -1).map(item => ({ label: item.name, href: item.url }))} />
+
             {/* Hero Section */}
             <div className="relative h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-2xl">
-                <Image
+                <ProgressiveImage
                     src={recipe.image_url || "/placeholder-recipe.jpg"}
                     alt={recipe.title}
                     fill
@@ -77,7 +120,10 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                             </Link>
                         )}
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">{recipe.title}</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-2 drop-shadow-lg">{recipe.title}</h1>
+                    <div className="flex items-center gap-4 mb-4">
+                        <StarRating rating={recipe.average_rating || 0} size="lg" showNumber />
+                    </div>
                     <p className="text-lg md:text-xl text-gray-200 max-w-3xl drop-shadow-md mb-8">
                         {recipe.short_description}
                     </p>
@@ -85,9 +131,10 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     <div className="flex flex-wrap gap-4">
                         <Link href={`/recipes/${recipe.slug}/cook`}>
                             <Button size="lg" className="rounded-full text-lg px-8 bg-white text-primary hover:bg-gray-100 border-0 shadow-lg">
-                                Start Cooking Mode <ChefHat className="ml-2 w-5 h-5" />
+                                Start Cooking
                             </Button>
                         </Link>
+                        <PhotoUploadButton recipeId={recipe.id} recipeTitle={recipe.title} />
                         {recipe.ingredients && (
                             <ShoppingListButton
                                 ingredients={recipe.ingredients}
@@ -95,6 +142,8 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                                 recipeTitle={recipe.title}
                             />
                         )}
+                        <RecipeShareButton recipe={recipe} />
+                        <RecipePrintButton />
                     </div>
                 </div>
             </div>
@@ -111,18 +160,26 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                                 <span className="font-bold">{recipe.time_minutes}m</span>
                             </div>
                             <div className="flex flex-col items-center p-4 bg-white/30 rounded-xl">
-                                <ChefHat className="w-6 h-6 mb-2 text-primary" />
-                                <span className="text-sm text-muted-foreground">Difficulty</span>
-                                <span className="font-bold capitalize">{recipe.difficulty}</span>
-                            </div>
-                            <div className="flex flex-col items-center p-4 bg-white/30 rounded-xl col-span-2">
                                 <Users className="w-6 h-6 mb-2 text-primary" />
                                 <span className="text-sm text-muted-foreground">Servings</span>
-                                <span className="font-bold">{recipe.servings} People</span>
+                                <span className="font-bold">{recipe.servings}</span>
                             </div>
+                        </div>
+                        <div className="flex flex-col items-center p-4 bg-white/30 rounded-xl">
+                            <span className="text-sm text-muted-foreground mb-2">Difficulty</span>
+                            <DifficultyIcon difficulty={recipe.difficulty} showLabel size="lg" />
                         </div>
                     </GlassPanel>
 
+                    {/* Servings Calculator */}
+                    {recipe.ingredients && (
+                        <ServingsCalculator
+                            originalServings={recipe.servings}
+                            ingredients={recipe.ingredients}
+                        />
+                    )}
+
+                    {/* Ingredients List */}
                     <GlassPanel className="p-6">
                         <h3 className="text-xl font-bold border-b border-border/50 pb-4 mb-4">Ingredients</h3>
                         <ul className="space-y-3">
@@ -134,10 +191,32 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                             ))}
                         </ul>
                     </GlassPanel>
+
+                    {/* Nutrition Facts */}
+                    <NutritionFacts recipe={recipe} />
+
+                    {/* Allergen Information */}
+                    {recipe.allergens && recipe.allergens.length > 0 && (
+                        <GlassPanel className="p-6">
+                            <AllergenBadges allergens={recipe.allergens} />
+                        </GlassPanel>
+                    )}
+
+                    {/* Equipment List */}
+                    <EquipmentList equipment={recipe.equipment} />
+
+                    {/* Ingredient Substitutions */}
+                    <IngredientSubstitutions ingredients={recipe.ingredients} />
+
+                    {/* Recently Viewed Widget */}
+                    <RecentlyViewedWidget />
                 </div>
 
                 {/* Right Column: Steps & Reviews */}
                 <div className="lg:col-span-2 space-y-8">
+                    {/* Video Tutorial */}
+                    <VideoEmbed videoUrl={recipe.video_url} />
+
                     <GlassPanel className="p-8">
                         <h3 className="text-2xl font-bold border-b border-border/50 pb-4 mb-6">Instructions</h3>
                         <div className="space-y-8">
@@ -167,6 +246,12 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     </GlassPanel>
                 </div>
             </div>
+
+            {/* AI Recipe Assistant */}
+            <AIRecipeAssistant recipe={recipe} />
+
+            {/* Similar Recipes */}
+            <RelatedRecipes currentRecipe={recipe} />
         </div>
     );
 }

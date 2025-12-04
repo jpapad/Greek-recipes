@@ -1,29 +1,44 @@
 import { supabase } from './supabaseClient';
 
 export async function signUp(email: string, password: string) {
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-    });
+    try {
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined,
+            }
+        });
 
-    if (error) {
+        if (error) {
+            console.error('Signup error:', error);
+            throw error;
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Signup exception:', error);
         throw error;
     }
-
-    return data;
 }
 
 export async function signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-    });
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-    if (error) {
+        if (error) {
+            console.error('SignIn error:', error);
+            throw error;
+        }
+
+        return data;
+    } catch (error) {
+        console.error('SignIn exception:', error);
         throw error;
     }
-
-    return data;
 }
 
 export async function signOut() {
@@ -47,9 +62,9 @@ export async function getUser() {
         }
 
         return user;
-    } catch (error: any) {
+    } catch (error: unknown) {
         // Suppress auth session errors
-        if (error.message?.includes('session') || error.name === 'AuthSessionMissingError') {
+        if (error instanceof Error && (error.message?.includes('session') || error.name === 'AuthSessionMissingError')) {
             return null;
         }
         throw error;

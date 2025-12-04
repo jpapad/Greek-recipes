@@ -5,6 +5,7 @@ import { deleteRegion } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface DeleteRegionButtonProps {
     id: string;
@@ -12,11 +13,12 @@ interface DeleteRegionButtonProps {
 }
 
 export function DeleteRegionButton({ id, name }: DeleteRegionButtonProps) {
+    const { t } = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        if (!confirm(`Are you sure you want to delete "${name}"? This will affect all recipes in this region.`)) {
+        if (!confirm(t('Admin.confirmDelete') + ` "${name}"?`)) {
             return;
         }
 
@@ -26,7 +28,7 @@ export function DeleteRegionButton({ id, name }: DeleteRegionButtonProps) {
         if (success) {
             router.refresh();
         } else {
-            alert("Failed to delete region");
+            alert(t('Admin.error'));
             setIsDeleting(false);
         }
     };

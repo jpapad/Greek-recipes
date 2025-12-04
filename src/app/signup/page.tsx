@@ -8,9 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { useToast } from "@/components/ui/toast";
+import { useTranslations } from "@/hooks/useTranslations";
 
 export default function SignupPage() {
+    const { t } = useTranslations();
     const router = useRouter();
+    const { showToast } = useToast();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -22,23 +26,39 @@ export default function SignupPage() {
         setError("");
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match");
+            setError(t('Auth.passwordsDontMatch'));
             return;
         }
 
         if (password.length < 6) {
-            setError("Password must be at least 6 characters");
+            setError(t('Auth.passwordMinLength'));
             return;
         }
 
         setIsLoading(true);
 
         try {
-            await signUp(email, password);
-            alert("Account created! Please check your email to verify your account.");
+            const result = await signUp(email, password);
+            
+            // Check if email confirmation is required
+            if (result?.user && result.user.confirmed_at) {
+                // User is auto-confirmed (email verification disabled)
+                showToast(t('Auth.signUpSuccess'), "success");
+            } else if (result?.user && !result.user.confirmed_at) {
+                // Email verification required
+                showToast(t('Auth.signUpSuccess'), "success");
+            } else {
+                // Account created but status unclear
+                showToast(t('Auth.signUpSuccess'), "success");
+            }
+            
             router.push("/login");
-        } catch (err: any) {
-            setError(err.message || "Failed to sign up");
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message || t('Auth.signUpFailed'));
+            } else {
+                setError(t('Auth.signUpFailed'));
+            }
             setIsLoading(false);
         }
     };
@@ -47,8 +67,8 @@ export default function SignupPage() {
         <div className="min-h-screen flex items-center justify-center p-4">
             <GlassPanel className="w-full max-w-md p-8">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-                    <p className="text-muted-foreground">Join Greek Recipes today</p>
+                    <h1 className="text-3xl font-bold mb-2">{t('Auth.createAccount')}</h1>
+                    <p className="text-muted-foreground">{t('Auth.joinCommunity')}</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -59,7 +79,7 @@ export default function SignupPage() {
                     )}
 
                     <div>
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('Auth.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -71,7 +91,7 @@ export default function SignupPage() {
                     </div>
 
                     <div>
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('Auth.password')}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -84,7 +104,7 @@ export default function SignupPage() {
                     </div>
 
                     <div>
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <Label htmlFor="confirmPassword">{t('Auth.confirmPassword')}</Label>
                         <Input
                             id="confirmPassword"
                             type="password"
@@ -96,20 +116,20 @@ export default function SignupPage() {
                     </div>
 
                     <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-                        {isLoading ? "Creating account..." : "Sign Up"}
+                        {isLoading ? t('Admin.saving') : t('Auth.signUp')}
                     </Button>
                 </form>
 
                 <div className="mt-6 text-center text-sm">
-                    <span className="text-muted-foreground">Already have an account? </span>
+                    <span className="text-muted-foreground">{t('Auth.alreadyHaveAccount')} </span>
                     <Link href="/login" className="text-primary hover:underline font-medium">
-                        Sign in
+                        {t('Auth.signIn')}
                     </Link>
                 </div>
 
                 <div className="mt-4 text-center">
                     <Link href="/" className="text-sm text-muted-foreground hover:text-primary">
-                        ← Back to Home
+                        ← {t('Navbar.home')}
                     </Link>
                 </div>
             </GlassPanel>

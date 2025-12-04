@@ -1,0 +1,237 @@
+/* 
+ * Theme Presets - Ready to use themes
+ * Copy any theme to globals.css :root section
+ */
+
+/* ========================================
+   CURRENT THEME: Orange/Pink Greek Style
+   ======================================== */
+:root {
+  --primary: oklch(0.65 0.22 35);        /* Orange */
+  --secondary: oklch(0.97 0 0);
+  --accent: oklch(0.97 0 0);
+  --radius: 1rem;
+}
+
+
+/* ========================================
+   PRESET 1: Modern Blue/Purple
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.55 0.25 250);
+  --secondary: oklch(0.65 0.18 280);
+  --accent: oklch(0.75 0.15 180);
+  --radius: 0.75rem;
+  
+  --background: oklch(0.98 0.01 240);
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+}
+
+.dark {
+  --primary: oklch(0.6 0.22 250);
+  --secondary: oklch(0.55 0.15 280);
+  --accent: oklch(0.65 0.12 180);
+}
+
+End of PRESET 1 */
+
+
+/* ========================================
+   PRESET 2: Elegant Black/Gold
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.75 0.18 85);
+  --secondary: oklch(0.25 0 0);
+  --accent: oklch(0.85 0.12 60);
+  --radius: 0.5rem;
+  
+  --background: oklch(0.99 0 0);
+  --foreground: oklch(0.15 0 0);
+  --muted: oklch(0.45 0 0);
+  --border: oklch(0.88 0 0);
+}
+
+.dark {
+  --primary: oklch(0.7 0.16 85);
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.98 0 0);
+}
+
+End of PRESET 2 */
+/* ========================================
+   PRESET 3: Fresh Green/Mint
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.65 0.18 145);
+  --secondary: oklch(0.75 0.12 165);
+  --accent: oklch(0.8 0.1 180);
+  --radius: 1.25rem;
+  
+  --background: oklch(0.98 0.01 145);
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+}
+
+.dark {
+  --primary: oklch(0.6 0.15 145);
+  --secondary: oklch(0.55 0.1 165);
+}
+
+End of PRESET 3 */
+
+
+/* ========================================
+   PRESET 4: Vibrant Pink/Magenta
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.65 0.28 340);
+  --secondary: oklch(0.7 0.22 320);
+  --accent: oklch(0.75 0.18 10);
+  --radius: 1.5rem;
+  
+  --background: oklch(0.98 0.01 340);
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+}
+
+.dark {
+  --primary: oklch(0.6 0.25 340);
+  --secondary: oklch(0.55 0.2 320);
+}
+
+End of PRESET 4 */
+
+
+/* ========================================
+   PRESET 5: Professional Navy/Gray
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.45 0.12 240);
+  --secondary: oklch(0.65 0.08 250);
+  --accent: oklch(0.75 0.1 200);
+  --radius: 0.5rem;
+  
+  --background: oklch(0.98 0.005 240);
+  --foreground: oklch(0.2 0.01 240);
+  --muted: oklch(0.5 0.01 240);
+  --border: oklch(0.9 0.005 240);
+}
+
+.dark {
+  --primary: oklch(0.55 0.12 240);
+  --secondary: oklch(0.45 0.08 250);
+  --background: oklch(0.15 0.01 240);
+  --foreground: oklch(0.95 0.005 240);
+}
+
+End of PRESET 5 */
+
+
+/* ========================================
+   PRESET 6: Warm Sunset (Orange/Red)
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.65 0.24 35);
+  --secondary: oklch(0.6 0.22 15);
+  --accent: oklch(0.75 0.18 50);
+  --radius: 1rem;
+  
+  --background: oklch(0.98 0.01 35);
+  --foreground: oklch(0.145 0 0);
+  --muted: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+}
+
+.dark {
+  --primary: oklch(0.6 0.22 35);
+  --secondary: oklch(0.55 0.2 15);
+  --background: oklch(0.14 0.01 15);
+}
+
+End of PRESET 6 */
+
+
+/* ========================================
+   PRESET 7: Minimal Monochrome
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.2 0 0);
+  --secondary: oklch(0.4 0 0);
+  --accent: oklch(0.6 0 0);
+  --radius: 0.25rem;
+  
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1 0 0);
+  --muted: oklch(0.5 0 0);
+  --border: oklch(0.9 0 0);
+}
+
+.dark {
+  --primary: oklch(0.9 0 0);
+  --secondary: oklch(0.7 0 0);
+  --background: oklch(0.1 0 0);
+  --foreground: oklch(0.95 0 0);
+}
+
+End of PRESET 7 */
+
+
+/* ========================================
+   PRESET 8: Pastel Rainbow
+   ======================================== */
+/* Uncomment below to use this theme:
+
+:root {
+  --primary: oklch(0.75 0.12 290);
+  --secondary: oklch(0.8 0.1 340);
+  --accent: oklch(0.85 0.08 180);
+  --radius: 1.5rem;
+  
+  --background: oklch(0.98 0.01 290);
+  --foreground: oklch(0.3 0.05 290);
+  --muted: oklch(0.6 0.03 290);
+  --border: oklch(0.92 0.02 290);
+}
+
+.dark {
+  --primary: oklch(0.65 0.1 290);
+  --secondary: oklch(0.6 0.08 340);
+  --background: oklch(0.18 0.02 290);
+}
+
+End of PRESET 8 */
+
+
+/* ========================================
+   HOW TO USE:
+   
+   1. Pick a preset above
+   2. Remove the opening comment and closing comment markers
+   3. Copy the variables
+   4. Paste into src/app/globals.css :root section
+   5. Save and see instant changes!
+   
+   OR just change individual colors:
+   - --primary: Main brand color
+   - --secondary: Supporting color
+   - --accent: Highlight color
+   - --radius: Border roundness
+   ======================================== */
