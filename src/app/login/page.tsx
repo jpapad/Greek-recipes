@@ -36,16 +36,29 @@ function LoginForm() {
             
             if (result?.user) {
                 showToast(t('Auth.signInSuccess'), "success");
-                
+
                 const redirectTo = searchParams.get('redirect') || '/';
-                
-                // Force refresh session and redirect
-                try {
-                    await fetch('/api/auth/refresh', { method: 'POST' });
-                } catch (refreshErr) {
-                    console.warn('Session refresh failed:', refreshErr);
+
+                // If signIn returned a session, send tokens to server to set cookies
+                const access_token = result?.data?.session?.access_token || result?.session?.access_token || result?.access_token || null;
+                const refresh_token = result?.data?.session?.refresh_token || result?.session?.refresh_token || result?.refresh_token || null;
+
+                if (access_token) {
+                    try {
+                        await fetch('/api/auth/set-session', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ access_token, refresh_token }),
+                            credentials: 'include',
+                        });
+                    } catch (err) {
+                        console.warn('Set-session failed:', err);
+                    }
+                } else {
+                    // Fallback: try refresh endpoint
+                    try { await fetch('/api/auth/refresh', { method: 'POST' }); } catch {}
                 }
-                
+
                 // Force full page reload to ensure fresh session
                 setTimeout(() => {
                     window.location.href = redirectTo;
