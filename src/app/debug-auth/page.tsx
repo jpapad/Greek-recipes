@@ -81,6 +81,12 @@ export default function DebugAuthPage() {
                             <span>is_admin flag: <strong>{String(apiInfo?.user?.is_admin)}</strong></span>
                         </div>
                         <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                                Type: {typeof apiInfo?.user?.is_admin} | 
+                                Raw: {JSON.stringify(apiInfo?.user?.user_metadata?.is_admin)}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
                             {apiInfo?.user?.email && apiInfo?.user?.is_admin === true ? '✅' : '❌'}
                             <span>Can access /admin: <strong>{apiInfo?.user?.email && apiInfo?.user?.is_admin === true ? 'YES' : 'NO'}</strong></span>
                         </div>
@@ -90,11 +96,29 @@ export default function DebugAuthPage() {
                 <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-sm">
                     <h3 className="font-bold mb-2">💡 Troubleshooting Steps:</h3>
                     <ol className="list-decimal list-inside space-y-1">
-                        <li>Make sure you ran <code className="bg-black/30 px-1 rounded">SET_ADMIN_NOW.sql</code> in Supabase</li>
+                        <li>Make sure you ran <code className="bg-black/30 px-1 rounded">FORCE_ADMIN_UPDATE.sql</code> in Supabase</li>
                         <li>Click "Force Session Refresh" above</li>
-                        <li>If still not working, logout and login again</li>
-                        <li>Check that email in SQL matches your login email</li>
+                        <li><strong>IMPORTANT:</strong> Close ALL browser tabs for this site</li>
+                        <li>Open a NEW tab and login again</li>
+                        <li>Come back to this page and check again</li>
+                        <li>If still not working, check that email in SQL matches exactly: jpapad85@gmail.com</li>
                     </ol>
+                </div>
+
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 text-sm">
+                    <h3 className="font-bold mb-2">🔧 Quick Fix Commands:</h3>
+                    <div className="space-y-2 font-mono text-xs">
+                        <div>
+                            <p className="text-muted-foreground mb-1">Run in Supabase SQL Editor:</p>
+                            <pre className="bg-black/30 p-2 rounded overflow-x-auto">
+{`UPDATE auth.users 
+SET raw_user_meta_data = 
+  jsonb_set(COALESCE(raw_user_meta_data, '{}'::jsonb), 
+  '{is_admin}', 'true'::jsonb)
+WHERE email = 'jpapad85@gmail.com';`}
+                            </pre>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

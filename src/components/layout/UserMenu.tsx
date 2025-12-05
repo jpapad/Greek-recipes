@@ -23,8 +23,8 @@ export function UserMenu() {
 
     const handleSignOut = async () => {
         await signOut();
-        router.push("/");
-        router.refresh();
+        // Force full page reload to clear all state
+        window.location.href = "/";
     };
 
     if (!user) {

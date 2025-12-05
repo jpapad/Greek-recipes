@@ -35,16 +35,21 @@ function LoginForm() {
             const result = await signIn(email, password);
             
             if (result?.user) {
-                // Force refresh session to get updated user_metadata
-                await fetch('/api/auth/refresh', { method: 'POST' });
-                
                 showToast(t('Auth.signInSuccess'), "success");
                 
                 const redirectTo = searchParams.get('redirect') || '/';
                 
+                // Force refresh session and redirect
+                try {
+                    await fetch('/api/auth/refresh', { method: 'POST' });
+                } catch (refreshErr) {
+                    console.warn('Session refresh failed:', refreshErr);
+                }
+                
+                // Force full page reload to ensure fresh session
                 setTimeout(() => {
                     window.location.href = redirectTo;
-                }, 500);
+                }, 300);
             } else {
                 setError(t('Auth.signInFailed'));
                 setIsLoading(false);

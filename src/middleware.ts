@@ -73,14 +73,17 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(loginUrl)
         }
 
-        // Check if user is admin
-        const isAdmin = user.user_metadata?.is_admin === true
+        // Check if user is admin - be more flexible with the check
+        const isAdmin = user.user_metadata?.is_admin === true || user.user_metadata?.is_admin === 'true'
         console.log('🔑 Is Admin?', isAdmin)
         console.log('📋 Full user_metadata:', user.user_metadata)
+        console.log('🔍 is_admin value:', user.user_metadata?.is_admin)
+        console.log('🔍 is_admin type:', typeof user.user_metadata?.is_admin)
         
         if (!isAdmin) {
             console.log('⛔ User is not admin - redirecting to login')
-            console.log('💡 To fix: Run set-admin-user.sql in Supabase SQL Editor')
+            console.log('💡 To fix: Run SET_ADMIN_NOW.sql in Supabase SQL Editor with your email')
+            console.log('💡 Then logout and login again to refresh session')
             const loginUrl = new URL('/login', request.url)
             loginUrl.searchParams.set('error', 'admin_access_required')
             loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
