@@ -4,95 +4,20 @@ import { HomeSection } from './types/home-sections';
 import { SiteSetting } from './types/site-settings';
 import { Page, MenuItem } from './types/pages';
 
-// Mock Data for fallback
-const MOCK_REGIONS: Region[] = [
-    {
-        id: '1',
-        name: 'Crete',
-        slug: 'crete',
-        description: 'Home of the Mediterranean diet, famous for olive oil and fresh herbs.',
-        image_url: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1000&auto=format&fit=crop',
-    },
-    {
-        id: '2',
-        name: 'Cyclades',
-        slug: 'cyclades',
-        description: 'Known for fresh seafood and sun-dried tomatoes.',
-        image_url: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=1000&auto=format&fit=crop',
-    },
-    {
-        id: '3',
-        name: 'Peloponnese',
-        slug: 'peloponnese',
-        description: 'Rich in history and flavors, famous for oranges and olives.',
-        image_url: 'https://images.unsplash.com/photo-1560703650-ef3e0f254ae0?q=80&w=1000&auto=format&fit=crop',
-    },
-];
-
-const MOCK_RECIPES: Recipe[] = [
-    {
-        id: '1',
-        title: 'Moussaka',
-        slug: 'moussaka',
-        region_id: '1',
-        short_description: 'The legendary eggplant casserole with rich meat sauce and creamy béchamel.',
-        steps: [
-            'Slice eggplants and potatoes.',
-            'Fry them lightly.',
-            'Prepare the meat sauce with cinnamon and cloves.',
-            'Make the béchamel sauce.',
-            'Layer everything and bake.'
-        ],
-        ingredients: ['Eggplants', 'Potatoes', 'Ground Beef', 'Béchamel Sauce', 'Cheese'],
-        time_minutes: 90,
-        difficulty: 'hard',
-        servings: 8,
-        image_url: 'https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?q=80&w=1000&auto=format&fit=crop',
-        category: 'Main Dish',
-        region: MOCK_REGIONS[0],
-    },
-    {
-        id: '2',
-        title: 'Greek Salad (Horiatiki)',
-        slug: 'greek-salad',
-        region_id: '1',
-        short_description: 'Fresh, vibrant, and healthy traditional salad.',
-        steps: ['Chop tomatoes and cucumbers.', 'Add onions and olives.', 'Top with feta block.', 'Drizzle olive oil and oregano.'],
-        ingredients: ['Tomatoes', 'Cucumbers', 'Feta Cheese', 'Olives', 'Olive Oil'],
-        time_minutes: 15,
-        difficulty: 'easy',
-        servings: 4,
-        image_url: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=1000&auto=format&fit=crop',
-        category: 'Salad',
-        region: MOCK_REGIONS[0],
-    },
-    {
-        id: '3',
-        title: 'Spanakopita',
-        slug: 'spanakopita',
-        region_id: '3',
-        short_description: 'Spinach and feta pie wrapped in crispy phyllo dough.',
-        steps: ['Prepare spinach filling with herbs and feta.', 'Layer phyllo sheets with butter.', 'Add filling and bake.'],
-        ingredients: ['Spinach', 'Feta', 'Phyllo Dough', 'Dill', 'Spring Onions'],
-        time_minutes: 60,
-        difficulty: 'medium',
-        servings: 6,
-        image_url: 'https://images.unsplash.com/photo-1606525437679-037aca74a3e9?q=80&w=1000&auto=format&fit=crop',
-        category: 'Pie',
-        region: MOCK_REGIONS[2],
-    },
-];
+// Production: remove mock data. API functions now return empty arrays/null on DB errors
+// so the admin UI reflects the real database state.
 
 export async function getRegions(): Promise<Region[]> {
     const { data, error } = await supabase.from('regions').select('*');
     // Only fall back to mock data when there's an actual error or the response is undefined/null.
     // If the query succeeds but returns an empty array, return that empty array so admin pages
     // and lists reflect the real DB state after creations/deletions.
-    if (error || !data) {
-        console.warn('Using mock regions data');
-        return MOCK_REGIONS;
+    if (error) {
+        console.error('Error fetching regions:', error);
+        return [];
     }
-    return data;
+
+    return data || [];
 }
 
 export interface GetRecipesOptions {
@@ -181,38 +106,12 @@ export async function getRecipes(options: GetRecipesOptions = {}): Promise<Recip
 
     const { data, error } = await query;
 
-    // Only use mock fallback when there's a real error or no data at all (undefined/null).
-    // If the query succeeds but returns an empty array, propagate that empty array so
-    // pages (especially admin pages) can accurately reflect an empty DB after deletions.
-    if (error || !data) {
-        console.warn('Using mock recipes data (fallback)');
-        // Filter mock data if DB fails
-        let filtered = [...MOCK_RECIPES];
-
-        if (options.category) {
-            filtered = filtered.filter(r => r.category === options.category);
-        }
-        if (options.difficulty) {
-            filtered = filtered.filter(r => r.difficulty === options.difficulty);
-        }
-        if (options.search) {
-            const lowerQuery = options.search.toLowerCase();
-            filtered = filtered.filter(r => r.title.toLowerCase().includes(lowerQuery));
-        }
-        if (options.time) {
-            if (options.time === "Under 30m") {
-                filtered = filtered.filter(r => r.time_minutes < 30);
-            } else if (options.time === "30m - 60m") {
-                filtered = filtered.filter(r => r.time_minutes >= 30 && r.time_minutes <= 60);
-            } else if (options.time === "Over 60m") {
-                filtered = filtered.filter(r => r.time_minutes > 60);
-            }
-        }
-        return filtered;
+    if (error) {
+        console.error('Error fetching recipes:', error);
+        return [];
     }
 
-    // At this point `data` is a valid array (possibly empty) returned from the DB.
-    return data;
+    return data || [];
 }
 
 export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
@@ -223,8 +122,8 @@ export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
         .single();
 
     if (error || !data) {
-        console.warn('Using mock recipe data for slug:', slug);
-        return MOCK_RECIPES.find((r) => r.slug === slug) || null;
+        console.error('Error fetching recipe by slug:', error);
+        return null;
     }
     return data;
 }
@@ -237,8 +136,8 @@ export async function getRegionBySlug(slug: string): Promise<Region | null> {
         .single();
 
     if (error || !data) {
-        console.warn('Using mock region data for slug:', slug);
-        return MOCK_REGIONS.find((r) => r.slug === slug) || null;
+        console.error('Error fetching region by slug:', error);
+        return null;
     }
     return data;
 }
@@ -249,10 +148,11 @@ export async function getRecipesByRegion(regionId: string): Promise<Recipe[]> {
         .select('*, region:regions(*)')
         .eq('region_id', regionId);
 
-    if (error || !data || data.length === 0) {
-        return MOCK_RECIPES.filter(r => r.region_id === regionId);
+    if (error) {
+        console.error('Error fetching recipes by region:', error);
+        return [];
     }
-    return data;
+    return data || [];
 }
 
 // ============================================
