@@ -7,7 +7,7 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { access_token, refresh_token } = body || {};
 
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
 
         // Prepare a single response so we can attach cookies to it
         const response = NextResponse.json({ success: true });
