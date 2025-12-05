@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
 import Link from "next/link";
 
+// Force dynamic rendering so admin sees fresh DB data after edits/creates.
+export const dynamic = 'force-dynamic';
+
 export default async function AdminCitiesPage() {
     const cities = await getCities();
 
