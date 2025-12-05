@@ -282,15 +282,23 @@ export async function updateRecipe(id: string, recipe: Partial<Recipe>): Promise
 }
 
 export async function deleteRecipe(id: string): Promise<boolean> {
-    const { error } = await supabase
+    // Request deleted row(s) back so we can verify deletion succeeded
+    const { data, error } = await supabase
         .from('recipes')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select('id');
 
     if (error) {
         console.error('Error deleting recipe:', error);
         return false;
     }
+
+    if (!data || (Array.isArray(data) && data.length === 0)) {
+        console.warn('Delete returned no rows for id:', id, 'data:', data);
+        return false;
+    }
+
     return true;
 }
 
