@@ -1,10 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { getPrefectureById } from '@/lib/api';
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-    const { id } = params;
+export async function GET(request: NextRequest, context: any) {
+    // Next's context.params can be either an object or a Promise depending on runtime/types.
+    // Normalize to an object by awaiting if necessary.
     try {
+        const paramsObj = await (context?.params ?? {});
+        const id: string | undefined = paramsObj?.id;
+
+        if (!id) {
+            return NextResponse.json({ ok: false, error: 'Missing id param' }, { status: 400 });
+        }
+
         const prefecture = await getPrefectureById(id);
 
         const { data: raw, error } = await supabase
