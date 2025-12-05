@@ -8,10 +8,6 @@ const IMAGE_CACHE = 'greek-recipes-images-v2';
 // Static assets to cache on install
 const STATIC_ASSETS = [
   '/',
-  '/recipes',
-  '/regions',
-  '/favorites',
-  '/offline',
   '/manifest.json',
 ];
 
@@ -21,7 +17,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
+      // Cache with error handling
+      return cache.addAll(STATIC_ASSETS).catch(err => {
+        console.warn('Failed to cache some assets:', err);
+      });
     })
   );
   self.skipWaiting();
