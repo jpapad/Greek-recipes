@@ -1,10 +1,11 @@
-import { getPrefectures } from "@/lib/api";
+import { getPrefectureById } from "@/lib/api";
 import { PrefectureForm } from "@/components/admin/PrefectureForm";
 import { notFound } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 export default async function EditPrefecturePage({ params }: { params: { id: string } }) {
-    const prefectures = await getPrefectures();
-    const prefecture = prefectures.find((p) => p.id === params.id);
+    const prefecture = await getPrefectureById(params.id);
 
     if (!prefecture) {
         notFound();

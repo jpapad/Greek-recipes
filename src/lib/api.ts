@@ -393,6 +393,20 @@ export async function getPrefectureBySlug(slug: string): Promise<Prefecture | nu
     return data;
 }
 
+export async function getPrefectureById(id: string): Promise<Prefecture | null> {
+    const { data, error } = await supabase
+        .from('prefectures')
+        .select('*, region:region_id(*)')
+        .eq('id', id)
+        .single();
+
+    if (error) {
+        console.error('Error fetching prefecture by id:', error);
+        return null;
+    }
+    return data;
+}
+
 export async function createPrefecture(prefecture: Partial<Prefecture>): Promise<Prefecture | null> {
     const { data, error } = await supabase
         .from('prefectures')
