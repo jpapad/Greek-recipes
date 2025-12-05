@@ -12,6 +12,9 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 interface DeleteRecipeButtonProps {
     id: string;
     title: string;
+    onBeforeDelete?: () => void;
+    onDeleteFailed?: () => void;
+    onDeleted?: () => void;
 }
 
 export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
@@ -26,15 +29,22 @@ export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
         showToast(t('Admin.deleting') || 'Deleting...', 'info');
 
         setIsDeleting(true);
+        // Allow parent to optimistically remove the item from UI
+        if (onBeforeDelete) onBeforeDelete();
         const success = await deleteRecipe(id);
 
         if (success) {
             showToast(t('Admin.deleted') || 'Deleted', 'success');
             setShowConfirm(false);
-            router.refresh();
+            if (onDeleted) {
+                onDeleted();
+            } else {
+                router.refresh();
+            }
         } else {
             showToast(t('Admin.error') || 'Error deleting', 'error');
             setIsDeleting(false);
+            if (onDeleteFailed) onDeleteFailed();
         }
     };
 

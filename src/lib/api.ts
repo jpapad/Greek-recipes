@@ -178,9 +178,12 @@ export async function getRecipes(options: GetRecipesOptions = {}): Promise<Recip
 
     const { data, error } = await query;
 
-    if (error || !data || data.length === 0) {
-        console.warn('Using mock recipes data (fallback or empty)');
-        // Filter mock data if DB fails or is empty
+    // Only use mock fallback when there's a real error or no data at all (undefined/null).
+    // If the query succeeds but returns an empty array, propagate that empty array so
+    // pages (especially admin pages) can accurately reflect an empty DB after deletions.
+    if (error || !data) {
+        console.warn('Using mock recipes data (fallback)');
+        // Filter mock data if DB fails
         let filtered = [...MOCK_RECIPES];
 
         if (options.category) {
@@ -204,6 +207,8 @@ export async function getRecipes(options: GetRecipesOptions = {}): Promise<Recip
         }
         return filtered;
     }
+
+    // At this point `data` is a valid array (possibly empty) returned from the DB.
     return data;
 }
 
