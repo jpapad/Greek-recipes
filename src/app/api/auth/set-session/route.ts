@@ -7,9 +7,10 @@ export async function POST(req: Request) {
         const body = await req.json();
         const { access_token, refresh_token } = body || {};
 
-        const cookieStore = await cookies();
+        const cookieStore = cookies();
 
-        const res = NextResponse.json({ success: false });
+        // Prepare a single response so we can attach cookies to it
+        const response = NextResponse.json({ success: true });
 
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,11 +21,11 @@ export async function POST(req: Request) {
                         return cookieStore.get(name)?.value;
                     },
                     set(name: string, value: string, options: any) {
-                        // Set cookie on the outgoing response
-                        res.cookies.set({ name, value, ...options });
+                        // Attach cookie to response
+                        response.cookies.set(name, value, options);
                     },
                     remove(name: string, options: any) {
-                        res.cookies.set({ name, value: '', ...options });
+                        response.cookies.set(name, '', options);
                     },
                 },
             }
@@ -37,9 +38,8 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: error.message }, { status: 400 });
         }
 
-        res.headers.set('Cache-Control', 'no-store');
-        // Return the response which contains set-cookie headers
-        return NextResponse.json({ success: true });
+        response.headers.set('Cache-Control', 'no-store');
+        return response;
     } catch (err: unknown) {
         return NextResponse.json({ success: false, error: (err as Error).message }, { status: 500 });
     }
