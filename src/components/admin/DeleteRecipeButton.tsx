@@ -17,7 +17,7 @@ interface DeleteRecipeButtonProps {
     onDeleted?: () => void;
 }
 
-export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
+export function DeleteRecipeButton({ id, title, onBeforeDelete, onDeleteFailed, onDeleted }: DeleteRecipeButtonProps) {
     const { t } = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
@@ -30,21 +30,21 @@ export function DeleteRecipeButton({ id, title }: DeleteRecipeButtonProps) {
 
         setIsDeleting(true);
         // Allow parent to optimistically remove the item from UI
-        if (onBeforeDelete) onBeforeDelete();
+        onBeforeDelete?.();
         const success = await deleteRecipe(id);
 
         if (success) {
             showToast(t('Admin.deleted') || 'Deleted', 'success');
             setShowConfirm(false);
             if (onDeleted) {
-                onDeleted();
+                onDeleted?.();
             } else {
                 router.refresh();
             }
         } else {
             showToast(t('Admin.error') || 'Error deleting', 'error');
             setIsDeleting(false);
-            if (onDeleteFailed) onDeleteFailed();
+            onDeleteFailed?.();
         }
     };
 
