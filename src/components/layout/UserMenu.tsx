@@ -81,11 +81,13 @@ export function UserMenu() {
                         </div>
                         <div className="p-2 space-y-1">
                             {isAdmin && (
-                                <Link href="/admin" onClick={() => setIsOpen(false)}>
-                                    <a className="flex items-center gap-2 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors text-foreground">
-                                        <Shield className="w-4 h-4 text-green-600" />
-                                        <span className="font-medium">Admin Panel</span>
-                                    </a>
+                                <Link
+                                    href="/admin"
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors text-foreground"
+                                >
+                                    <Shield className="w-4 h-4 text-green-600" />
+                                    <span className="font-medium">Admin Panel</span>
                                 </Link>
                             )}
                             <button
