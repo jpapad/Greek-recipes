@@ -40,8 +40,8 @@ function LoginForm() {
                 const redirectTo = searchParams.get('redirect') || '/';
 
                 // If signIn returned a session, send tokens to server to set cookies
-                const access_token = result?.data?.session?.access_token || result?.session?.access_token || result?.access_token || null;
-                const refresh_token = result?.data?.session?.refresh_token || result?.session?.refresh_token || result?.refresh_token || null;
+                const access_token = result?.session?.access_token ?? result?.access_token ?? null;
+                const refresh_token = result?.session?.refresh_token ?? result?.refresh_token ?? null;
 
                 if (access_token) {
                     try {
