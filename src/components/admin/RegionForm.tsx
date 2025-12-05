@@ -63,12 +63,22 @@ export function RegionForm({ region }: RegionFormProps) {
                 local_products: localProducts,
             };
             
+            let result = null;
             if (region?.id) {
-                await updateRegion(region.id, data);
+                result = await updateRegion(region.id, data);
             } else {
-                await createRegion(data);
+                result = await createRegion(data);
             }
-            router.push("/admin/regions");
+
+            if (!result) {
+                // Update/create failed on the server — inform the user and do not navigate away.
+                alert(t('Admin.saveFailed'));
+                setIsSubmitting(false);
+                return;
+            }
+
+            // Navigate to the regions list after successful save and then refresh server data.
+            await router.push("/admin/regions");
             router.refresh();
         } catch (error) {
             alert(t('Admin.error'));
