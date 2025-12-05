@@ -22,6 +22,10 @@ function LoginForm() {
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
+    // Check for admin access error
+    const adminError = searchParams.get('error') === 'admin_access_required';
+    const fromAdmin = searchParams.get('redirect')?.startsWith('/admin');
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -31,6 +35,9 @@ function LoginForm() {
             const result = await signIn(email, password);
             
             if (result?.user) {
+                // Force refresh session to get updated user_metadata
+                await fetch('/api/auth/refresh', { method: 'POST' });
+                
                 showToast(t('Auth.signInSuccess'), "success");
                 
                 const redirectTo = searchParams.get('redirect') || '/';
@@ -80,6 +87,33 @@ function LoginForm() {
                             {t('Auth.signInToContinue')}
                         </p>
                     </div>
+
+                    {/* Admin Access Error Alert */}
+                    {adminError && (
+                        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                            <div className="flex items-start gap-3">
+                                <div className="text-red-600 dark:text-red-400 text-2xl">🔒</div>
+                                <div className="flex-1 space-y-2">
+                                    <h3 className="font-semibold text-red-900 dark:text-red-100">
+                                        Admin Access Required
+                                    </h3>
+                                    <p className="text-sm text-red-700 dark:text-red-300">
+                                        You need admin privileges to access this area. Please contact the site administrator or run the <code className="bg-red-200 dark:bg-red-800 px-1 rounded">set-admin-user.sql</code> script in Supabase.
+                                    </p>
+                                    <details className="text-xs text-red-600 dark:text-red-400 mt-2">
+                                        <summary className="cursor-pointer font-medium hover:text-red-800 dark:hover:text-red-200">
+                                            How to fix this?
+                                        </summary>
+                                        <ol className="mt-2 ml-4 list-decimal space-y-1">
+                                            <li>Open Supabase SQL Editor</li>
+                                            <li>Run: <code className="bg-red-200 dark:bg-red-800 px-1">UPDATE auth.users SET raw_user_meta_data = raw_user_meta_data || '{`{"is_admin": true}`}'::jsonb WHERE email = 'your@email.com';</code></li>
+                                            <li>Logout and login again</li>
+                                        </ol>
+                                    </details>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Social Login Buttons */}
                     <div className="space-y-3">
