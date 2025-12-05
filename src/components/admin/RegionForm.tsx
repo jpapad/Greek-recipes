@@ -78,8 +78,20 @@ export function RegionForm({ region }: RegionFormProps) {
             }
 
             // Navigate to the regions list after successful save and then refresh server data.
+            // Use a soft navigation first, then attempt a refresh. As a reliable fallback
+            // (some client/server cache scenarios), force a full reload so the server
+            // rendered page picks up the new DB row.
             await router.push("/admin/regions");
-            router.refresh();
+            try {
+                router.refresh();
+            } catch (err) {
+                // ignore
+            }
+
+            // Ensure the page shows the latest server data by forcing a hard reload.
+            if (typeof window !== 'undefined') {
+                window.location.href = '/admin/regions';
+            }
         } catch (error) {
             alert(t('Admin.error'));
             setIsSubmitting(false);
