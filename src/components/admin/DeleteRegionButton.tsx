@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useToast } from "@/components/ui/toast";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 interface DeleteRegionButtonProps {
     id: string;
