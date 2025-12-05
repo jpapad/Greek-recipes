@@ -85,7 +85,10 @@ const MOCK_RECIPES: Recipe[] = [
 
 export async function getRegions(): Promise<Region[]> {
     const { data, error } = await supabase.from('regions').select('*');
-    if (error || !data || data.length === 0) {
+    // Only fall back to mock data when there's an actual error or the response is undefined/null.
+    // If the query succeeds but returns an empty array, return that empty array so admin pages
+    // and lists reflect the real DB state after creations/deletions.
+    if (error || !data) {
         console.warn('Using mock regions data');
         return MOCK_REGIONS;
     }
