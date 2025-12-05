@@ -40,7 +40,9 @@ export function UserMenu() {
         );
     }
 
-    const isAdmin = user.user_metadata?.is_admin === true;
+    // Accept boolean true or string 'true' for compatibility with different session shapes
+    const isAdmin =
+        user.user_metadata?.is_admin === true || user.user_metadata?.is_admin === 'true';
 
     return (
         <div className="relative">
@@ -69,9 +71,9 @@ export function UserMenu() {
                                 <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium truncate">{user.email}</p>
                                     {isAdmin && (
-                                        <span className="inline-flex items-center gap-1 text-xs text-primary">
-                                            <Shield className="w-3 h-3" />
-                                            Admin
+                                        <span className="inline-flex items-center gap-2 text-xs text-green-700 bg-green-100/60 px-2 py-0.5 rounded">
+                                            <Shield className="w-3 h-3 text-green-700" />
+                                            <strong className="text-[11px]">Admin</strong>
                                         </span>
                                     )}
                                 </div>
@@ -80,10 +82,10 @@ export function UserMenu() {
                         <div className="p-2 space-y-1">
                             {isAdmin && (
                                 <Link href="/admin" onClick={() => setIsOpen(false)}>
-                                    <div className="flex items-center gap-2 px-3 py-2 hover:bg-primary/10 rounded-lg cursor-pointer transition-colors">
-                                        <Shield className="w-4 h-4 text-primary" />
+                                    <a className="flex items-center gap-2 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors text-foreground">
+                                        <Shield className="w-4 h-4 text-green-600" />
                                         <span className="font-medium">Admin Panel</span>
-                                    </div>
+                                    </a>
                                 </Link>
                             )}
                             <button
