@@ -45,7 +45,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  manifest: "/manifest.json",
+  // Add a version query param to the manifest to force a fresh fetch
+  // when service workers or caches had previously stored a 401 response.
+  manifest: "/manifest.json?v=2",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
