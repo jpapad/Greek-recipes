@@ -128,6 +128,38 @@ export default function RootLayout({
         </ThemeProvider>
         
         {/* Service Worker Registration */}
+        {/* In preview environments sometimes an older Service Worker cached a 401 for manifest.json.
+            To ensure preview users see the updated manifest and SW behavior immediately, run a
+            one-time unregister+cache-clear on vercel preview hosts before registering the new SW.
+            This code only runs when the hostname contains 'vercel.app'. */}
+        <Script id="preview-unregister-sw" strategy="afterInteractive">
+          {`
+            try {
+              if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+                (async () => {
+                  console.log('Preview detected: unregistering service workers and clearing caches');
+                  try {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(regs.map(r => r.unregister()));
+                  } catch (e) {
+                    console.warn('Error unregistering SWs:', e);
+                  }
+                  try {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map(k => caches.delete(k)));
+                  } catch (e) {
+                    console.warn('Error clearing caches:', e);
+                  }
+                  // reload so the page fetches fresh assets (including manifest)
+                  try { location.reload(); } catch (e) { /* ignore */ }
+                })();
+              }
+            } catch (e) {
+              console.warn('Preview SW cleanup script error', e);
+            }
+          `}
+        </Script>
+
         <Script id="register-sw" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
