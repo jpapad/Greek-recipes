@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
 import { Calendar, ChevronLeft, ChevronRight, Plus, ShoppingCart } from 'lucide-react';
-import { getCurrentWeekMealPlan, getMealPlans, createMealPlan } from '@/lib/meal-plan-api';
+import { getCurrentWeekMealPlan, createMealPlan } from '@/lib/meal-plan-api';
 import { getUser } from '@/lib/auth';
 import type { MealPlan } from '@/lib/types';
 import { useRouter } from 'next/navigation';

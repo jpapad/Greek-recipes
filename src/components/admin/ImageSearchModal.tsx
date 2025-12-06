@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, X, Loader2, Download, ExternalLink } from "lucide-react";
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GlassPanel } from "@/components/ui/GlassPanel";
@@ -149,9 +150,11 @@ export function ImageSearchModal({
                     className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer border-2 border-transparent hover:border-purple-400 transition-all"
                     onClick={() => setSelectedPhoto(photo)}
                   >
-                    <img
+                    <Image
                       src={photo.thumb}
-                      alt={photo.alt}
+                      alt={photo.alt || ''}
+                      width={400}
+                      height={400}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
@@ -184,9 +187,11 @@ export function ImageSearchModal({
             onClick={() => setSelectedPhoto(null)}
           >
             <div className="relative max-w-5xl max-h-[90vh]">
-              <img
+              <Image
                 src={selectedPhoto.url}
-                alt={selectedPhoto.alt}
+                alt={selectedPhoto.alt || ''}
+                width={selectedPhoto.width}
+                height={selectedPhoto.height}
                 className="max-w-full max-h-[80vh] object-contain rounded-lg"
               />
               <div className="absolute top-4 right-4 flex gap-2">

@@ -1,6 +1,6 @@
 // Meal Planning API functions for Supabase
 import { supabase } from './supabaseClient';
-import type { MealPlan, MealPlanItem, ShoppingList, ShoppingListItem, MealType } from './types';
+import type { MealPlan, MealPlanItem, ShoppingList, ShoppingListItem } from './types';
 
 // ==================== MEAL PLANS ====================
 

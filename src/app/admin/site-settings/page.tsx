@@ -7,7 +7,7 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, RotateCcw, Palette, Image, Sparkles, Type, Layout as LayoutIcon, Zap, Eye } from "lucide-react";
+import { Save, RotateCcw, Palette, Image as ImageIcon, Sparkles, Type, Layout as LayoutIcon, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SiteSettingsPage() {
@@ -22,10 +22,6 @@ export default function SiteSettingsPage() {
     const [glassmorphism, setGlassmorphism] = useState<GlassmorphismSettings | null>(null);
     const [typography, setTypography] = useState<TypographySettings | null>(null);
     const [spacing, setSpacing] = useState<SpacingSettings | null>(null);
-
-    useEffect(() => {
-        loadSettings();
-    }, []);
 
     async function loadSettings() {
         setLoading(true);
@@ -47,6 +43,10 @@ export default function SiteSettingsPage() {
 
         setLoading(false);
     }
+
+    useEffect(() => {
+        loadSettings();
+    }, []);
 
     async function handleSaveColors() {
         if (!colors) return;
@@ -155,7 +155,7 @@ export default function SiteSettingsPage() {
                         Χρώματα
                     </TabsTrigger>
                     <TabsTrigger value="backgrounds" className="gap-2">
-                        <Image className="w-4 h-4" />
+                        <ImageIcon className="w-4 h-4" />
                         Backgrounds
                     </TabsTrigger>
                     <TabsTrigger value="glass" className="gap-2">

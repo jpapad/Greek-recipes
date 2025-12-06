@@ -1,8 +1,7 @@
 import { getPrefectures } from "@/lib/api";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Plus, Edit } from "lucide-react";
 import Link from "next/link";
 
 // Force dynamic rendering so admin sees fresh DB data after edits/creates.

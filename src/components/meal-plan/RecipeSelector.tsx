@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Recipe } from "@/lib/types";
 import { getRecipes } from "@/lib/api";
 import { Search, X } from "lucide-react";

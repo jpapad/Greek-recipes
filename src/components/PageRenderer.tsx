@@ -25,17 +25,24 @@ interface PageRendererProps {
 }
 
 export default function PageRenderer({ page }: PageRendererProps) {
-    const TemplateWrapper = getTemplateWrapper(page.template);
-
-    return (
-        <TemplateWrapper>
-            <div className="space-y-6 sm:space-y-8 md:space-y-12">
-                {page.content.blocks.map((block, index) => (
-                    <BlockRenderer key={index} block={block} />
-                ))}
-            </div>
-        </TemplateWrapper>
+    const content = (
+        <div className="space-y-6 sm:space-y-8 md:space-y-12">
+            {page.content.blocks.map((block, index) => (
+                <BlockRenderer key={index} block={block} />
+            ))}
+        </div>
     );
+
+    switch (page.template) {
+        case 'full-width':
+            return <FullWidthTemplate>{content}</FullWidthTemplate>;
+        case 'sidebar-left':
+            return <SidebarLeftTemplate>{content}</SidebarLeftTemplate>;
+        case 'sidebar-right':
+            return <SidebarRightTemplate>{content}</SidebarRightTemplate>;
+        default:
+            return <DefaultTemplate>{content}</DefaultTemplate>;
+    }
 }
 
 function BlockRenderer({ block }: { block: ContentBlock }) {
@@ -81,18 +88,8 @@ function BlockRenderer({ block }: { block: ContentBlock }) {
     }
 }
 
-function getTemplateWrapper(template: string) {
-    switch (template) {
-        case 'full-width':
-            return FullWidthTemplate;
-        case 'sidebar-left':
-            return SidebarLeftTemplate;
-        case 'sidebar-right':
-            return SidebarRightTemplate;
-        default:
-            return DefaultTemplate;
-    }
-}
+// Template selection is handled directly in the renderer to avoid creating
+// components during render time (static component rule).
 
 function DefaultTemplate({ children }: { children: React.ReactNode }) {
     return (

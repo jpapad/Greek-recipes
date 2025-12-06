@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+
 import { getUser, signOut } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Shield, Mail } from "lucide-react";
+import { User, LogOut, Shield } from "lucide-react";
 import Link from "next/link";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export function UserMenu() {
-    const router = useRouter();
+    
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 

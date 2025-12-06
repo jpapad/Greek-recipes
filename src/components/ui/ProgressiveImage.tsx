@@ -51,6 +51,7 @@ export function ProgressiveImage({
             <Image
                 src={src}
                 fill
+                alt={alt}
                 {...imageProps}
             />
         );
@@ -62,6 +63,7 @@ export function ProgressiveImage({
                 src={src}
                 width={width}
                 height={height}
+                alt={alt}
                 {...imageProps}
             />
         );
@@ -72,6 +74,7 @@ export function ProgressiveImage({
         <Image
             src={src}
             fill
+            alt={alt}
             {...imageProps}
         />
     );

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { getAuthors, updateUserRole } from '@/lib/blog-api';
 import type { UserProfile } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
@@ -12,12 +11,8 @@ import { UserPlus, UserMinus } from 'lucide-react';
 export default function AuthorsManagementPage() {
   const [authors, setAuthors] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [newAuthorEmail, setNewAuthorEmail] = useState('');
+  
   const { showToast } = useToast();
-
-  useEffect(() => {
-    loadAuthors();
-  }, []);
 
   const loadAuthors = async () => {
     setLoading(true);
@@ -25,6 +20,10 @@ export default function AuthorsManagementPage() {
     setAuthors(data);
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadAuthors();
+  }, []);
 
   const toggleAuthorRole = async (userId: string, currentStatus: boolean) => {
     const result = await updateUserRole(userId, { is_author: !currentStatus });

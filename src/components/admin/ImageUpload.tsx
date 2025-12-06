@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { GlassPanel } from "@/components/ui/GlassPanel";
+ 
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+ 
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Upload, Link as LinkIcon } from "lucide-react";

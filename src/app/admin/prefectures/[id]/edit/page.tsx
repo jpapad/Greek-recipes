@@ -1,6 +1,6 @@
 import { getPrefectureById } from "@/lib/api";
 import { PrefectureForm } from "@/components/admin/PrefectureForm";
-import { notFound } from "next/navigation";
+ 
 import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';

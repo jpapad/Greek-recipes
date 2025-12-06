@@ -36,18 +36,12 @@ interface HierarchicalMapProps {
     regions: (Region & { lat: number; lng: number })[];
     prefectures: (Prefecture & { lat: number; lng: number })[];
     cities: (City & { lat: number; lng: number })[];
-    onRegionClick?: (slug: string) => void;
-    onPrefectureClick?: (slug: string) => void;
-    onCityClick?: (slug: string) => void;
 }
 
 export function HierarchicalMap({ 
     regions, 
     prefectures, 
     cities,
-    onRegionClick,
-    onPrefectureClick,
-    onCityClick 
 }: HierarchicalMapProps) {
     const [viewLevel, setViewLevel] = useState<ViewLevel>('regions');
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -70,9 +64,8 @@ export function HierarchicalMap({
     };
 
     const handleCityClick = (city: City & { lat: number; lng: number }) => {
-        if (onCityClick) {
-            onCityClick(city.slug);
-        }
+        setMapCenter([city.lat, city.lng]);
+        setMapZoom(12);
     };
 
     const goBack = () => {

@@ -3,7 +3,7 @@
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import Link from "next/link";
-import { Clock, X } from "lucide-react";
+import { Clock } from "lucide-react";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 
 export function RecentlyViewedWidget() {

@@ -3,7 +3,7 @@
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import Link from "next/link";
 import Image from "next/image";
-import { Facebook, Instagram, Twitter, Mail, MapPin, Phone, Heart } from "lucide-react";
+import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
 
 export function Footer() {

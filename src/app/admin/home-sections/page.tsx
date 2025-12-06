@@ -7,19 +7,15 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Plus, GripVertical, Eye, EyeOff, Pencil, Trash2, Save } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+ 
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 export default function HomeSectionsPage() {
-    const router = useRouter();
+    
     const [sections, setSections] = useState<HomeSection[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
-
-    useEffect(() => {
-        loadSections();
-    }, []);
 
     async function loadSections() {
         setLoading(true);
@@ -27,6 +23,10 @@ export default function HomeSectionsPage() {
         setSections(data);
         setLoading(false);
     }
+
+    useEffect(() => {
+        loadSections();
+    }, []);
 
     async function handleDragEnd(result: DropResult) {
         if (!result.destination) return;

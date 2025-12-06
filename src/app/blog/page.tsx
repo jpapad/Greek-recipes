@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { GlassPanel } from '@/components/ui/GlassPanel';
-import { Badge } from '@/components/ui/badge';
 import { getArticles, getArticleCategories } from '@/lib/blog-api';
-import { Calendar, Clock, Eye, User } from 'lucide-react';
+import { Calendar, Clock, Eye } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

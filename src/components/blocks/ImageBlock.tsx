@@ -1,6 +1,6 @@
 import { ImageBlock as ImageBlockType } from '@/lib/types/pages';
-import Image from 'next/image';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ImageBlock({ block }: { block: ImageBlockType }) {
     const widthClass = {
@@ -11,11 +11,12 @@ export default function ImageBlock({ block }: { block: ImageBlockType }) {
 
     const imageElement = (
         <div className={`relative ${widthClass} overflow-hidden rounded-lg`}>
-            <img
+            <Image
                 src={block.data.url}
-                alt={block.data.alt}
+                alt={block.data.alt || ''}
+                width={1200}
+                height={800}
                 className="w-full h-auto object-cover"
-                loading="lazy"
             />
             {block.data.caption && (
                 <p className="text-xs sm:text-sm text-center text-muted-foreground mt-2 px-2">

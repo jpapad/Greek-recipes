@@ -11,7 +11,7 @@ import { getCollections, updateCollection, getCollectionRecipes, addRecipeToColl
 import { getRecipes } from '@/lib/api';
 import { ArrowLeft, Globe, Lock, Plus, X, Search } from 'lucide-react';
 import Link from 'next/link';
-import type { Collection, Recipe, CollectionRecipe } from '@/lib/types';
+import type { Recipe, CollectionRecipe } from '@/lib/types';
 
 export default function EditCollectionPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();

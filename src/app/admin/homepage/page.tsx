@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getHomepageSettingBySection, updateHomepageSetting } from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Save, ChefHat, MapPin, Star, Salad, Utensils, Cake, Coffee } from "lucide-react";
+import { Plus, Trash2, Save } from "lucide-react";
 import type { StatsContent, CategoriesContent, NewsletterContent, StatItem, CategoryItem } from "@/lib/types/homepage";
 
 export default function HomepageSettingsPage() {
@@ -41,10 +41,6 @@ export default function HomepageSettingsPage() {
         privacyText: ''
     });
 
-    useEffect(() => {
-        loadSettings();
-    }, []);
-
     async function loadSettings() {
         setLoading(true);
         
@@ -60,6 +56,10 @@ export default function HomepageSettingsPage() {
 
         setLoading(false);
     }
+
+    useEffect(() => {
+        loadSettings();
+    }, []);
 
     async function handleSave() {
         setSaving(true);

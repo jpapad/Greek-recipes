@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getRecipes, getRegions, getPrefectures, getCities } from "@/lib/api";
 import { getArticles } from "@/lib/blog-api";
 import { GlassPanel } from "@/components/ui/GlassPanel";
-import { UtensilsCrossed, MapPin, TrendingUp, Building2, Home, FileText } from "lucide-react";
+import { UtensilsCrossed, MapPin, Building2, Home, FileText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ApiUsageTracker } from "@/components/admin/ApiUsageTracker";

@@ -1,7 +1,6 @@
 'use client';
 
 import { ArticleForm } from '@/components/admin/ArticleForm';
-import { GlassPanel } from '@/components/ui/GlassPanel';
 
 export default function NewArticlePage() {
   return (

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Recipe } from "@/lib/types";
 import { RecipeCard } from "./RecipeCard";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 import { supabase } from "@/lib/supabaseClient";
 
 interface RelatedRecipesProps {

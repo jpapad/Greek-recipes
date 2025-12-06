@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Utensils } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 

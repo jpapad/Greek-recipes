@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { GlassPanel } from '@/components/ui/GlassPanel';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { getRecipes } from '@/lib/api';
@@ -20,16 +19,16 @@ export function AddRecipeToMealModal({ date, mealType, onSelect, onClose }: AddR
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadRecipes();
-  }, [search]);
-
   async function loadRecipes() {
     setLoading(true);
     const data = await getRecipes({ search });
     setRecipes(data.slice(0, 20));
     setLoading(false);
   }
+
+  useEffect(() => {
+    loadRecipes();
+  }, [search]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">

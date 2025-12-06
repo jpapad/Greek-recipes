@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { GlassPanel } from '@/components/ui/GlassPanel';
-import { Button } from '@/components/ui/button';
 import { Plus, Check, Trash2, Coffee, Sun, Moon, Cookie } from 'lucide-react';
 import type { MealPlan, MealType, MealPlanItem } from '@/lib/types';
 import { addMealPlanItem, deleteMealPlanItem, toggleMealCompleted } from '@/lib/meal-plan-api';

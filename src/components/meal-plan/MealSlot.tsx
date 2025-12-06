@@ -4,7 +4,7 @@ import { useMealPlan, MealType } from "@/context/MealPlanContext";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Plus, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+ 
 
 interface MealSlotProps {
     day: number;

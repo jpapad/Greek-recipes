@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 import { RecipeCard } from "./RecipeCard";
 import { getRecipes } from "@/lib/api";
 import type { Recipe } from "@/lib/types";

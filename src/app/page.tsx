@@ -3,9 +3,8 @@ import { getArticles } from "@/lib/blog-api";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import Link from "next/link";
-import { ArrowRight, ChefHat, MapPin, Clock, Users, Star, BookOpen, Utensils, Cake, Salad, Coffee } from "lucide-react";
+import { ArrowRight, ChefHat, MapPin, Star, BookOpen, Utensils, Cake, Salad, Coffee } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { HeroSlider } from "@/components/layout/HeroSlider";
 import type { StatsContent, CategoriesContent, NewsletterContent } from "@/lib/types/homepage";
 

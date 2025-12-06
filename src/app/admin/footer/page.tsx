@@ -47,10 +47,6 @@ export default function FooterSettingsPage() {
         ]
     });
 
-    useEffect(() => {
-        loadSettings();
-    }, []);
-
     const loadSettings = async () => {
         setLoading(true);
         
@@ -70,6 +66,10 @@ export default function FooterSettingsPage() {
 
         setLoading(false);
     };
+
+    useEffect(() => {
+        loadSettings();
+    }, []);
 
     const handleSave = async () => {
         setSaving(true);

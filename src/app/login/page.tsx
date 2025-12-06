@@ -1,20 +1,18 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
-import Image from "next/image";
 import { Mail, Lock, ArrowRight, Facebook } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
 
 function LoginForm() {
     const { t } = useTranslations();
-    const router = useRouter();
     const searchParams = useSearchParams();
     const { showToast } = useToast();
     const [email, setEmail] = useState("");
@@ -24,7 +22,6 @@ function LoginForm() {
 
     // Check for admin access error
     const adminError = searchParams.get('error') === 'admin_access_required';
-    const fromAdmin = searchParams.get('redirect')?.startsWith('/admin');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

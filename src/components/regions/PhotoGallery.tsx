@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { X, ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 import { GlassPanel } from "@/components/ui/GlassPanel";
-import { Button } from "@/components/ui/button";
 
 interface PhotoGalleryProps {
   photos: string[];

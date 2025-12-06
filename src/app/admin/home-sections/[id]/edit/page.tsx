@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getHomeSectionById, createHomeSection, updateHomeSection } from "@/lib/api";
-import { HomeSection, SectionType } from "@/lib/types/home-sections";
+import { SectionType } from "@/lib/types/home-sections";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,12 +40,6 @@ export default function HomeSectionFormPage() {
         display_order: 999
     });
 
-    useEffect(() => {
-        if (isEditing) {
-            loadSection();
-        }
-    }, [sectionId]);
-
     async function loadSection() {
         if (!sectionId) return;
         
@@ -63,6 +57,12 @@ export default function HomeSectionFormPage() {
         }
         setLoading(false);
     }
+
+    useEffect(() => {
+        if (isEditing) {
+            loadSection();
+        }
+    }, [sectionId]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

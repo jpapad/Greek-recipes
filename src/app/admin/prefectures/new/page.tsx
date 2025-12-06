@@ -1,5 +1,4 @@
 import { PrefectureForm } from "@/components/admin/PrefectureForm";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 
 export default function NewPrefecturePage() {
     return (

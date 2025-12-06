@@ -35,6 +35,34 @@ interface TiptapEditorProps {
   placeholder?: string;
 }
 
+function ToolbarButton({ 
+  onClick, 
+  active, 
+  disabled, 
+  icon: Icon, 
+  title 
+}: { 
+  onClick: () => void; 
+  active?: boolean; 
+  disabled?: boolean; 
+  icon: any; 
+  title: string;
+}) {
+  return (
+    <Button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      variant={active ? 'default' : 'ghost'}
+      size="sm"
+      className="h-8 w-8 p-0"
+      title={title}
+    >
+      <Icon className="h-4 w-4" />
+    </Button>
+  );
+}
+
 export function TiptapEditor({ content, onChange, placeholder = 'Ξεκινήστε να γράφετε...' }: TiptapEditorProps) {
   const [showImageDialog, setShowImageDialog] = useState(false);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
@@ -99,31 +127,7 @@ export function TiptapEditor({ content, onChange, placeholder = 'Ξεκινήσ�
     }
   };
 
-  const ToolbarButton = ({ 
-    onClick, 
-    active, 
-    disabled, 
-    icon: Icon, 
-    title 
-  }: { 
-    onClick: () => void; 
-    active?: boolean; 
-    disabled?: boolean; 
-    icon: any; 
-    title: string;
-  }) => (
-    <Button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      variant={active ? 'default' : 'ghost'}
-      size="sm"
-      className="h-8 w-8 p-0"
-      title={title}
-    >
-      <Icon className="h-4 w-4" />
-    </Button>
-  );
+  
 
   return (
     <div className="border rounded-lg overflow-hidden bg-background">

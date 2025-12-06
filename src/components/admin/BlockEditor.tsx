@@ -8,10 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { 
-    Plus, Trash2, GripVertical, ChevronUp, ChevronDown,
-    Type, AlignLeft, Image as ImageIcon, Video, Code,
-    Quote, List, Minus, Space, MousePointer, Columns,
-    Sparkles, Mail, MapPin, UtensilsCrossed, Map, FileCode
+    Plus, Trash2, GripVertical, ChevronUp, ChevronDown, Sparkles
 } from 'lucide-react';
 
 interface BlockEditorProps {

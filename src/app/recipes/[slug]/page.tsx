@@ -24,8 +24,7 @@ import { RecentlyViewedWidget } from "@/components/recipes/RecentlyViewedWidget"
 import { RecentlyViewedTracker } from "@/components/recipes/RecentlyViewedTracker";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { generateRecipeSchema, generateBreadcrumbSchema } from "@/lib/schema";
-import { UnitConverter } from "@/components/recipes/UnitConverter";
-import { SimilarRecipes } from "@/components/recipes/SimilarRecipes";
+ 
 import { AllergenBadges } from "@/components/recipes/AllergenBadges";
 import { AIRecipeAssistant } from "@/components/recipes/AIRecipeAssistant";
 

@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Languages } from "lucide-react";
-import { useRouter, usePathname } from "next/navigation";
+ 
 
 export function LanguageSwitcher() {
     const [locale, setLocale] = useState('el');
     const [mounted, setMounted] = useState(false);
-    const router = useRouter();
-    const pathname = usePathname();
+    
 
     useEffect(() => {
         setMounted(true);

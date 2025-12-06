@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+ 
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +28,6 @@ import {
 import type { ShoppingList, ShoppingListItem } from "@/lib/types";
 
 export default function ShoppingListPage() {
-  const router = useRouter();
   const [userId, setUserId] = useState<string | null>(null);
   const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
   const [loading, setLoading] = useState(true);

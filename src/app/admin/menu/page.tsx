@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getAllMenuItems, deleteMenuItem, toggleMenuItem, reorderMenuItems, createMenuItem, updateMenuItem } from '@/lib/api';
+ 
+import { getAllMenuItems, deleteMenuItem, toggleMenuItem, createMenuItem, updateMenuItem } from '@/lib/api';
 import { MenuItem } from '@/lib/types/pages';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function MenuAdminPage() {
-    const router = useRouter();
+    
     const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [locationFilter, setLocationFilter] = useState<string>('all');
@@ -37,16 +37,16 @@ export default function MenuAdminPage() {
         css_class: ''
     });
 
-    useEffect(() => {
-        loadMenuItems();
-    }, []);
-
     async function loadMenuItems() {
         setLoading(true);
         const data = await getAllMenuItems();
         setMenuItems(data);
         setLoading(false);
     }
+
+    useEffect(() => {
+        loadMenuItems();
+    }, []);
 
     async function handleDelete(id: string, label: string) {
         if (!confirm(`Διαγραφή του "${label}" και όλων των υπο-στοιχείων;`)) return;

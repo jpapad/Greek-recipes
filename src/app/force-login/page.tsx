@@ -6,10 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth";
-import { useRouter } from "next/navigation";
-
 export default function ForceLoginPage() {
-    const router = useRouter();
+    
     const [email, setEmail] = useState("jpapad85@gmail.com");
     const [password, setPassword] = useState("");
     const [checkResult, setCheckResult] = useState<any>(null);

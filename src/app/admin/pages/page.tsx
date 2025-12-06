@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { getPages, deletePage, publishPage, duplicatePage, setHomepage } from '@/lib/api';
 import { Page } from '@/lib/types/pages';
 import { GlassPanel } from '@/components/ui/GlassPanel';
@@ -15,15 +14,11 @@ import {
 } from 'lucide-react';
 
 export default function PagesAdminPage() {
-    const router = useRouter();
+    
     const [pages, setPages] = useState<Page[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
-
-    useEffect(() => {
-        loadPages();
-    }, []);
 
     async function loadPages() {
         setLoading(true);
@@ -31,6 +26,10 @@ export default function PagesAdminPage() {
         setPages(data);
         setLoading(false);
     }
+
+    useEffect(() => {
+        loadPages();
+    }, []);
 
     async function handleDelete(id: string, title: string) {
         if (!confirm(`Διαγραφή σελίδας "${title}";`)) return;

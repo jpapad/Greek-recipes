@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GlassPanel } from "@/components/ui/GlassPanel";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { Recipe } from "@/lib/types";
 import { getSimilarRecipes } from "@/lib/recommendations";
