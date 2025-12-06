@@ -44,7 +44,7 @@ export default async function AdminPrefecturesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/prefectures/${prefecture.id}/edit`}>
+                                    <Link href={`/admin/prefectures/${encodeURIComponent(String(prefecture.id))}/edit`}>
                                         <Button variant="outline" size="sm">
                                             <Edit className="w-4 h-4 mr-2" />
                                             Edit
