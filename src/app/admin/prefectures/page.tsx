@@ -3,6 +3,7 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
+import PrefectureEditButtonClient from "@/components/admin/PrefectureEditButtonClient";
 
 // Force dynamic rendering so admin sees fresh DB data after edits/creates.
 export const dynamic = 'force-dynamic';
@@ -54,12 +55,8 @@ export default async function AdminPrefecturesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/prefectures/${safeId}/edit`}>
-                                        <Button variant="outline" size="sm">
-                                            <Edit className="w-4 h-4 mr-2" />
-                                            Edit
-                                        </Button>
-                                    </Link>
+                                    {/* Client-side debug button logs the prefecture object and href before navigation */}
+                                    <PrefectureEditButtonClient prefecture={prefecture} />
                                 </div>
                             </div>
                         </GlassPanel>
