@@ -132,36 +132,7 @@ export default function RootLayout({
             To ensure preview users see the updated manifest and SW behavior immediately, run a
             one-time unregister+cache-clear on vercel preview hosts before registering the new SW.
             This code only runs when the hostname contains 'vercel.app'. */}
-        <Script id="preview-unregister-sw" strategy="afterInteractive">
-          {`
-            try {
-              // Only run once per browser session to avoid reload loops.
-              if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') && !sessionStorage.getItem('swCleanupDone')) {
-                (async () => {
-                  console.log('Preview detected: unregistering service workers and clearing caches (one-time)');
-                  try {
-                    const regs = await navigator.serviceWorker.getRegistrations();
-                    await Promise.all(regs.map(r => r.unregister()));
-                  } catch (e) {
-                    console.warn('Error unregistering SWs:', e);
-                  }
-                  try {
-                    const keys = await caches.keys();
-                    await Promise.all(keys.map(k => caches.delete(k)));
-                  } catch (e) {
-                    console.warn('Error clearing caches:', e);
-                  }
-                  // mark as done for this session so we don't loop
-                  try { sessionStorage.setItem('swCleanupDone', '1'); } catch (e) { /* ignore */ }
-                  // reload so the page fetches fresh assets (including manifest)
-                  try { location.reload(); } catch (e) { /* ignore */ }
-                })();
-              }
-            } catch (e) {
-              console.warn('Preview SW cleanup script error', e);
-            }
-          `}
-        </Script>
+        {/* Removed one-time preview unregister script to avoid reload loops. */}
 
         <Script id="register-sw" strategy="afterInteractive">
           {`
