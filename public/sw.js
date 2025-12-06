@@ -8,7 +8,8 @@ const IMAGE_CACHE = 'greek-recipes-images-v2';
 // Static assets to cache on install
 const STATIC_ASSETS = [
   '/',
-  '/manifest.json',
+  // Note: don't pre-cache manifest.json here to avoid persisting stale 401 responses
+  // (manifest will be handled with a network-first strategy below).
 ];
 
 // Install event - cache static assets
@@ -62,6 +63,12 @@ self.addEventListener('fetch', (event) => {
 
   // API requests - Network first, fallback to cache
   if (url.pathname.startsWith('/api/')) {
+    event.respondWith(networkFirst(request, DYNAMIC_CACHE));
+    return;
+  }
+
+  // Manifest: prefer network (so we don't serve a previously cached 401). Cache only successful responses.
+  if (url.pathname === '/manifest.json' || url.pathname === '/manifest.webmanifest') {
     event.respondWith(networkFirst(request, DYNAMIC_CACHE));
     return;
   }
