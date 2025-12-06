@@ -31,7 +31,16 @@ export default async function AdminPrefecturesPage() {
                         <p className="text-muted-foreground">No prefectures found. Create one to get started!</p>
                     </GlassPanel>
                 ) : (
-                    prefectures.map((prefecture) => (
+                    prefectures.map((prefecture) => {
+                        // Defensive: ensure id is a plain UUID string. In some preview cases
+                        // an id value was observed to contain a full URL (likely from
+                        // accidental client mutation or caching). Extract a UUID if present
+                        // so the Link href is always well-formed.
+                        const rawId = String(prefecture.id ?? '');
+                        const uuidMatch = rawId.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                        const safeId = uuidMatch ? uuidMatch[0] : encodeURIComponent(rawId);
+
+                        return (
                         <GlassPanel key={prefecture.id} className="p-6">
                             <div className="flex items-center justify-between">
                                 <div>
@@ -45,7 +54,7 @@ export default async function AdminPrefecturesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/prefectures/${encodeURIComponent(String(prefecture.id))}/edit`}>
+                                    <Link href={`/admin/prefectures/${safeId}/edit`}>
                                         <Button variant="outline" size="sm">
                                             <Edit className="w-4 h-4 mr-2" />
                                             Edit
@@ -54,7 +63,7 @@ export default async function AdminPrefecturesPage() {
                                 </div>
                             </div>
                         </GlassPanel>
-                    ))
+                    )})
                 )}
             </div>
         </div>
