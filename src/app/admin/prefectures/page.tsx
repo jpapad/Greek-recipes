@@ -39,6 +39,7 @@ export default async function AdminPrefecturesPage() {
                                     <p className="text-sm text-muted-foreground">
                                         Region: {prefecture.region?.name || 'N/A'} • Slug: {prefecture.slug}
                                     </p>
+                                        <p className="text-xs text-muted-foreground mt-1">ID: {String(prefecture.id)}</p>
                                     {prefecture.description && (
                                         <p className="text-sm mt-2">{prefecture.description}</p>
                                     )}
