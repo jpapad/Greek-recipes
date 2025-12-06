@@ -7,12 +7,19 @@ export const dynamic = 'force-dynamic';
 
 export default async function EditPrefecturePage({ params }: { params: Record<string, any> }) {
     // Defensive: Next's internal named capture groups can sometimes use a different
-    // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks.
-    let id: string | undefined = params?.id ?? params?.nxtPid ?? params?.nxtPid;
+    // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks
+    // and be tolerant of encoded values, full URLs, or accidental literal
+    // strings like "undefined". Extract a UUID if present.
+    let id: string | undefined = params?.id ?? params?.nxtPid ?? Object.values(params || {})[0];
 
-    // Guard against literal strings "undefined" or "null"
-    if (typeof id === 'string' && (id === 'undefined' || id === 'null')) {
-        id = undefined;
+    if (typeof id === 'string') {
+        id = decodeURIComponent(id).trim();
+        if (id === 'undefined' || id === 'null' || id === '') {
+            id = undefined;
+        } else {
+            const uuidMatch = id.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+            if (uuidMatch) id = uuidMatch[0];
+        }
     }
 
     const prefecture = id ? await getPrefectureById(id) : null;
