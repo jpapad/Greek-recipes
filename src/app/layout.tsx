@@ -135,9 +135,10 @@ export default function RootLayout({
         <Script id="preview-unregister-sw" strategy="afterInteractive">
           {`
             try {
-              if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+              // Only run once per browser session to avoid reload loops.
+              if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') && !sessionStorage.getItem('swCleanupDone')) {
                 (async () => {
-                  console.log('Preview detected: unregistering service workers and clearing caches');
+                  console.log('Preview detected: unregistering service workers and clearing caches (one-time)');
                   try {
                     const regs = await navigator.serviceWorker.getRegistrations();
                     await Promise.all(regs.map(r => r.unregister()));
@@ -150,6 +151,8 @@ export default function RootLayout({
                   } catch (e) {
                     console.warn('Error clearing caches:', e);
                   }
+                  // mark as done for this session so we don't loop
+                  try { sessionStorage.setItem('swCleanupDone', '1'); } catch (e) { /* ignore */ }
                   // reload so the page fetches fresh assets (including manifest)
                   try { location.reload(); } catch (e) { /* ignore */ }
                 })();
