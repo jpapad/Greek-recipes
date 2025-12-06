@@ -376,7 +376,28 @@ export async function getPrefectures(regionId?: string): Promise<Prefecture[]> {
         console.error('Error fetching prefectures:', error);
         return [];
     }
-    return data || [];
+    // Defensive sanitization: ensure `id` is a plain UUID string when possible.
+    // In some preview/cache situations an `id` value was observed to contain
+    // an injected URL or other payload. Extract a UUID if present, otherwise
+    // leave the original string (it will be URL-encoded where used).
+    const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+    const safeData = (data || []).map((row: any) => {
+        try {
+            const rawId = String(row.id ?? '');
+            const m = rawId.match(uuidRegex);
+            if (m) {
+                row.id = m[0];
+            } else {
+                row.id = rawId;
+            }
+        } catch (e) {
+            // If anything goes wrong, leave id as-is and continue.
+            console.error('Error sanitizing prefecture id', e);
+        }
+        return row;
+    });
+
+    return safeData;
 }
 
 export async function getPrefectureBySlug(slug: string): Promise<Prefecture | null> {
