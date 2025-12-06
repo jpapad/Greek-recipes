@@ -5,8 +5,15 @@ import { supabase } from '@/lib/supabaseClient';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPrefecturePage({ params }: { params: { id: string } }) {
-    const id = params?.id;
+export default async function EditPrefecturePage({ params }: { params: Record<string, any> }) {
+    // Defensive: Next's internal named capture groups can sometimes use a different
+    // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks.
+    let id: string | undefined = params?.id ?? params?.nxtPid ?? params?.nxtPid;
+
+    // Guard against literal strings "undefined" or "null"
+    if (typeof id === 'string' && (id === 'undefined' || id === 'null')) {
+        id = undefined;
+    }
 
     const prefecture = id ? await getPrefectureById(id) : null;
 
@@ -35,6 +42,7 @@ export default async function EditPrefecturePage({ params }: { params: { id: str
             <p className="text-muted-foreground">No prefecture could be fetched for id <code>{String(id)}</code>.</p>
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
                 <h3 className="font-semibold">Route Params (raw)</h3>
+                <p className="text-xs mt-1">Param keys: {JSON.stringify(Object.keys(params || {}))}</p>
                 <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(params, null, 2)}</pre>
             </div>
             <div className="bg-red-50 border border-red-200 p-4 rounded">
