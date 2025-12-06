@@ -53,12 +53,29 @@ export default function ForceLoginPage() {
             setStep(3);
             // Step 2: Login
             const result = await signIn(email, password);
-            
+
             if (!result?.user) {
                 alert('Login failed!');
                 setLoading(false);
                 setStep(1);
                 return;
+            }
+
+            // If signIn returned a session, send tokens to server to set cookies
+            const access_token = result?.session?.access_token ?? null;
+            const refresh_token = result?.session?.refresh_token ?? null;
+
+            if (access_token) {
+                try {
+                    await fetch('/api/auth/set-session', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ access_token, refresh_token }),
+                        credentials: 'include',
+                    });
+                } catch (err) {
+                    console.warn('Set-session failed:', err);
+                }
             }
             
             setStep(4);
