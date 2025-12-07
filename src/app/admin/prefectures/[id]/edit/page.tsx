@@ -62,7 +62,7 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
     }
 
     // If we get here, the prefecture wasn't returned. Surface Supabase diagnostic info
-    // and the raw `params` object so we can see what Next provided for debugging.
+    // and the raw `params` / `searchParams` objects so we can see what Next provided for debugging.
     const { data: raw, error } = await supabase
         .from('prefectures')
         .select('*, region:region_id(*)')
@@ -82,6 +82,9 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
                 <h3 className="font-semibold">Route Params (raw)</h3>
                 <p className="text-xs mt-1">Param keys: {JSON.stringify(Object.keys(params || {}))}</p>
                 <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(params, null, 2)}</pre>
+                <h3 className="font-semibold mt-3">Search Params (raw)</h3>
+                <p className="text-xs mt-1">Search param keys: {JSON.stringify(Object.keys(searchParams || {}))}</p>
+                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(searchParams || null, null, 2)}</pre>
             </div>
             <div className="bg-red-50 border border-red-200 p-4 rounded">
                 <h2 className="font-semibold">Diagnostic</h2>
