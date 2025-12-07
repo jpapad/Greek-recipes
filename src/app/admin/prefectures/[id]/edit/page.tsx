@@ -2,6 +2,7 @@ import { getPrefectureById } from "@/lib/api";
 import { PrefectureForm } from "@/components/admin/PrefectureForm";
  
 import { supabase } from '@/lib/supabaseClient';
+import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,10 @@ export default async function EditPrefecturePage({ params }: { params: Record<st
         .select('*, region:region_id(*)')
         .eq('id', id);
 
+    // Collect server-side view of headers and cookie names (do not dump cookie values)
+    const serverHeaders = Object.fromEntries(nextHeaders().entries());
+    const serverCookieNames = nextCookies().getAll().map((c) => c.name);
+
     return (
         <div className="space-y-6 p-6">
             <h1 className="text-2xl font-bold">Prefecture Not Found</h1>
@@ -56,7 +61,7 @@ export default async function EditPrefecturePage({ params }: { params: Record<st
                 <h2 className="font-semibold">Diagnostic</h2>
                 <p className="text-sm text-muted-foreground mt-2">The page attempted to fetch the prefecture via server-side Supabase. Below is the raw response from Supabase (for debugging only).</p>
                 <pre className="mt-3 overflow-auto text-xs bg-white p-3 rounded">
-{JSON.stringify({ raw: raw || null, supabaseError: error || null }, null, 2)}
+{JSON.stringify({ raw: raw || null, supabaseError: error || null, serverHeaders, serverCookieNames }, null, 2)}
                 </pre>
             </div>
             <div>
