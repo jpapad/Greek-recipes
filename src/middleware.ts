@@ -26,6 +26,12 @@ export async function middleware(request: NextRequest) {
     const locale = request.cookies.get('NEXT_LOCALE')?.value || 'el';
     response.headers.set('x-locale', locale);
 
+    // Ensure the login page isn't cached at the edge (avoid stale cached login HTML)
+    if (pathname === '/login' || pathname.startsWith('/login?') || pathname.startsWith('/login/')) {
+        response.headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
+        return response
+    }
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -84,7 +90,12 @@ export async function middleware(request: NextRequest) {
             console.log('❌ No user found - redirecting to login')
             const loginUrl = new URL('/login', request.url)
             loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-            return NextResponse.redirect(loginUrl)
+            return NextResponse.redirect(loginUrl, {
+                headers: {
+                    // Prevent edge or service caching of the unauthenticated redirect
+                    'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
+                },
+            })
         }
 
         // Check if user is admin - be more flexible with the check
@@ -101,10 +112,16 @@ export async function middleware(request: NextRequest) {
             const loginUrl = new URL('/login', request.url)
             loginUrl.searchParams.set('error', 'admin_access_required')
             loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-            return NextResponse.redirect(loginUrl)
+            return NextResponse.redirect(loginUrl, {
+                headers: {
+                    'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
+                },
+            })
         }
         
         console.log('✅ Admin access granted')
+        // Ensure admin responses are not cached at the edge
+        response.headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
     }
 
     return response
