@@ -16,10 +16,8 @@ function extractIdFromParams(params: Record<string, any>) {
         return dec;
     } catch (e) {
         return String(raw || "");
-    }
-}
-
-export default async function EditCityPage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
+                )}
+            </div>
     const cities = await getCities();
     // Prefer route params, fall back to query string `searchParams.id` if present
     const idFromParams = extractIdFromParams(params || {});
