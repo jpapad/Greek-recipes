@@ -97,7 +97,6 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
             <div className="p-4 bg-blue-50 border rounded">
                 <h3 className="font-semibold">Client-side fallback</h3>
                 <p className="text-sm text-muted-foreground mt-1">If server params were empty, the client fallback will try to load the prefecture from the browser URL.</p>
-                {/* @ts-expect-error Server -> client component rendering intentionally */}
                 <ClientPrefectureLoader fallbackId={id} />
             </div>
             <div>

@@ -68,7 +68,6 @@ export default async function EditCityPage({ params, searchParams }: { params: R
                     <h3 className="font-semibold">Client-side fallback</h3>
                     <p className="text-sm text-muted-foreground mt-1">Client fallback will try to load the city from the browser URL if server params were empty.</p>
                     {/* Render client component for fallback */}
-                    {/* @ts-expect-error Server -> client component rendering intentionally */}
                     <ClientCityLoader />
                 </div>
             </div>
