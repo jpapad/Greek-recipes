@@ -2,6 +2,20 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+    // Early-return for static/public assets to avoid running auth logic
+    const pathname = request.nextUrl.pathname;
+    if (
+        pathname.startsWith('/_next') ||
+        pathname.startsWith('/api') ||
+        pathname === '/manifest.json' ||
+        pathname === '/manifest.webmanifest' ||
+        pathname === '/sw.js' ||
+        pathname.startsWith('/_next/static') ||
+        pathname.match(/\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$/)
+    ) {
+        return NextResponse.next();
+    }
+
     let response = NextResponse.next({
         request: {
             headers: request.headers,

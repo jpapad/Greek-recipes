@@ -123,19 +123,24 @@ async function cacheFirst(request, cacheName) {
 // Network-first strategy
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-
   try {
     const response = await fetch(request);
-    if (response.ok) {
-      cache.put(request, response.clone());
+
+    // Treat non-OK responses as failures so we don't cache/serve 4xx/5xx
+    if (!response || !response.ok) {
+      throw new Error('Network error or non-OK response');
     }
+
+    // Only cache successful responses
+    cache.put(request, response.clone());
     return response;
-  } catch {
+  } catch (err) {
+    // If network failed or returned non-OK, try to serve cached value instead
     const cached = await cache.match(request);
     if (cached) {
       return cached;
     }
-    
+
     // Return offline page for navigation requests
     if (request.mode === 'navigate') {
       const offlinePage = await cache.match('/offline');
