@@ -53,10 +53,8 @@ export default async function EditCityPage({ params, searchParams }: { params: R
         const serverCookieNames = _cookies.getAll().map((c) => c.name);
         return (
             <div className="space-y-8">
-                <div>
-                    <h1 className="text-3xl font-bold">City Not Found</h1>
-                    <p className="text-muted-foreground mt-1">Could not find a city matching the provided id.</p>
                 </div>
+            </div>
                 <div className="p-4 bg-red-50 border border-red-100 rounded">
                     <pre className="text-sm whitespace-pre-wrap">{JSON.stringify({ params, extractedId: id, serverHeaders, serverCookieNames }, null, 2)}</pre>
                 </div>
