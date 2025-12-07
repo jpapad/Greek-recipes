@@ -1,12 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type React from "react";
 import { Region, Prefecture, City } from "@/lib/types";
+import type { HierarchicalMapProps } from './HierarchicalMap';
 
 // Import hierarchical map dynamically
 const HierarchicalMap = dynamic(
     () => import("@/components/regions/HierarchicalMap").then((mod) => mod.HierarchicalMap),
-    { 
+    {
         ssr: false,
         loading: () => (
             <div className="h-[600px] w-full bg-gradient-to-br from-primary/10 to-blue-100/50 rounded-2xl animate-pulse flex items-center justify-center">
@@ -14,7 +16,7 @@ const HierarchicalMap = dynamic(
             </div>
         )
     }
-);
+) as unknown as React.ComponentType<HierarchicalMapProps>;
 
 interface HierarchicalMapSectionProps {
     regions: (Region & { lat: number; lng: number })[];

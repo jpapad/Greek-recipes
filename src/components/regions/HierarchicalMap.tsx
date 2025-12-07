@@ -32,16 +32,22 @@ const cityIcon = createCustomIcon('#10b981'); // Green for cities
 
 type ViewLevel = 'regions' | 'prefectures' | 'cities';
 
-interface HierarchicalMapProps {
+export interface HierarchicalMapProps {
     regions: (Region & { lat: number; lng: number })[];
     prefectures: (Prefecture & { lat: number; lng: number })[];
     cities: (City & { lat: number; lng: number })[];
+    onRegionClick?: (id: string) => void;
+    onPrefectureClick?: (id: string) => void;
+    onCityClick?: (slug: string) => void;
 }
 
 export function HierarchicalMap({ 
     regions, 
     prefectures, 
     cities,
+    onRegionClick,
+    onPrefectureClick,
+    onCityClick,
 }: HierarchicalMapProps) {
     const [viewLevel, setViewLevel] = useState<ViewLevel>('regions');
     const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -66,6 +72,7 @@ export function HierarchicalMap({
     const handleCityClick = (city: City & { lat: number; lng: number }) => {
         setMapCenter([city.lat, city.lng]);
         setMapZoom(12);
+        if (onCityClick) onCityClick(city.slug);
     };
 
     const goBack = () => {
