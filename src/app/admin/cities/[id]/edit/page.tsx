@@ -66,38 +66,39 @@ const cities = await getCities();
                     <h3 className="font-semibold">Client-side fallback</h3>
                     <p className="text-sm text-muted-foreground mt-1">Client fallback will try to load the city from the browser URL if server params were empty.</p>
                     {/* Small client component inline to avoid adding extra files */}
-                    <script suppressHydrationWarning={true} dangerouslySetInnerHTML={{ __html: `(${function() {
-                        const container = document.currentScript?.parentElement;
-                        if (!container) return;
-                        async function run() {
-                            try {
-                                const url = new URL(window.location.href);
-                                const qp = url.searchParams.get('id');
-                                let id = qp || (url.pathname.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/) || [])[0];
-                                if (!id) return;
-                                const res = await fetch('/api/debug/cities/' + id);
-                                if (!res.ok) return;
-                                const data = await res.json();
-                                const pre = document.createElement('pre');
-                                pre.className = 'mt-2 text-sm bg-white p-3 rounded';
-                                pre.textContent = JSON.stringify(data, null, 2);
-                                container.appendChild(pre);
-                            } catch(e) {}
-                        }
-                        run();
-                    }.toString()})()` }} />
+                    <script suppressHydrationWarning={true} dangerouslySetInnerHTML={{ __html: `(function(){
+                        try{
+                            var container = (document.currentScript && document.currentScript.parentElement);
+                            if (!container) return;
+                            (async function(){
+                                try{
+                                    var url = new URL(window.location.href);
+                                    var qp = url.searchParams.get('id');
+                                    var id = qp || ((url.pathname.match(new RegExp('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'))||[])[0]);
+                                    if(!id) return;
+                                    var res = await fetch('/api/debug/cities/' + id);
+                                    if(!res.ok) return;
+                                    var data = await res.json();
+                                    var pre = document.createElement('pre');
+                                    pre.className = 'mt-2 text-sm bg-white p-3 rounded';
+                                    pre.textContent = JSON.stringify(data, null, 2);
+                                    container.appendChild(pre);
+                                }catch(e){}
+                            })();
+                        }catch(e){}
+                    })();` }} />
                 </div>
                 {!id && (
                     <script
-                        dangerouslySetInnerHTML={{ __html: `(() => {
-                            try {
-                                const m = location.pathname.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
-                                if (m && m[0]) {
-                                    const uid = m[0];
-                                    const u = new URL(location.href);
-                                    if (!u.searchParams.get('id')) { u.searchParams.set('id', uid); location.replace(u.toString()); }
+                        dangerouslySetInnerHTML={{ __html: `(function(){
+                            try{
+                                var m = location.pathname.match(new RegExp('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'));
+                                if(m && m[0]){
+                                    var uid = m[0];
+                                    var u = new URL(location.href);
+                                    if(!u.searchParams.get('id')){ u.searchParams.set('id', uid); location.replace(u.toString()); }
                                 }
-                            } catch (e) {}
+                            }catch(e){}
                         })();` }}
                     />
                 )}
