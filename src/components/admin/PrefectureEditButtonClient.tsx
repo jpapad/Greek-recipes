@@ -34,6 +34,15 @@ export default function PrefectureEditButtonClient({ prefecture }: { prefecture:
                 // In dev show a compact debug line so you can verify hrefs quickly.
                 console.log('[ADMIN DEBUG] edit href ->', href, '| id ->', rawIdStr);
             }
+
+            // Force a full-page navigation to ensure the browser sends cookies
+            // and the server renders the correct RSC. This avoids client-side
+            // route mismatches produced by Next's router during preview/edge
+            // redirects. It's a small UX tradeoff but reliable for admin flows.
+            e.preventDefault();
+            if (typeof window !== 'undefined') {
+                window.location.assign(href);
+            }
         } catch (err) {
             console.error('[DEBUG] Error logging prefecture:', err);
         }
