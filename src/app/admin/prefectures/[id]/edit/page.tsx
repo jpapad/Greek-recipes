@@ -48,6 +48,24 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
         }
     }
 
+    // If the server request does not include an auth cookie, avoid attempting
+    // a server-side fetch — render the client loader so the browser (with the
+    // user's cookies) can fetch and render the prefecture. This avoids showing
+    // the login/diagnostic HTML when the preview edge or server is unauthenticated.
+    const _cookies = await nextCookies();
+    const serverCookieNames = _cookies.getAll().map((c) => c.name || '');
+    const hasAuthCookie = serverCookieNames.some((n) => n.startsWith('sb-'));
+
+    if (!hasAuthCookie) {
+        return (
+            <div className="space-y-6 p-6">
+                <h1 className="text-2xl font-bold">Edit Prefecture</h1>
+                <p className="text-muted-foreground">Loading in browser — please sign in if prompted.</p>
+                <ClientPrefectureLoader fallbackId={id} />
+            </div>
+        );
+    }
+
     const prefecture = id ? await getPrefectureById(id) : null;
 
     if (prefecture) {
