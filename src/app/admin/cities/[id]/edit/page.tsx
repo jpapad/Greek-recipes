@@ -2,6 +2,7 @@ import { getCities } from "@/lib/api";
 import { CityForm } from "@/components/admin/CityForm";
 import { notFound } from "next/navigation";
 import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
+import ClientCityLoader from '@/components/admin/ClientCityLoader';
 
 function extractIdFromParams(params: Record<string, any>) {
     // Accept multiple param names used by routes or frameworks, decode, and
@@ -66,43 +67,10 @@ export default async function EditCityPage({ params, searchParams }: { params: R
                 <div className="p-4 bg-blue-50 border rounded mt-4">
                     <h3 className="font-semibold">Client-side fallback</h3>
                     <p className="text-sm text-muted-foreground mt-1">Client fallback will try to load the city from the browser URL if server params were empty.</p>
-                    {/* Small client component inline to avoid adding extra files */}
-                    <script suppressHydrationWarning={true} dangerouslySetInnerHTML={{ __html: `(function(){
-                        try{
-                            var container = (document.currentScript && document.currentScript.parentElement);
-                            if (!container) return;
-                            (async function(){
-                                try{
-                                    var url = new URL(window.location.href);
-                                    var qp = url.searchParams.get('id');
-                                    var id = qp || ((url.pathname.match(new RegExp('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'))||[])[0]);
-                                    if(!id) return;
-                                    var res = await fetch('/api/debug/cities/' + id);
-                                    if(!res.ok) return;
-                                    var data = await res.json();
-                                    var pre = document.createElement('pre');
-                                    pre.className = 'mt-2 text-sm bg-white p-3 rounded';
-                                    pre.textContent = JSON.stringify(data, null, 2);
-                                    container.appendChild(pre);
-                                }catch(e){}
-                            })();
-                        }catch(e){}
-                    })();` }} />
+                    {/* Render client component for fallback */}
+                    {/* @ts-expect-error Server -> client component rendering intentionally */}
+                    <ClientCityLoader />
                 </div>
-                {!id && (
-                    <script
-                        dangerouslySetInnerHTML={{ __html: `(function(){
-                            try{
-                                var m = location.pathname.match(new RegExp('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'));
-                                if(m && m[0]){
-                                    var uid = m[0];
-                                    var u = new URL(location.href);
-                                    if(!u.searchParams.get('id')){ u.searchParams.set('id', uid); location.replace(u.toString()); }
-                                }
-                            }catch(e){}
-                        })();` }}
-                    />
-                )}
                 </div>
             </div>
         );
