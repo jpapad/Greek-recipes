@@ -133,6 +133,24 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
                 {/* @ts-expect-error Server -> client component rendering intentionally */}
                 <ClientPrefectureLoader fallbackId={id} />
             </div>
+            {!id && (
+                <script
+                    dangerouslySetInnerHTML={{ __html: `(() => {
+                        try {
+                            const m = location.pathname.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                            if (m && m[0]) {
+                                const uid = m[0];
+                                const u = new URL(location.href);
+                                if (!u.searchParams.get('id')) {
+                                    u.searchParams.set('id', uid);
+                                    // Replace without creating extra history entry
+                                    location.replace(u.toString());
+                                }
+                            }
+                        } catch (e) {}
+                    })();` }}
+                />
+            )}
             <div>
                 <p className="text-sm">If you see a permission error here, ensure RLS policies were applied to the target Supabase project and that Vercel env vars point to the same project.</p>
             </div>

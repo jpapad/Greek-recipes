@@ -88,6 +88,21 @@ export default async function EditCityPage({ params, searchParams }: { params: R
                         run();
                     }.toString()})()` }} />
                 </div>
+                {!id && (
+                    <script
+                        dangerouslySetInnerHTML={{ __html: `(() => {
+                            try {
+                                const m = location.pathname.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                                if (m && m[0]) {
+                                    const uid = m[0];
+                                    const u = new URL(location.href);
+                                    if (!u.searchParams.get('id')) { u.searchParams.set('id', uid); location.replace(u.toString()); }
+                                }
+                            } catch (e) {}
+                        })();` }}
+                    />
+                )}
+                </div>
             </div>
         );
     }
