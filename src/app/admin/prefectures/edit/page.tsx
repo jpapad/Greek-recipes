@@ -14,6 +14,40 @@ export default async function EditPrefectureByQueryPage({ searchParams }: { sear
         else id = sp;
     }
 
+    // If searchParams didn't provide an id (some server requests / edge
+    // proxy flows strip query params), try extracting the id from the
+    // Referer header. This covers flows where middleware redirected to
+    // /login and the browser redirected back, or when the client navigated
+    // from the list page with the id in the referer URL.
+    if (!id) {
+        try {
+            const _hdrs = await nextHeaders();
+            const referer = _hdrs.get('referer') || _hdrs.get('referrer') || '';
+            if (referer) {
+                // Attempt to find ?id= in the referer first
+                const mQ = referer.match(/[?&]id=([^&]+)/);
+                if (mQ && mQ[1]) {
+                    const dec = decodeURIComponent(mQ[1]);
+                    const uuidMatch = dec.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                    if (uuidMatch) id = uuidMatch[0];
+                    else id = dec;
+                } else {
+                    // Otherwise, try to extract a UUID from the referer path
+                    const uuidMatch = referer.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                    if (uuidMatch) id = uuidMatch[0];
+                }
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+    }
+
+    // Normalize common literal garbage values
+    if (typeof id === 'string') {
+        id = decodeURIComponent(id).trim();
+        if (id === 'undefined' || id === 'null' || id === '') id = undefined;
+    }
+
     const cookiesForAuth = await nextCookies();
     const serverCookieNamesAuth = cookiesForAuth.getAll().map((c) => c.name || '');
     const hasAuthCookie = serverCookieNamesAuth.some((n) => n.startsWith('sb-'));
