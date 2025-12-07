@@ -6,11 +6,12 @@ import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPrefecturePage({ params }: { params: Record<string, any> }) {
+export default async function EditPrefecturePage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
     // Defensive: Next's internal named capture groups can sometimes use a different
     // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks
     // and be tolerant of encoded values, full URLs, or accidental literal
-    // strings like "undefined". Extract a UUID if present.
+    // strings like "undefined". Extract a UUID if present. Prefer route
+    // params, but fall back to `searchParams.id` which we now include on links.
     let id: string | undefined = params?.id ?? params?.nxtPid ?? Object.values(params || {})[0];
 
     if (typeof id === 'string') {
@@ -21,6 +22,11 @@ export default async function EditPrefecturePage({ params }: { params: Record<st
             const uuidMatch = id.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
             if (uuidMatch) id = uuidMatch[0];
         }
+    }
+
+    // If route params didn't provide an id, attempt query fallback
+    if (!id && searchParams?.id) {
+        id = String(searchParams.id);
     }
 
     const prefecture = id ? await getPrefectureById(id) : null;

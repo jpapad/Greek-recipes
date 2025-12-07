@@ -54,7 +54,7 @@ export default async function AdminPrefecturesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/prefectures/${safeId}/edit`}>
+                                    <Link href={`/admin/prefectures/${safeId}/edit?id=${safeId}`}>
                                         <Button variant="outline" size="sm">
                                             <Edit className="w-4 h-4 mr-2" />
                                             Edit

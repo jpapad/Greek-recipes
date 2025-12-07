@@ -58,7 +58,7 @@ export default async function AdminCitiesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/cities/${safeId(city.id)}/edit`}>
+                                        <Link href={`/admin/cities/${safeId(city.id)}/edit?id=${safeId(city.id)}`}>
                                         <Button variant="outline" size="sm">
                                             <Edit className="w-4 h-4 mr-2" />
                                             Edit

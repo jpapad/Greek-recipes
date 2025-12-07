@@ -19,9 +19,12 @@ function extractIdFromParams(params: Record<string, any>) {
     }
 }
 
-export default async function EditCityPage({ params }: { params: Record<string, any> }) {
+export default async function EditCityPage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
     const cities = await getCities();
-    const id = extractIdFromParams(params || {});
+    // Prefer route params, fall back to query string `searchParams.id` if present
+    const idFromParams = extractIdFromParams(params || {});
+    const idFromQuery = searchParams?.id ? String(searchParams.id) : undefined;
+    const id = idFromParams || idFromQuery;
     const city = cities.find((c) => c.id === id || c.slug === id || c.id === decodeURIComponent(String(id || "")));
 
     if (!city) {

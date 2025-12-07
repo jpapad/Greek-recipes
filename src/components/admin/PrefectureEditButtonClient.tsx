@@ -9,7 +9,7 @@ export default function PrefectureEditButtonClient({ prefecture }: { prefecture:
     const rawId = String(prefecture?.id ?? "");
     const uuidMatch = rawId.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
     const safeId = uuidMatch ? uuidMatch[0] : encodeURIComponent(rawId);
-    const href = `/admin/prefectures/${safeId}/edit`;
+    const href = `/admin/prefectures/${safeId}/edit?id=${safeId}`;
 
     const handleClick = (e: React.MouseEvent) => {
         try {
