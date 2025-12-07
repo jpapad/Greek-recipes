@@ -6,6 +6,40 @@ import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
+// Client-side fallback loader (renders when server couldn't determine id)
+function ClientPrefectureLoader({ fallbackId }: { fallbackId?: string }) {
+    'use client'
+    const { useEffect, useState } = require('react')
+    const [pref, setPref] = useState<any>(null)
+    useEffect(() => {
+        try {
+            const url = new URL(window.location.href)
+            // Try query param first, then extract uuid from path
+            const qp = url.searchParams.get('id')
+            let id = qp || undefined
+            if (!id) {
+                const m = url.pathname.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/)
+                if (m) id = m[0]
+            }
+            if (!id && fallbackId) id = fallbackId
+            if (!id) return
+            (async () => {
+                try {
+                    const res = await fetch(`/api/debug/prefectures/${id}`)
+                    if (res.ok) setPref(await res.json())
+                } catch (e) { /* ignore */ }
+            })()
+        } catch (e) {}
+    }, [])
+    if (!pref) return <div className="p-4">Loading...</div>
+    return (
+        <div>
+            <h2 className="text-xl font-semibold">Client-loaded Prefecture</h2>
+            <pre className="mt-2 text-sm bg-white p-3 rounded">{JSON.stringify(pref, null, 2)}</pre>
+        </div>
+    )
+}
+
 export default async function EditPrefecturePage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
     // Defensive: Next's internal named capture groups can sometimes use a different
     // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks
@@ -92,6 +126,12 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
                 <pre className="mt-3 overflow-auto text-xs bg-white p-3 rounded">
 {JSON.stringify({ raw: raw || null, supabaseError: error || null, serverHeaders, serverCookieNames }, null, 2)}
                 </pre>
+            </div>
+            <div className="p-4 bg-blue-50 border rounded">
+                <h3 className="font-semibold">Client-side fallback</h3>
+                <p className="text-sm text-muted-foreground mt-1">If server params were empty, the client fallback will try to load the prefecture from the browser URL.</p>
+                {/* @ts-expect-error Server -> client component rendering intentionally */}
+                <ClientPrefectureLoader fallbackId={id} />
             </div>
             <div>
                 <p className="text-sm">If you see a permission error here, ensure RLS policies were applied to the target Supabase project and that Vercel env vars point to the same project.</p>
