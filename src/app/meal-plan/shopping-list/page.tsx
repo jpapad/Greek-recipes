@@ -42,7 +42,11 @@ export default function ShoppingListPage() {
     try {
       const user = await getUser();
       if (!user) {
-        router.push("/login?redirect=/meal-plan/shopping-list");
+        // Avoid client-side Next router import hiccups in build environments;
+        // use a direct location redirect which works in the browser.
+        if (typeof window !== "undefined") {
+          window.location.href = "/login?redirect=/meal-plan/shopping-list";
+        }
         return;
       }
 
