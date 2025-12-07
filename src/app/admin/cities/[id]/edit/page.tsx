@@ -24,7 +24,23 @@ export default async function EditCityPage({ params, searchParams }: { params: R
     // Prefer route params, fall back to query string `searchParams.id` if present
     const idFromParams = extractIdFromParams(params || {});
     const idFromQuery = searchParams?.id ? String(searchParams.id) : undefined;
-    const id = idFromParams || idFromQuery;
+    let id = idFromParams || idFromQuery;
+
+    // If still no id, try extracting it from Referer header's redirect param
+    if (!id) {
+        try {
+            const _hdrs = await nextHeaders();
+            const referer = _hdrs.get('referer') || _hdrs.get('referrer') || '';
+            const m = referer.match(/[?&]redirect=([^&]+)/);
+            if (m && m[1]) {
+                const decoded = decodeURIComponent(m[1]);
+                const uuidMatch = decoded.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                if (uuidMatch) id = uuidMatch[0];
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
     const city = cities.find((c) => c.id === id || c.slug === id || c.id === decodeURIComponent(String(id || "")));
 
     if (!city) {

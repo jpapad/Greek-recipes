@@ -29,6 +29,24 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
         id = String(searchParams.id);
     }
 
+    // If still no id, try extracting it from Referer header's redirect param
+    // This covers the case where middleware redirected to /login and the
+    // login page redirected back using ?redirect=/admin/prefectures/:id/edit
+    if (!id) {
+        const _hdrs = await nextHeaders();
+        const referer = _hdrs.get('referer') || _hdrs.get('referrer') || '';
+        try {
+            const m = referer.match(/[?&]redirect=([^&]+)/);
+            if (m && m[1]) {
+                const decoded = decodeURIComponent(m[1]);
+                const uuidMatch = decoded.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+                if (uuidMatch) id = uuidMatch[0];
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+    }
+
     const prefecture = id ? await getPrefectureById(id) : null;
 
     if (prefecture) {
