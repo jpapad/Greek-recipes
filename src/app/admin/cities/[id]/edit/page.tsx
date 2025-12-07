@@ -27,8 +27,10 @@ export default async function EditCityPage({ params }: { params: Record<string, 
     if (!city) {
         // Render diagnostics instead of throwing immediately so preview shows
         // useful information to debug param mismatches, auth, or stale SW caches.
-        const serverHeaders = Object.fromEntries(nextHeaders().entries());
-        const serverCookieNames = nextCookies().getAll().map((c) => c.name);
+        const _hdrs = await nextHeaders();
+        const serverHeaders = Object.fromEntries(_hdrs.entries());
+        const _cookies = await nextCookies();
+        const serverCookieNames = _cookies.getAll().map((c) => c.name);
         return (
             <div className="space-y-8">
                 <div>

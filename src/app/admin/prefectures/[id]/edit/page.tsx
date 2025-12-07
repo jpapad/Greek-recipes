@@ -45,8 +45,10 @@ export default async function EditPrefecturePage({ params }: { params: Record<st
         .eq('id', id);
 
     // Collect server-side view of headers and cookie names (do not dump cookie values)
-    const serverHeaders = Object.fromEntries(nextHeaders().entries());
-    const serverCookieNames = nextCookies().getAll().map((c) => c.name);
+    const _hdrs = await nextHeaders();
+    const serverHeaders = Object.fromEntries(_hdrs.entries());
+    const _cookies = await nextCookies();
+    const serverCookieNames = _cookies.getAll().map((c) => c.name);
 
     return (
         <div className="space-y-6 p-6">
