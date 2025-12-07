@@ -25,9 +25,19 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
         }
     }
 
-    // If route params didn't provide an id, attempt query fallback
-    if (!id && searchParams?.id) {
-        id = String(searchParams.id);
+    // Prefer a valid `searchParams.id` when present. In some preview/redirect
+    // flows the route `params` can be present but contain an invalid value
+    // (e.g. 'undefined' or a full URL). If the query `id` is a valid UUID,
+    // prefer it (override bad route params). Otherwise fall back to the
+    // existing behavior.
+    if (searchParams?.id) {
+        const sp = String(searchParams.id);
+        const spUuid = sp.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+        if (spUuid) {
+            id = spUuid[0];
+        } else if (!id) {
+            id = sp;
+        }
     }
 
     // If still no id, try extracting it from Referer header's redirect param

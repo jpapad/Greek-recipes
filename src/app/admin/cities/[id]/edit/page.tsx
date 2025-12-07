@@ -22,10 +22,20 @@ function extractIdFromParams(params: Record<string, any>) {
 
 export default async function EditCityPage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
     const cities = await getCities();
-    // Prefer route params, fall back to query string `searchParams.id` if present
+    // Prefer a valid `searchParams.id` when present. If the query `id` is a
+    // valid UUID prefer it (override a potentially-bad route param). Otherwise
+    // fall back to the route param or the raw query value.
     const idFromParams = extractIdFromParams(params || {});
     const idFromQuery = searchParams?.id ? String(searchParams.id) : undefined;
-    let id = idFromParams || idFromQuery;
+    let id = idFromParams;
+    if (idFromQuery) {
+        const m = idFromQuery.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+        if (m) {
+            id = m[0];
+        } else if (!id) {
+            id = idFromQuery;
+        }
+    }
 
     // If still no id, try extracting it from Referer header's redirect param
     if (!id) {
