@@ -13,10 +13,29 @@ export default function PrefectureEditButtonClient({ prefecture }: { prefecture:
 
     const handleClick = (e: React.MouseEvent) => {
         try {
-            console.log("[DEBUG] Prefecture object:", prefecture);
-            console.log("[DEBUG] Computed edit href:", href);
+            const rawIdStr = String(prefecture?.id ?? '');
+            const logs = {
+                href,
+                rawId: rawIdStr,
+                safeId,
+                prefectureSlug: prefecture?.slug ?? null,
+                prefectureName: prefecture?.name ?? null,
+            };
+
+            // Only expand details when something looks suspicious to reduce noise.
+            const suspicious = rawIdStr === 'undefined' || rawIdStr === 'null' || rawIdStr === '' || (rawIdStr && rawIdStr.indexOf('/') >= 0);
+
+            if (suspicious) {
+                console.groupCollapsed('[ADMIN DEBUG] Edit navigation (suspicious)');
+                console.table(logs);
+                console.trace();
+                console.groupEnd();
+            } else if (process.env.NODE_ENV !== 'production') {
+                // In dev show a compact debug line so you can verify hrefs quickly.
+                console.log('[ADMIN DEBUG] edit href ->', href, '| id ->', rawIdStr);
+            }
         } catch (err) {
-            console.error("[DEBUG] Error logging prefecture:", err);
+            console.error('[DEBUG] Error logging prefecture:', err);
         }
     };
 
