@@ -16,9 +16,10 @@ function extractIdFromParams(params: Record<string, any>) {
         return dec;
     } catch (e) {
         return String(raw || "");
-                )}
-            </div>
-    const cities = await getCities();
+    }
+}
+
+const cities = await getCities();
     // Prefer route params, fall back to query string `searchParams.id` if present
     const idFromParams = extractIdFromParams(params || {});
     const idFromQuery = searchParams?.id ? String(searchParams.id) : undefined;
