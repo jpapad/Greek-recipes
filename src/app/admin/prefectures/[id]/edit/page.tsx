@@ -62,12 +62,25 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
         );
     }
 
-    // If we get here, the prefecture wasn't returned. Surface Supabase diagnostic info
-    // and the raw `params` / `searchParams` objects so we can see what Next provided for debugging.
-    const { data: raw, error } = await supabase
-        .from('prefectures')
-        .select('*, region:region_id(*)')
-        .eq('id', id);
+    // If we get here, the prefecture wasn't returned. Only attempt a direct
+    // Supabase server query when `id` looks like a UUID — otherwise skip the
+    // query to avoid errors like `invalid input syntax for type uuid: "undefined"`.
+    let raw = null as any;
+    let error: any = null;
+    const uuidRegex = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/;
+    if (id && uuidRegex.test(String(id))) {
+        const res = await supabase
+            .from('prefectures')
+            .select('*, region:region_id(*)')
+            .eq('id', id);
+        raw = res.data || null;
+        error = res.error || null;
+    } else {
+        // Do not call Supabase with an invalid id. Surface a small diagnostic
+        // marker instead of the database error.
+        raw = null;
+        error = { message: 'skipped server fetch: missing or invalid id' };
+    }
 
     // Collect server-side view of headers and cookie names (do not dump cookie values)
     const _hdrs = await nextHeaders();
