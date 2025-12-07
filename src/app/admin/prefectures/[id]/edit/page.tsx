@@ -52,9 +52,9 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
     // a server-side fetch — render the client loader so the browser (with the
     // user's cookies) can fetch and render the prefecture. This avoids showing
     // the login/diagnostic HTML when the preview edge or server is unauthenticated.
-    const _cookies = await nextCookies();
-    const serverCookieNames = _cookies.getAll().map((c) => c.name || '');
-    const hasAuthCookie = serverCookieNames.some((n) => n.startsWith('sb-'));
+    const cookiesForAuth = await nextCookies();
+    const serverCookieNamesAuth = cookiesForAuth.getAll().map((c) => c.name || '');
+    const hasAuthCookie = serverCookieNamesAuth.some((n) => n.startsWith('sb-'));
 
     if (!hasAuthCookie) {
         return (
