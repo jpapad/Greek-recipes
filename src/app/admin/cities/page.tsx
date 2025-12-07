@@ -4,6 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
 import Link from "next/link";
 
+function safeId(id: string | undefined) {
+    if (!id) return "";
+    try {
+        const dec = decodeURIComponent(String(id));
+        const match = dec.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
+        if (match) return match[0];
+        return encodeURIComponent(dec);
+    } catch (e) {
+        return encodeURIComponent(String(id));
+    }
+}
+
 // Force dynamic rendering so admin sees fresh DB data after edits/creates.
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +58,7 @@ export default async function AdminCitiesPage() {
                                     )}
                                 </div>
                                 <div className="flex gap-2">
-                                    <Link href={`/admin/cities/${city.id}/edit`}>
+                                    <Link href={`/admin/cities/${safeId(city.id)}/edit`}>
                                         <Button variant="outline" size="sm">
                                             <Edit className="w-4 h-4 mr-2" />
                                             Edit
