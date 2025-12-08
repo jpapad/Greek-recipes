@@ -26,6 +26,7 @@ export function CityForm({ city }: CityFormProps) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetchingCoords, setIsFetchingCoords] = useState(false);
     const [isGeneratingTouristData, setIsGeneratingTouristData] = useState(false);
+    const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
     const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
 
     const [formData, setFormData] = useState({
@@ -70,7 +71,7 @@ export function CityForm({ city }: CityFormProps) {
                 events_festivals: events,
                 local_products: localProducts,
             };
-            
+
             if (city?.id) {
                 await updateCity(city.id, data);
             } else {
@@ -103,11 +104,11 @@ export function CityForm({ city }: CityFormProps) {
             }
 
             const data = await response.json();
-            
+
             if (data.error) {
                 throw new Error(data.details || data.error);
             }
-            
+
             setFormData({
                 ...formData,
                 latitude: data.latitude.toString(),
@@ -122,6 +123,72 @@ export function CityForm({ city }: CityFormProps) {
         }
     };
 
+    const handleGenerateDescription = async () => {
+        if (!formData.name) {
+            alert("Παρακαλώ εισάγετε πρώτα το όνομα της πόλης");
+            return;
+        }
+
+        setIsGeneratingDescription(true);
+        try {
+            const response = await fetch("/api/generate-location-description", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    locationName: formData.name,
+                    locationType: "city"
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+
+                if (response.status === 429) {
+                    throw new Error("Πάρα πολλές αιτήσεις. Παρακαλώ περιμένετε 1 λεπτό.");
+                }
+
+                throw new Error(errorData.details || errorData.error || errorData.message);
+            }
+
+            const data = await response.json();
+
+            if (data.description) {
+                setFormData({ ...formData, description: data.description });
+            }
+
+            // Track usage
+            if (data._usage) {
+                try {
+                    const STORAGE_KEY = "openai_usage_tracker";
+                    const stored = localStorage.getItem(STORAGE_KEY);
+                    const today = new Date().toISOString().split("T")[0];
+
+                    let stats = stored ? JSON.parse(stored) : { tokensToday: 0, requestsToday: 0, lastReset: today };
+
+                    if (stats.lastReset !== today) {
+                        stats = { tokensToday: 0, requestsToday: 0, lastReset: today };
+                    }
+
+                    stats.tokensToday += data._usage.tokens;
+                    stats.requestsToday += 1;
+
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+                    window.dispatchEvent(new Event("usage-updated"));
+
+                    console.log(`✅ Description generated: +${data._usage.tokens} tokens`);
+                } catch (err) {
+                    console.error("Failed to track usage:", err);
+                }
+            }
+        } catch (error) {
+            const message = error instanceof Error ? error.message : "Unknown error";
+            alert(`Αποτυχία δημιουργίας περιγραφής: ${message}`);
+            console.error("Description generation error:", error);
+        } finally {
+            setIsGeneratingDescription(false);
+        }
+    };
+
     const handleGenerateTouristData = async () => {
         if (!formData.name) {
             alert("Παρακαλώ εισάγετε πρώτα το όνομα της πόλης");
@@ -133,7 +200,7 @@ export function CityForm({ city }: CityFormProps) {
             const response = await fetch("/api/generate-tourist-data", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     locationName: formData.name,
                     locationType: "city"
                 }),
@@ -145,32 +212,32 @@ export function CityForm({ city }: CityFormProps) {
             }
 
             const data = await response.json();
-            
+
             // Track usage in localStorage
             if (data._usage) {
                 try {
                     const STORAGE_KEY = "openai_usage_tracker";
                     const stored = localStorage.getItem(STORAGE_KEY);
                     const today = new Date().toISOString().split("T")[0];
-                    
+
                     let stats = stored ? JSON.parse(stored) : { tokensToday: 0, requestsToday: 0, lastReset: today };
-                    
+
                     if (stats.lastReset !== today) {
                         stats = { tokensToday: 0, requestsToday: 0, lastReset: today };
                     }
-                    
+
                     stats.tokensToday += data._usage.tokens;
                     stats.requestsToday += 1;
-                    
+
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
                     window.dispatchEvent(new Event("usage-updated"));
-                    
+
                     console.log(`✅ Usage tracked: +${data._usage.tokens} tokens (Total today: ${stats.tokensToday})`);
                 } catch (err) {
                     console.error("Failed to track usage:", err);
                 }
             }
-            
+
             if (data.photo_gallery && Array.isArray(data.photo_gallery)) {
                 setPhotoGallery(data.photo_gallery);
             }
@@ -242,7 +309,20 @@ export function CityForm({ city }: CityFormProps) {
                 </div>
 
                 <div>
-                    <Label htmlFor="description">Description</Label>
+                    <div className="flex items-center justify-between mb-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={handleGenerateDescription}
+                            disabled={isGeneratingDescription || !formData.name}
+                            className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                        >
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            {isGeneratingDescription ? 'Δημιουργία...' : 'AI Περιγραφή'}
+                        </Button>
+                    </div>
                     <Textarea
                         id="description"
                         value={formData.description}
