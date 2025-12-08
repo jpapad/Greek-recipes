@@ -6,9 +6,9 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Search, 
-  X, 
+import {
+  Search,
+  X,
   Filter,
   Clock,
   ChefHat,
@@ -20,15 +20,16 @@ import {
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { getRecipes, getRegions } from "@/lib/api";
 import type { Recipe, Region } from "@/lib/types";
+import { flattenIngredients } from "@/lib/recipeHelpers";
 
 export default function AdvancedSearchPage() {
   const searchParams = useSearchParams();
-  
+
   // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [currentIngredient, setCurrentIngredient] = useState("");
-  
+
   // Filter state
   const [showFilters, setShowFilters] = useState(true);
   const [maxTime, setMaxTime] = useState<number | null>(null);
@@ -39,7 +40,7 @@ export default function AdvancedSearchPage() {
   const [isVegan, setIsVegan] = useState(false);
   const [isGlutenFree, setIsGlutenFree] = useState(false);
   const [isDairyFree, setIsDairyFree] = useState(false);
-  
+
   // Data state
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -50,7 +51,7 @@ export default function AdvancedSearchPage() {
   useEffect(() => {
     const mode = searchParams.get("mode");
     const urlIngredients = searchParams.getAll("ingredient");
-    
+
     if (mode === "ingredients" && urlIngredients.length > 0) {
       setSearchMode("ingredients");
       setIngredients(urlIngredients);
@@ -104,11 +105,11 @@ export default function AdvancedSearchPage() {
       if (searchMode === "ingredients" && ingredients.length > 0) {
         allRecipes = allRecipes.filter((recipe) => {
           if (!recipe.ingredients || recipe.ingredients.length === 0) return false;
-          
-          const recipeIngredients = recipe.ingredients.map((ing) =>
+
+          const recipeIngredients = flattenIngredients(recipe.ingredients).map((ing) =>
             ing.toLowerCase()
           );
-          
+
           // Check if recipe contains ALL specified ingredients
           return ingredients.every((ing) =>
             recipeIngredients.some((recipeIng) =>
@@ -192,7 +193,7 @@ export default function AdvancedSearchPage() {
       <section className="relative py-2 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-600/20" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.1),transparent)]" />
-        
+
         <div className="container mx-auto relative z-10">
           <div className="text-center mb-1">
             <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-500 via-pink-400 to-orange-400 bg-clip-text text-transparent leading-tight">
@@ -310,11 +311,10 @@ export default function AdvancedSearchPage() {
                       <button
                         key={time}
                         onClick={() => setMaxTime(maxTime === time ? null : time)}
-                        className={`w-full px-4 py-2 rounded-lg border transition-all ${
-                          maxTime === time
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-white/5 border-white/20 hover:bg-white/10"
-                        }`}
+                        className={`w-full px-4 py-2 rounded-lg border transition-all ${maxTime === time
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-white/5 border-white/20 hover:bg-white/10"
+                          }`}
                       >
                         ≤ {time} λεπτά
                       </button>
@@ -333,11 +333,10 @@ export default function AdvancedSearchPage() {
                       <button
                         key={diff}
                         onClick={() => setDifficulty(difficulty === diff ? null : diff)}
-                        className={`w-full px-4 py-2 rounded-lg border transition-all ${
-                          difficulty === diff
-                            ? "bg-primary text-primary-foreground border-primary"
-                            : "bg-white/5 border-white/20 hover:bg-white/10"
-                        }`}
+                        className={`w-full px-4 py-2 rounded-lg border transition-all ${difficulty === diff
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-white/5 border-white/20 hover:bg-white/10"
+                          }`}
                       >
                         {diff === "easy" && "Εύκολο"}
                         {diff === "medium" && "Μέτριο"}
