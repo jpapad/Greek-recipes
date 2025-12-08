@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createRecipe, updateRecipe, getRecipeBySlug, getPrefectures, getCities } from "@/lib/api";
-import { Recipe, Region, Prefecture, City } from "@/lib/types";
+import { Recipe, Region, Prefecture, City, IngredientGroup, StepGroup } from "@/lib/types";
+import { migrateIngredientsToGroups, migrateStepsToGroups } from "@/lib/recipeHelpers";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { ImageSearchModal } from "@/components/admin/ImageSearchModal";
+import { GroupedIngredientsEditor } from "@/components/admin/GroupedIngredientsEditor";
+import { GroupedStepsEditor } from "@/components/admin/GroupedStepsEditor";
 import { Plus, X, Save, Search, Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -51,12 +54,12 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
         is_dairy_free: recipe?.is_dairy_free || false,
     });
 
-    const [ingredients, setIngredients] = useState<string[]>(
-        recipe?.ingredients || [""]
+    const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
+        migrateIngredientsToGroups(recipe?.ingredients)
     );
 
-    const [steps, setSteps] = useState<string[]>(
-        Array.isArray(recipe?.steps) ? recipe.steps : [""]
+    const [stepGroups, setStepGroups] = useState<StepGroup[]>(
+        migrateStepsToGroups(recipe?.steps)
     );
 
     const [allergens, setAllergens] = useState<string[]>(
@@ -64,7 +67,7 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
     );
 
     const allergenOptions = [
-        "Nuts", "Dairy", "Gluten", "Eggs", "Shellfish", "Fish", 
+        "Nuts", "Dairy", "Gluten", "Eggs", "Shellfish", "Fish",
         "Soy", "Sesame", "Peanuts", "Tree Nuts", "Wheat", "Milk"
     ];
 
@@ -121,6 +124,17 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
             return;
         }
 
+        // Clean up groups: remove empty items
+        const cleanedIngredients = ingredientGroups.map(group => ({
+            ...group,
+            items: group.items.filter(item => item.trim() !== '')
+        })).filter(group => group.items.length > 0);
+
+        const cleanedSteps = stepGroups.map(group => ({
+            ...group,
+            items: group.items.filter(item => item.trim() !== '')
+        })).filter(group => group.items.length > 0);
+
         const recipeData: Omit<Recipe, 'id' | 'created_at'> = {
             title: formData.title,
             slug: formData.slug,
@@ -128,8 +142,8 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
             prefecture_id: formData.prefecture_id || undefined,
             city_id: formData.city_id || undefined,
             short_description: formData.short_description || undefined,
-            steps: steps.filter(s => s.trim() !== ""),
-            ingredients: ingredients.filter(i => i.trim() !== ""),
+            steps: cleanedSteps,
+            ingredients: cleanedIngredients,
             time_minutes: formData.time_minutes,
             difficulty: formData.difficulty as 'easy' | 'medium' | 'hard',
             servings: formData.servings,
@@ -163,25 +177,7 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
         }
     };
 
-    const addIngredient = () => setIngredients([...ingredients, ""]);
-    const removeIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
-    };
-    const updateIngredient = (index: number, value: string) => {
-        const newIngredients = [...ingredients];
-        newIngredients[index] = value;
-        setIngredients(newIngredients);
-    };
 
-    const addStep = () => setSteps([...steps, ""]);
-    const removeStep = (index: number) => {
-        setSteps(steps.filter((_, i) => i !== index));
-    };
-    const updateStep = (index: number, value: string) => {
-        const newSteps = [...steps];
-        newSteps[index] = value;
-        setSteps(newSteps);
-    };
 
     const handleGenerateImage = async () => {
         if (!formData.title) {
@@ -206,7 +202,7 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
             }
 
             const data = await response.json();
-            
+
             if (data.imageUrl) {
                 setFormData({ ...formData, image_url: data.imageUrl });
                 alert("Η εικόνα δημιουργήθηκε επιτυχώς με AI! 🎨");
@@ -463,9 +459,9 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
                         />
                         {formData.image_url && (
                             <div className="mt-4">
-                                <img 
-                                    src={formData.image_url} 
-                                    alt="Recipe preview" 
+                                <img
+                                    src={formData.image_url}
+                                    alt="Recipe preview"
                                     className="w-full h-48 object-cover rounded-lg border-2 border-primary/20"
                                     onError={(e) => {
                                         console.error("Image failed to load:", formData.image_url);
@@ -489,73 +485,17 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
                     />
                 </div>
 
-                {/* Ingredients */}
-                <div>
-                    <div className="flex items-center justify-between mb-3">
-                        <Label>{t('Admin.ingredients')} *</Label>
-                        <Button type="button" onClick={addIngredient} size="sm" variant="outline">
-                            <Plus className="w-4 h-4 mr-1" /> {t('Admin.addIngredient')}
-                        </Button>
-                    </div>
-                    <div className="space-y-2">
-                        {ingredients.map((ingredient, index) => (
-                            <div key={index} className="flex gap-2">
-                                <Input
-                                    value={ingredient}
-                                    onChange={(e) => updateIngredient(index, e.target.value)}
-                                    placeholder={`Ingredient ${index + 1}`}
-                                />
-                                {ingredients.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        onClick={() => removeIngredient(index)}
-                                        size="icon"
-                                        variant="ghost"
-                                        className="text-destructive"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {/* Grouped Ingredients */}
+                <GroupedIngredientsEditor
+                    groups={ingredientGroups}
+                    onChange={setIngredientGroups}
+                />
 
-                {/* Steps */}
-                <div>
-                    <div className="flex items-center justify-between mb-3">
-                        <Label>{t('Admin.steps')} *</Label>
-                        <Button type="button" onClick={addStep} size="sm" variant="outline">
-                            <Plus className="w-4 h-4 mr-1" /> {t('Admin.addStep')}
-                        </Button>
-                    </div>
-                    <div className="space-y-2">
-                        {steps.map((step, index) => (
-                            <div key={index} className="flex gap-2">
-                                <div className="flex-shrink-0 w-8 h-10 flex items-center justify-center bg-primary/10 text-primary rounded-lg font-bold">
-                                    {index + 1}
-                                </div>
-                                <Textarea
-                                    value={step}
-                                    onChange={(e) => updateStep(index, e.target.value)}
-                                    placeholder={`Step ${index + 1}`}
-                                    rows={2}
-                                />
-                                {steps.length > 1 && (
-                                    <Button
-                                        type="button"
-                                        onClick={() => removeStep(index)}
-                                        size="icon"
-                                        variant="ghost"
-                                        className="text-destructive"
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {/* Grouped Steps */}
+                <GroupedStepsEditor
+                    groups={stepGroups}
+                    onChange={setStepGroups}
+                />
 
                 <div className="flex gap-4 pt-4">
                     <Button type="submit" size="lg" disabled={isSubmitting}>

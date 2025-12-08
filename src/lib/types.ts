@@ -73,6 +73,16 @@ export interface City {
     local_products?: LocalProduct[];
 }
 
+export interface IngredientGroup {
+    title?: string;
+    items: string[];
+}
+
+export interface StepGroup {
+    title?: string;
+    items: string[];
+}
+
 export interface Recipe {
     id: string;
     title: string;
@@ -81,8 +91,8 @@ export interface Recipe {
     prefecture_id?: string;
     city_id?: string;
     short_description?: string;
-    steps: string[] | any; // JSON or text
-    ingredients?: string[];
+    steps: StepGroup[] | string[]; // Support both old and new formats
+    ingredients?: IngredientGroup[] | string[]; // Support both old and new formats
     time_minutes: number;
     difficulty: 'easy' | 'medium' | 'hard';
     servings: number;
@@ -153,23 +163,23 @@ export interface Article {
     category_id?: string;
     tags?: string[];
     related_recipe_ids?: string[];
-    
+
     // SEO
     meta_title?: string;
     meta_description?: string;
     keywords?: string[];
-    
+
     // Publishing
     status: 'draft' | 'published' | 'archived';
     published_at?: string;
-    
+
     // Stats
     views_count?: number;
     reading_time_minutes?: number;
-    
+
     created_at?: string;
     updated_at?: string;
-    
+
     // Relations
     author?: UserProfile;
     category?: ArticleCategory;
@@ -215,7 +225,7 @@ export interface Collection {
     is_public: boolean;
     created_at: string;
     updated_at: string;
-    
+
     // Relations
     user?: UserProfile;
     recipe_count?: number;
@@ -228,7 +238,7 @@ export interface CollectionRecipe {
     recipe_id: string;
     added_at: string;
     notes?: string;
-    
+
     // Relations
     recipe?: Recipe;
 }
@@ -245,7 +255,7 @@ export interface MealPlan {
     notes?: string;
     created_at: string;
     updated_at: string;
-    
+
     // Relations
     items?: MealPlanItem[];
 }
@@ -260,7 +270,7 @@ export interface MealPlanItem {
     notes?: string;
     is_completed: boolean;
     created_at: string;
-    
+
     // Relations
     recipe?: Recipe;
 }
@@ -273,7 +283,7 @@ export interface ShoppingList {
     is_active: boolean;
     created_at: string;
     updated_at: string;
-    
+
     // Relations
     items?: ShoppingListItem[];
 }
@@ -287,7 +297,7 @@ export interface ShoppingListItem {
     is_checked: boolean;
     recipe_id?: string;
     created_at: string;
-    
+
     // Relations
     recipe?: Recipe;
 }

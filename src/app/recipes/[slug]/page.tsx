@@ -22,9 +22,12 @@ import { PhotoUploadButton } from "@/components/recipes/PhotoUploadButton";
 import { IngredientSubstitutions } from "@/components/recipes/IngredientSubstitutions";
 import { RecentlyViewedWidget } from "@/components/recipes/RecentlyViewedWidget";
 import { RecentlyViewedTracker } from "@/components/recipes/RecentlyViewedTracker";
+import { GroupedIngredientsDisplay } from "@/components/recipes/GroupedIngredientsDisplay";
+import { GroupedStepsDisplay } from "@/components/recipes/GroupedStepsDisplay";
+import { flattenIngredients } from "@/lib/recipeHelpers";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { generateRecipeSchema, generateBreadcrumbSchema } from "@/lib/schema";
- 
+
 import { AllergenBadges } from "@/components/recipes/AllergenBadges";
 import { AIRecipeAssistant } from "@/components/recipes/AIRecipeAssistant";
 
@@ -92,7 +95,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
             />
 
             <RecentlyViewedTracker recipe={recipe} />
-            
+
             {/* Breadcrumbs */}
             <Breadcrumbs items={breadcrumbItems.slice(0, -1).map(item => ({ label: item.name, href: item.url }))} />
 
@@ -136,7 +139,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                         <PhotoUploadButton recipeId={recipe.id} recipeTitle={recipe.title} />
                         {recipe.ingredients && (
                             <ShoppingListButton
-                                ingredients={recipe.ingredients}
+                                ingredients={flattenIngredients(recipe.ingredients)}
                                 recipeId={recipe.id}
                                 recipeTitle={recipe.title}
                             />
@@ -174,21 +177,14 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     {recipe.ingredients && (
                         <ServingsCalculator
                             originalServings={recipe.servings}
-                            ingredients={recipe.ingredients}
+                            ingredients={flattenIngredients(recipe.ingredients)}
                         />
                     )}
 
                     {/* Ingredients List */}
                     <GlassPanel className="p-6">
                         <h3 className="text-xl font-bold border-b border-border/50 pb-4 mb-4">Ingredients</h3>
-                        <ul className="space-y-3">
-                            {recipe.ingredients?.map((ingredient, index) => (
-                                <li key={index} className="flex items-start gap-3 p-2 rounded-lg hover:bg-white/20 transition-colors">
-                                    <div className="w-2 h-2 mt-2 rounded-full bg-primary flex-shrink-0" />
-                                    <span className="text-foreground/90">{ingredient}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        <GroupedIngredientsDisplay ingredients={recipe.ingredients} />
                     </GlassPanel>
 
                     {/* Nutrition Facts */}
@@ -205,7 +201,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     <EquipmentList equipment={recipe.equipment} />
 
                     {/* Ingredient Substitutions */}
-                    <IngredientSubstitutions ingredients={recipe.ingredients} />
+                    <IngredientSubstitutions ingredients={flattenIngredients(recipe.ingredients)} />
 
                     {/* Recently Viewed Widget */}
                     <RecentlyViewedWidget />
@@ -218,25 +214,7 @@ export default async function RecipeDetailPage({ params }: PageProps) {
 
                     <GlassPanel className="p-8">
                         <h3 className="text-2xl font-bold border-b border-border/50 pb-4 mb-6">Instructions</h3>
-                        <div className="space-y-8">
-                            {Array.isArray(recipe.steps) ? (
-                                recipe.steps.map((step, index) => (
-                                    <div key={index} className="flex gap-6 group">
-                                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-lg group-hover:bg-primary group-hover:text-white transition-colors">
-                                            {index + 1}
-                                        </div>
-                                        <div className="pt-1">
-                                            <p className="text-lg leading-relaxed text-foreground/90">{step}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="prose prose-lg dark:prose-invert">
-                                    {/* Fallback if steps is JSON or string */}
-                                    {JSON.stringify(recipe.steps)}
-                                </div>
-                            )}
-                        </div>
+                        <GroupedStepsDisplay steps={recipe.steps} />
                     </GlassPanel>
 
                     {/* Reviews Section */}
