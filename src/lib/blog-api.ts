@@ -249,6 +249,91 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   }
 }
 
+export async function getAuthors(): Promise<UserProfile[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_roles')
+      .select('*, profile:user_profiles(*)')
+      .or('is_author.eq.true,is_admin.eq.true')
+      .order('created_at');
+
+    if (error) {
+      if (error.code === '42P01' || error.message?.includes('does not exist')) {
+        console.warn('Blog tables not created yet.');
+        return [];
+      }
+      throw error;
+    }
+
+    // Map joined profile data to flat UserProfile structure
+    return (data || []).map((role: any) => ({
+      ...role,
+      name: role.profile?.display_name || role.profile?.name, // Handle possible variations
+      bio: role.profile?.bio,
+      avatar_url: role.profile?.avatar_url,
+      // Keep existing role fields
+      is_admin: role.is_admin,
+      is_author: role.is_author,
+      user_id: role.user_id
+    }));
+  } catch (error) {
+    console.error('Error fetching authors:', error);
+    return [];
+  }
+}
+
+export async function updateUserRole(userId: string, updates: Partial<UserProfile>): Promise<UserProfile | null> {
+  try {
+    const { is_admin, is_author, name, bio, avatar_url } = updates;
+
+    // 1. Update user_roles (Permissions)
+    if (is_admin !== undefined || is_author !== undefined) {
+      const roleUpdates: any = { user_id: userId };
+      if (is_admin !== undefined) roleUpdates.is_admin = is_admin;
+      if (is_author !== undefined) roleUpdates.is_author = is_author;
+
+      // Upsert role to ensure it exists
+      const { error: roleError } = await supabase
+        .from('user_roles')
+        .upsert(roleUpdates);
+
+      if (roleError) throw roleError;
+    }
+
+    // 2. Update user_profiles (Display Info)
+    if (name !== undefined || bio !== undefined || avatar_url !== undefined) {
+      const profileUpdates: any = {
+        user_id: userId,
+        updated_at: new Date().toISOString()
+      };
+
+      if (name !== undefined) profileUpdates.display_name = name;
+      if (bio !== undefined) profileUpdates.bio = bio;
+      if (avatar_url !== undefined) profileUpdates.avatar_url = avatar_url;
+
+      // Upsert profile
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert(profileUpdates);
+
+      if (profileError) {
+        console.error('Error updating profile part:', profileError);
+        throw profileError;
+      }
+    }
+
+    // Return combined result (optimistic)
+    return {
+      user_id: userId,
+      ...updates
+    };
+
+  } catch (error) {
+    console.error('Error updating user role/profile:', error);
+    return null;
+  }
+}
+
 export async function searchUsers(query: string): Promise<UserProfile[]> {
   try {
     const { data, error } = await supabase
