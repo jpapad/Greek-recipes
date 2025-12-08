@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     try {
-        const { regionName } = await request.json();
+        const { regionName, parentName } = await request.json();
 
         if (!regionName) {
             return NextResponse.json(
@@ -12,7 +12,11 @@ export async function POST(request: Request) {
         }
 
         // Use Nominatim (OpenStreetMap) geocoding API - free and reliable
-        const searchQuery = `${regionName}, Greece`;
+        // If parentName is provided (e.g. Prefecture for a City), use it for better accuracy
+        const searchQuery = parentName
+            ? `${regionName}, ${parentName}, Greece`
+            : `${regionName}, Greece`;
+
         const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=json&limit=1`;
 
         const response = await fetch(url, {

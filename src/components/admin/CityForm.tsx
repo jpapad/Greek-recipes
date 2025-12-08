@@ -93,10 +93,17 @@ export function CityForm({ city }: CityFormProps) {
 
         setIsFetchingCoords(true);
         try {
+            // Find selected prefecture to provide context
+            const selectedPrefecture = prefectures.find(p => p.id === formData.prefecture_id);
+            const parentName = selectedPrefecture?.name;
+
             const response = await fetch("/api/get-coordinates", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ regionName: formData.name }),
+                body: JSON.stringify({
+                    regionName: formData.name,
+                    parentName: parentName // Send prefecture name for context
+                }),
             });
 
             if (!response.ok) {
