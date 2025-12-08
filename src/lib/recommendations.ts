@@ -1,4 +1,5 @@
 import { Recipe } from "./types";
+import { flattenIngredients } from "@/lib/recipeHelpers";
 
 interface RecipeScore {
     recipe: Recipe;
@@ -42,9 +43,9 @@ function calculateSimilarityScore(recipe1: Recipe, recipe2: Recipe): number {
     }
 
     // Common ingredients: +0.5 points per shared ingredient
-    const ingredients1 = recipe1.ingredients?.map(i => i.toLowerCase()) || [];
-    const ingredients2 = recipe2.ingredients?.map(i => i.toLowerCase()) || [];
-    const commonIngredients = ingredients1.filter(i => 
+    const ingredients1 = flattenIngredients(recipe1.ingredients).map(i => i.toLowerCase()) || [];
+    const ingredients2 = flattenIngredients(recipe2.ingredients).map(i => i.toLowerCase()) || [];
+    const commonIngredients = ingredients1.filter(i =>
         ingredients2.some(i2 => i.includes(i2) || i2.includes(i))
     );
     score += commonIngredients.length * 0.5;
@@ -69,11 +70,11 @@ export function getRecommendedRecipes(
     const scores: RecipeScore[] = allRecipes
         .filter(r => !favoriteIds.has(r.id))
         .map(recipe => {
-            const scores = userFavorites.map(fav => 
+            const scores = userFavorites.map(fav =>
                 calculateSimilarityScore(fav, recipe)
             );
             const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
-            
+
             return {
                 recipe,
                 score: avgScore
