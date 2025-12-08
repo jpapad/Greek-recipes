@@ -4,22 +4,22 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import Link from "next/link";
 import Image from "next/image";
 import { Facebook, Instagram, Twitter, Mail, MapPin, Phone } from "lucide-react";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 export function Footer() {
-    const { t } = useTranslations();
-    
+    const t = useTranslations();
+
     return (
         <footer className="mt-32 relative">
             {/* Wave Divider */}
             <div className="absolute top-0 left-0 right-0 -translate-y-full">
                 <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-20">
-                    <path d="M0,0 C150,80 350,80 600,40 C850,0 1050,0 1200,40 L1200,120 L0,120 Z" 
-                          fill="oklch(0.92 0.02 220)" 
-                          fillOpacity="0.3" />
-                    <path d="M0,20 C200,100 400,100 600,60 C800,20 1000,20 1200,60 L1200,120 L0,120 Z" 
-                          fill="oklch(0.94 0.015 215)" 
-                          fillOpacity="0.5" />
+                    <path d="M0,0 C150,80 350,80 600,40 C850,0 1050,0 1200,40 L1200,120 L0,120 Z"
+                        fill="oklch(0.92 0.02 220)"
+                        fillOpacity="0.3" />
+                    <path d="M0,20 C200,100 400,100 600,60 C800,20 1000,20 1200,60 L1200,120 L0,120 Z"
+                        fill="oklch(0.94 0.015 215)"
+                        fillOpacity="0.5" />
                 </svg>
             </div>
 
@@ -152,14 +152,14 @@ export function Footer() {
                                     <span>+30 210 123 4567</span>
                                 </li>
                             </ul>
-                            
+
                             {/* Newsletter */}
                             <div className="mt-6 p-4 bg-gradient-to-br from-orange-500/10 to-pink-500/10 rounded-xl border border-orange-500/20">
                                 <p className="text-sm font-semibold text-foreground mb-2">{t('Footer.newsletter')}</p>
                                 <p className="text-xs text-muted-foreground mb-3">{t('Footer.newsletterDescription')}</p>
                                 <div className="flex gap-2">
-                                    <input 
-                                        type="email" 
+                                    <input
+                                        type="email"
                                         placeholder={t('Footer.newsletterPlaceholder')}
                                         className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/50 dark:bg-black/50 backdrop-blur-sm border border-white/40 focus:outline-none focus:ring-2 focus:ring-orange-500"
                                     />

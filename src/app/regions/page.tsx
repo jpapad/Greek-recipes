@@ -5,11 +5,11 @@ import { getRegions, getPrefectures, getCities } from "@/lib/api";
 import { RegionCard } from "@/components/regions/RegionCard";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { HierarchicalMapSection } from "@/components/regions/HierarchicalMapSection";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import type { Region, Prefecture, City } from "@/lib/types";
 
 export default function RegionsPage() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const [regions, setRegions] = useState<Region[]>([]);
     const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
     const [cities, setCities] = useState<City[]>([]);

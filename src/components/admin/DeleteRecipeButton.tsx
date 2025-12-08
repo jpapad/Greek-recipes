@@ -5,7 +5,7 @@ import { deleteRecipe } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import { useToast } from "@/components/ui/toast";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
@@ -18,7 +18,7 @@ interface DeleteRecipeButtonProps {
 }
 
 export function DeleteRecipeButton({ id, title, onBeforeDelete, onDeleteFailed, onDeleted }: DeleteRecipeButtonProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
     const { showToast } = useToast();

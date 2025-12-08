@@ -10,10 +10,10 @@ import { Grid, List, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { IngredientSearchWidget } from "@/components/recipes/IngredientSearchWidget";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 export default function RecipesPage() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState<FilterOptions>({});
@@ -38,7 +38,7 @@ export default function RecipesPage() {
             result = result.filter(r => r.difficulty === filters.difficulty);
         }
         if (filters.category) {
-            result = result.filter(r => 
+            result = result.filter(r =>
                 r.category?.toLowerCase().replace(/\s+/g, '-') === filters.category
             );
         }
@@ -102,24 +102,24 @@ export default function RecipesPage() {
             {/* Filters & View Toggle */}
             <div className="flex items-center justify-between gap-4">
                 <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
-                
+
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'outline'}
-                    size="icon"
-                    onClick={() => setViewMode('grid')}
-                    className="rounded-full"
-                  >
-                    <Grid className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'outline'}
-                    size="icon"
-                    onClick={() => setViewMode('list')}
-                    className="rounded-full"
-                  >
-                    <List className="w-4 h-4" />
-                  </Button>
+                    <Button
+                        variant={viewMode === 'grid' ? 'default' : 'outline'}
+                        size="icon"
+                        onClick={() => setViewMode('grid')}
+                        className="rounded-full"
+                    >
+                        <Grid className="w-4 h-4" />
+                    </Button>
+                    <Button
+                        variant={viewMode === 'list' ? 'default' : 'outline'}
+                        size="icon"
+                        onClick={() => setViewMode('list')}
+                        className="rounded-full"
+                    >
+                        <List className="w-4 h-4" />
+                    </Button>
                 </div>
             </div>
 
@@ -138,17 +138,17 @@ export default function RecipesPage() {
                 </GlassPanel>
             ) : (
                 <>
-                  <div className="text-sm text-muted-foreground mb-4">
-                    Βρέθηκαν {filteredAndSortedRecipes.length} συνταγές
-                  </div>
-                  <div className={viewMode === 'grid' 
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                    : "space-y-4"
-                  }>
-                    {filteredAndSortedRecipes.map((recipe) => (
-                        <RecipeCard key={recipe.id} recipe={recipe} />
-                    ))}
-                  </div>
+                    <div className="text-sm text-muted-foreground mb-4">
+                        Βρέθηκαν {filteredAndSortedRecipes.length} συνταγές
+                    </div>
+                    <div className={viewMode === 'grid'
+                        ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                        : "space-y-4"
+                    }>
+                        {filteredAndSortedRecipes.map((recipe) => (
+                            <RecipeCard key={recipe.id} recipe={recipe} />
+                        ))}
+                    </div>
                 </>
             )}
         </div>

@@ -8,11 +8,12 @@ import { UtensilsCrossed, MapPin, Building2, Home, FileText } from "lucide-react
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ApiUsageTracker } from "@/components/admin/ApiUsageTracker";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import { Recipe, Region, Prefecture, City } from "@/lib/types";
 
+// HMR Force Update
 export default function AdminDashboard() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [regions, setRegions] = useState<Region[]>([]);
     const [prefectures, setPrefectures] = useState<Prefecture[]>([]);

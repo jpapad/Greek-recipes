@@ -14,16 +14,17 @@ import { Recipe } from "@/lib/types";
 import { ProgressiveImage } from "@/components/ui/ProgressiveImage";
 import { DifficultyIcon } from "@/components/ui/DifficultyIcon";
 import { StarRating } from "@/components/ui/StarRating";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { flattenIngredients } from "@/lib/recipeHelpers";
 
 interface RecipeCardProps {
     recipe: Recipe;
+    viewMode?: 'grid' | 'list';
 }
 
-export function RecipeCard({ recipe }: RecipeCardProps) {
-    const { t } = useTranslations();
+export function RecipeCard({ recipe, viewMode = 'grid' }: RecipeCardProps) {
+    const t = useTranslations();
     const { isFavorite, toggleFavorite } = useFavorites();
     const { addItems } = useShoppingList();
     const favorite = isFavorite(recipe.id);

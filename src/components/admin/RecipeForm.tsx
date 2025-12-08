@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "@/components/admin/ImageUpload";
+import { ImageUpload } from "@/components/ui/ImageUpload";
 import { ImageSearchModal } from "@/components/admin/ImageSearchModal";
 import { GroupedIngredientsEditor } from "@/components/admin/GroupedIngredientsEditor";
 import { GroupedStepsEditor } from "@/components/admin/GroupedStepsEditor";
 import { Plus, X, Save, Search, Sparkles } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 interface RecipeFormProps {
     recipe?: Recipe;
@@ -24,7 +24,7 @@ interface RecipeFormProps {
 }
 
 export function RecipeForm({ recipe, regions }: RecipeFormProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const router = useRouter();
     const { showToast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -231,78 +231,15 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
                             required
                         />
                     </div>
-
                     <div>
-                        <Label htmlFor="slug">{t('Admin.recipeSlug')} *</Label>
+                        <Label htmlFor="slug">{t('Admin.slug')} *</Label>
                         <Input
                             id="slug"
                             value={formData.slug}
-                            onChange={(e) => {
-                                setFormData({ ...formData, slug: e.target.value });
-                                setSlugError("");
-                            }}
+                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                             required
                         />
                         {slugError && <p className="text-red-500 text-sm mt-1">{slugError}</p>}
-                    </div>
-
-                    <div>
-                        <Label htmlFor="region">{t('Admin.region')}</Label>
-                        <select
-                            id="region"
-                            value={formData.region_id}
-                            onChange={(e) => setFormData({ ...formData, region_id: e.target.value })}
-                            className="w-full p-2 rounded-lg border border-border bg-background"
-                        >
-                            <option value="">{t('Admin.selectRegion')}</option>
-                            {regions.map((region) => (
-                                <option key={region.id} value={region.id}>
-                                    {region.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div>
-                        <Label htmlFor="prefecture">{t('Admin.prefecture')}</Label>
-                        <select
-                            id="prefecture"
-                            value={formData.prefecture_id}
-                            onChange={(e) => setFormData({ ...formData, prefecture_id: e.target.value })}
-                            disabled={!formData.region_id}
-                            className="w-full p-2 rounded-lg border border-border bg-background disabled:opacity-50"
-                        >
-                            <option value="">{t('Admin.selectPrefecture')}</option>
-                            {filteredPrefectures.map((prefecture) => (
-                                <option key={prefecture.id} value={prefecture.id}>
-                                    {prefecture.name}
-                                </option>
-                            ))}
-                        </select>
-                        {!formData.region_id && (
-                            <p className="text-xs text-muted-foreground mt-1">{t('Admin.selectRegion')} first</p>
-                        )}
-                    </div>
-
-                    <div>
-                        <Label htmlFor="city">{t('Admin.city')}</Label>
-                        <select
-                            id="city"
-                            value={formData.city_id}
-                            onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
-                            disabled={!formData.prefecture_id}
-                            className="w-full p-2 rounded-lg border border-border bg-background disabled:opacity-50"
-                        >
-                            <option value="">{t('Admin.selectCity')}</option>
-                            {filteredCities.map((city) => (
-                                <option key={city.id} value={city.id}>
-                                    {city.name}
-                                </option>
-                            ))}
-                        </select>
-                        {!formData.prefecture_id && (
-                            <p className="text-xs text-muted-foreground mt-1">{t('Admin.selectPrefecture')} first</p>
-                        )}
                     </div>
 
                     <div>
@@ -311,172 +248,47 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
                             id="category"
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            placeholder="e.g. Main Dish, Dessert"
                         />
                     </div>
 
-                    {/* Dietary Tags */}
-                    <div className="col-span-2">
-                        <Label>{t('Filters.dietary')}</Label>
-                        <div className="flex flex-wrap gap-4 mt-2">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_vegetarian}
-                                    onChange={(e) => setFormData({ ...formData, is_vegetarian: e.target.checked })}
-                                    className="w-4 h-4 rounded border-border"
-                                />
-                                <span className="text-sm">{t('Admin.isVegetarian')}</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_vegan}
-                                    onChange={(e) => setFormData({ ...formData, is_vegan: e.target.checked })}
-                                    className="w-4 h-4 rounded border-border"
-                                />
-                                <span className="text-sm">{t('Admin.isVegan')}</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_gluten_free}
-                                    onChange={(e) => setFormData({ ...formData, is_gluten_free: e.target.checked })}
-                                    className="w-4 h-4 rounded border-border"
-                                />
-                                <span className="text-sm">{t('Admin.isGlutenFree')}</span>
-                            </label>
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={formData.is_dairy_free}
-                                    onChange={(e) => setFormData({ ...formData, is_dairy_free: e.target.checked })}
-                                    className="w-4 h-4 rounded border-border"
-                                />
-                                <span className="text-sm">{t('Admin.isDairyFree')}</span>
-                            </label>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            <Label htmlFor="time">{t('Admin.prepTime')} (min)</Label>
+                            <Input
+                                id="time"
+                                type="number"
+                                value={formData.time_minutes}
+                                onChange={(e) => setFormData({ ...formData, time_minutes: parseInt(e.target.value) })}
+                            />
                         </div>
-                    </div>
-
-                    {/* Allergens */}
-                    <div>
-                        <Label>Αλλεργιογόνα</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2 p-4 border border-border/50 rounded-lg bg-background/50">
-                            {allergenOptions.map((allergen) => (
-                                <label key={allergen} className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={allergens.includes(allergen)}
-                                        onChange={(e) => {
-                                            if (e.target.checked) {
-                                                setAllergens([...allergens, allergen]);
-                                            } else {
-                                                setAllergens(allergens.filter(a => a !== allergen));
-                                            }
-                                        }}
-                                        className="w-4 h-4 rounded border-border"
-                                    />
-                                    <span className="text-sm">{allergen}</span>
-                                </label>
-                            ))}
+                        <div>
+                            <Label htmlFor="servings">{t('Admin.servings')}</Label>
+                            <Input
+                                id="servings"
+                                type="number"
+                                value={formData.servings}
+                                onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
+                            />
                         </div>
-                    </div>
-
-                    <div>
-                        <Label htmlFor="time">{t('Admin.timeMinutes')} *</Label>
-                        <Input
-                            id="time"
-                            type="number"
-                            value={formData.time_minutes}
-                            onChange={(e) => setFormData({ ...formData, time_minutes: parseInt(e.target.value) })}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <Label htmlFor="difficulty">{t('Admin.difficulty')} *</Label>
-                        <select
-                            id="difficulty"
-                            value={formData.difficulty}
-                            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
-                            className="w-full p-2 rounded-lg border border-border bg-background"
-                            required
-                        >
-                            <option value="easy">{t('Recipe.easy')}</option>
-                            <option value="medium">{t('Recipe.medium')}</option>
-                            <option value="hard">{t('Recipe.hard')}</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <Label htmlFor="servings">{t('Admin.servings')} *</Label>
-                        <Input
-                            id="servings"
-                            type="number"
-                            value={formData.servings}
-                            onChange={(e) => setFormData({ ...formData, servings: parseInt(e.target.value) })}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <div className="flex items-center justify-between mb-2">
-                            <Label htmlFor="image">{t('Admin.recipeImage')} *</Label>
-                            <div className="flex gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setImageSearchOpen(true)}
-                                    className="gap-2"
-                                >
-                                    <Search className="w-4 h-4" />
-                                    {t('Admin.searchImages')}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleGenerateImage}
-                                    disabled={isGeneratingImage || !formData.title}
-                                    className="gap-2 bg-gradient-to-r from-purple-500/10 to-pink-500/10 hover:from-purple-500/20 hover:to-pink-500/20"
-                                >
-                                    {isGeneratingImage ? (
-                                        <>
-                                            <Sparkles className="w-4 h-4 animate-pulse" />
-                                            {t('Admin.loading')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Sparkles className="w-4 h-4" />
-                                            {t('Admin.generateImage')}
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
+                        <div>
+                            <Label htmlFor="difficulty">{t('Admin.difficulty')}</Label>
+                            <select
+                                id="difficulty"
+                                value={formData.difficulty}
+                                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as 'easy' | 'medium' | 'hard' })}
+                                className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            >
+                                <option value="easy">{t('Recipe.easy')}</option>
+                                <option value="medium">{t('Recipe.medium')}</option>
+                                <option value="hard">{t('Recipe.hard')}</option>
+                            </select>
                         </div>
-                        <ImageUpload
-                            onUpload={(url: string) => setFormData({ ...formData, image_url: url })}
-                        />
-                        {formData.image_url && (
-                            <div className="mt-4">
-                                <img
-                                    src={formData.image_url}
-                                    alt="Recipe preview"
-                                    className="w-full h-48 object-cover rounded-lg border-2 border-primary/20"
-                                    onError={(e) => {
-                                        console.error("Image failed to load:", formData.image_url);
-                                    }}
-                                />
-                                <p className="text-xs text-muted-foreground mt-2 truncate">
-                                    {formData.image_url}
-                                </p>
-                            </div>
-                        )}
                     </div>
                 </div>
 
                 <div>
-                    <Label htmlFor="description">{t('Admin.shortDescription')}</Label>
+                    <Label htmlFor="description">{t('Admin.description')}</Label>
                     <Textarea
                         id="description"
                         value={formData.short_description}
@@ -485,42 +297,177 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
                     />
                 </div>
 
-                {/* Grouped Ingredients */}
-                <GroupedIngredientsEditor
-                    groups={ingredientGroups}
-                    onChange={setIngredientGroups}
-                />
+                {/* Region/Prefecture/City Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-white/20 rounded-lg">
+                    <div>
+                        <Label htmlFor="region">{t('Admin.region')}</Label>
+                        <select
+                            id="region"
+                            value={formData.region_id}
+                            onChange={(e) => setFormData({ ...formData, region_id: e.target.value })}
+                            className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                        >
+                            <option value="">{t('Admin.selectRegion')}</option>
+                            {regions.map((r) => (
+                                <option key={r.id} value={r.id}>{r.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <Label htmlFor="prefecture">{t('Admin.prefecture')}</Label>
+                        <select
+                            id="prefecture"
+                            value={formData.prefecture_id}
+                            onChange={(e) => setFormData({ ...formData, prefecture_id: e.target.value })}
+                            className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            disabled={!formData.region_id}
+                        >
+                            <option value="">{t('Admin.selectPrefecture')}</option>
+                            {filteredPrefectures.map((p) => (
+                                <option key={p.id} value={p.id}>{p.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <Label htmlFor="city">{t('Admin.city')}</Label>
+                        <select
+                            id="city"
+                            value={formData.city_id}
+                            onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
+                            className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                            disabled={!formData.prefecture_id}
+                        >
+                            <option value="">{t('Admin.selectCity')}</option>
+                            {filteredCities.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
 
-                {/* Grouped Steps */}
-                <GroupedStepsEditor
-                    groups={stepGroups}
-                    onChange={setStepGroups}
-                />
+                {/* Dietary Info */}
+                <div className="p-4 bg-white/20 rounded-lg space-y-3">
+                    <Label>Dietary Information</Label>
+                    <div className="flex flex-wrap gap-4">
+                        {[
+                            { key: 'is_vegetarian', label: 'Vegetarian' },
+                            { key: 'is_vegan', label: 'Vegan' },
+                            { key: 'is_gluten_free', label: 'Gluten Free' },
+                            { key: 'is_dairy_free', label: 'Dairy Free' }
+                        ].map((diet) => (
+                            <label key={diet.key} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={(formData as any)[diet.key]}
+                                    onChange={(e) => setFormData({ ...formData, [diet.key]: e.target.checked })}
+                                    className="rounded border-gray-300"
+                                />
+                                <span>{diet.label}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
 
-                <div className="flex gap-4 pt-4">
-                    <Button type="submit" size="lg" disabled={isSubmitting}>
-                        <Save className="w-5 h-5 mr-2" />
-                        {isSubmitting ? t('Admin.saving') : recipe ? t('Admin.editRecipe') : t('Admin.createRecipe')}
-                    </Button>
+                {/* Allergens */}
+                <div className="p-4 bg-white/20 rounded-lg space-y-3">
+                    <Label>Allergens</Label>
+                    <div className="flex flex-wrap gap-2">
+                        {allergenOptions.map((allergen) => (
+                            <label key={allergen} className="flex items-center gap-2 cursor-pointer bg-white/40 px-3 py-1 rounded-full">
+                                <input
+                                    type="checkbox"
+                                    checked={allergens.includes(allergen)}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setAllergens([...allergens, allergen]);
+                                        } else {
+                                            setAllergens(allergens.filter(a => a !== allergen));
+                                        }
+                                    }}
+                                    className="rounded border-gray-300"
+                                />
+                                <span>{allergen}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Image Upload */}
+                <div>
+                    <Label>{t('Admin.recipeImage')}</Label>
+                    <div className="flex items-start gap-4 mt-2">
+                        <div className="flex-1">
+                            <ImageUpload
+                                bucket="recipe-images"
+                                currentImage={formData.image_url}
+                                onImageUploaded={(url) => setFormData({ ...formData, image_url: url })}
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setImageSearchOpen(true)}
+                                className="gap-2"
+                            >
+                                <Search className="w-4 h-4" />
+                                {t('Admin.searchImages')}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleGenerateImage}
+                                disabled={isGeneratingImage || !formData.title}
+                                className="gap-2 bg-gradient-to-r from-purple-500/10 to-blue-500/10 hover:from-purple-500/20 hover:to-blue-500/20 border-purple-200"
+                            >
+                                {isGeneratingImage ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+                                ) : (
+                                    <Sparkles className="w-4 h-4 text-purple-600" />
+                                )}
+                                {t('Admin.generateAIImage')}
+                            </Button>
+                        </div>
+                    </div>
+                    <ImageSearchModal
+                        isOpen={imageSearchOpen}
+                        onClose={() => setImageSearchOpen(false)}
+                        onSelect={(url) => {
+                            setFormData({ ...formData, image_url: url });
+                            setImageSearchOpen(false);
+                        }}
+                        initialQuery={formData.title}
+                    />
+                </div>
+
+                {/* Ingredients & Steps */}
+                <div className="space-y-8">
+                    <GroupedIngredientsEditor
+                        groups={ingredientGroups}
+                        onChange={setIngredientGroups}
+                    />
+
+                    <GroupedStepsEditor
+                        groups={stepGroups}
+                        onChange={setStepGroups}
+                    />
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-end gap-4 pt-4 border-t border-border/50">
                     <Button
                         type="button"
-                        size="lg"
                         variant="outline"
                         onClick={() => router.back()}
                     >
                         {t('Admin.cancel')}
                     </Button>
+                    <Button type="submit" disabled={isSubmitting} className="min-w-[150px]">
+                        <Save className="w-4 h-4 mr-2" />
+                        {isSubmitting ? t('Admin.saving') : t('Admin.saveRecipe')}
+                    </Button>
                 </div>
             </GlassPanel>
-
-            {/* Image Search Modal */}
-            <ImageSearchModal
-                isOpen={imageSearchOpen}
-                onClose={() => setImageSearchOpen(false)}
-                onSelect={(url) => setFormData({ ...formData, image_url: url })}
-                initialQuery={formData.title}
-                type="food"
-            />
         </form>
     );
 }

@@ -16,14 +16,14 @@ import PhotoGalleryManager from "./PhotoGalleryManager";
 import AttractionsManager from "./AttractionsManager";
 import EventsManager from "./EventsManager";
 import LocalProductsManager from "./LocalProductsManager";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 interface RegionFormProps {
     region?: Region;
 }
 
 export function RegionForm({ region }: RegionFormProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFetchingCoords, setIsFetchingCoords] = useState(false);
@@ -233,8 +233,17 @@ export function RegionForm({ region }: RegionFormProps) {
 
             const data = await response.json();
 
-            // Track usage in localStorage
+            // Populate fields if data exists
+            if (data.photo_gallery) setPhotoGallery(data.photo_gallery);
+            if (data.attractions) setAttractions(data.attractions);
+            if (data.how_to_get_there) setHowToGetThere(data.how_to_get_there);
+            if (data.tourist_info) setTouristInfo(data.tourist_info);
+            if (data.events_festivals) setEvents(data.events_festivals);
+            if (data.local_products) setLocalProducts(data.local_products);
+
+            // Track usage
             if (data._usage) {
+                // ...existing usage tracking logic...
                 try {
                     const STORAGE_KEY = "openai_usage_tracker";
                     const stored = localStorage.getItem(STORAGE_KEY);
@@ -242,50 +251,25 @@ export function RegionForm({ region }: RegionFormProps) {
 
                     let stats = stored ? JSON.parse(stored) : { tokensToday: 0, requestsToday: 0, lastReset: today };
 
-                    // Reset if new day
                     if (stats.lastReset !== today) {
                         stats = { tokensToday: 0, requestsToday: 0, lastReset: today };
                     }
 
-                    // Update stats
                     stats.tokensToday += data._usage.tokens;
                     stats.requestsToday += 1;
 
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
-
-                    // Trigger update event for tracker component
                     window.dispatchEvent(new Event("usage-updated"));
-
-                    console.log(`✅ Usage tracked: +${data._usage.tokens} tokens (Total today: ${stats.tokensToday})`);
                 } catch (err) {
                     console.error("Failed to track usage:", err);
                 }
             }
 
-            // Update all tourist data states
-            if (data.photo_gallery && Array.isArray(data.photo_gallery)) {
-                setPhotoGallery(data.photo_gallery);
-            }
-            if (data.attractions && Array.isArray(data.attractions)) {
-                setAttractions(data.attractions);
-            }
-            if (data.how_to_get_there) {
-                setHowToGetThere(data.how_to_get_there);
-            }
-            if (data.tourist_info) {
-                setTouristInfo(data.tourist_info);
-            }
-            if (data.events_festivals && Array.isArray(data.events_festivals)) {
-                setEvents(data.events_festivals);
-            }
-            if (data.local_products && Array.isArray(data.local_products)) {
-                setLocalProducts(data.local_products);
-            }
+            alert(t('Admin.dataGeneratedSuccess'));
 
-            alert("Τα τουριστικά δεδομένα δημιουργήθηκαν επιτυχώς με AI!");
         } catch (error) {
             const message = error instanceof Error ? error.message : "Unknown error";
-            alert(`Αποτυχία δημιουργίας τουριστικών δεδομένων: ${message}`);
+            alert(`Αποτυχία δημιουργίας δεδομένων: ${message}`);
             console.error("Tourist data generation error:", error);
         } finally {
             setIsGeneratingTouristData(false);
@@ -294,25 +278,26 @@ export function RegionForm({ region }: RegionFormProps) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <GlassPanel className="p-8 space-y-6 max-w-2xl">
-                <div>
-                    <Label htmlFor="name">{t('Admin.regionName')} *</Label>
-                    <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        required
-                    />
-                </div>
-
-                <div>
-                    <Label htmlFor="slug">{t('Admin.regionSlug')} *</Label>
-                    <Input
-                        id="slug"
-                        value={formData.slug}
-                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                        required
-                    />
+            <GlassPanel className="p-8 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <Label htmlFor="name">{t('Admin.name')} *</Label>
+                        <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="slug">{t('Admin.slug')} *</Label>
+                        <Input
+                            id="slug"
+                            value={formData.slug}
+                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                            required
+                        />
+                    </div>
                 </div>
 
                 <div>
@@ -320,89 +305,99 @@ export function RegionForm({ region }: RegionFormProps) {
                         <Label htmlFor="description">{t('Admin.description')}</Label>
                         <Button
                             type="button"
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             onClick={handleGenerateDescription}
                             disabled={isGeneratingDescription || !formData.name}
-                            className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                            className="text-purple-600 hover:text-purple-700 hover:bg-purple-50"
                         >
-                            <Sparkles className="w-3 h-3 mr-1" />
-                            {isGeneratingDescription ? 'Δημιουργία...' : 'AI Περιγραφή'}
+                            {isGeneratingDescription ? (
+                                <span className="animate-spin mr-2">⏳</span>
+                            ) : (
+                                <Sparkles className="w-4 h-4 mr-2" />
+                            )}
+                            {t('Admin.generateDescription')}
                         </Button>
                     </div>
                     <Textarea
                         id="description"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        rows={3}
+                        rows={4}
                     />
                 </div>
 
-                <div>
-                    <Label htmlFor="image">{t('Admin.regionImage')}</Label>
-                    <ImageUpload
-                        bucket="region-images"
-                        currentImage={formData.image_url}
-                        onImageUploaded={(url) => setFormData({ ...formData, image_url: url })}
-                    />
-                </div>
-
-                <div className="space-y-4">\n                    <div className="flex items-center justify-between">
-                    <Label>{t('Admin.mapCoordinates')}</Label>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGetCoordinates}
-                        disabled={isFetchingCoords || !formData.name}
-                    >
-                        <MapPin className="w-4 h-4 mr-2" />
-                        {isFetchingCoords ? t('Admin.gettingCoordinates') : t('Admin.getCoordinates')}
-                    </Button>
-                </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="latitude">{t('Admin.latitude')}</Label>
+                {/* Coordinates & Map */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <Label htmlFor="latitude">{t('Admin.latitude')}</Label>
+                        <div className="flex gap-2">
                             <Input
                                 id="latitude"
-                                type="number"
-                                step="0.000001"
-                                placeholder="e.g., 38.5"
                                 value={formData.latitude}
                                 onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                                placeholder="38.5"
                             />
-                            <p className="text-xs text-muted-foreground mt-1">{t('Admin.forMapPin')}</p>
                         </div>
-                        <div>
-                            <Label htmlFor="longitude">{t('Admin.longitude')}</Label>
+                    </div>
+                    <div>
+                        <Label htmlFor="longitude">{t('Admin.longitude')}</Label>
+                        <div className="flex gap-2">
                             <Input
                                 id="longitude"
-                                type="number"
-                                step="0.000001"
-                                placeholder="e.g., 23.5"
                                 value={formData.longitude}
                                 onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                                placeholder="23.5"
                             />
-                            <p className="text-xs text-muted-foreground mt-1">{t('Admin.forMapPin')}</p>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleGetCoordinates}
+                                disabled={isFetchingCoords || !formData.name}
+                                title="Get coordinates from name"
+                            >
+                                {isFetchingCoords ? (
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+                                ) : (
+                                    <MapPin className="w-4 h-4" />
+                                )}
+                            </Button>
                         </div>
                     </div>
                 </div>
 
-                {/* Tourist Data Section */}
-                <div className="border-t pt-6 space-y-6">
+                <div>
+                    <Label>{t('Admin.regionImage')}</Label>
+                    <div className="mt-2">
+                        <ImageUpload
+                            bucket="region-images"
+                            currentImage={formData.image_url}
+                            onImageUploaded={(url) => setFormData({ ...formData, image_url: url })}
+                        />
+                    </div>
+                </div>
+
+                {/* --- Extended Tourist Information Sections --- */}
+                <div className="space-y-8 pt-4 border-t border-border/50">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-xl font-semibold">{t('Admin.touristData')}</h3>
+                        <h3 className="text-xl font-semibold">{t('Admin.touristInfo')}</h3>
                         <Button
                             type="button"
-                            variant="default"
-                            size="sm"
                             onClick={handleGenerateTouristData}
                             disabled={isGeneratingTouristData || !formData.name}
-                            className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            className="bg-gradient-to-r from-purple-500 to-blue-500 text-white"
                         >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            {isGeneratingTouristData ? t('Admin.generatingWithAI') : t('Admin.generateWithAI')}
+                            {isGeneratingTouristData ? (
+                                <>
+                                    <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                                    {t('Admin.generating')}
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-4 h-4 mr-2" />
+                                    {t('Admin.generateAllData')}
+                                </>
+                            )}
                         </Button>
                     </div>
 
@@ -417,24 +412,22 @@ export function RegionForm({ region }: RegionFormProps) {
                     />
 
                     <div>
-                        <Label htmlFor="how-to-get">{t('Admin.howToGet')}</Label>
+                        <Label className="mb-2 block">{t('Admin.howToGetThere')}</Label>
                         <Textarea
-                            id="how-to-get"
                             value={howToGetThere}
                             onChange={(e) => setHowToGetThere(e.target.value)}
-                            rows={4}
-                            placeholder={t('Admin.howToGetPlaceholder')}
+                            placeholder={t('Admin.howToGetTherePlaceholder')}
+                            rows={3}
                         />
                     </div>
 
                     <div>
-                        <Label htmlFor="tourist-info">{t('Admin.touristInfo')}</Label>
+                        <Label className="mb-2 block">{t('Admin.additionalTouristInfo')}</Label>
                         <Textarea
-                            id="tourist-info"
                             value={touristInfo}
                             onChange={(e) => setTouristInfo(e.target.value)}
-                            rows={4}
                             placeholder={t('Admin.touristInfoPlaceholder')}
+                            rows={3}
                         />
                     </div>
 
@@ -449,18 +442,17 @@ export function RegionForm({ region }: RegionFormProps) {
                     />
                 </div>
 
-                <div className="flex gap-4 pt-4">
-                    <Button type="submit" size="lg" disabled={isSubmitting}>
-                        <Save className="w-5 h-5 mr-2" />
-                        {isSubmitting ? t('Admin.saving') : region ? t('Admin.updateRegion') : t('Admin.createRegion')}
-                    </Button>
+                <div className="flex justify-end gap-4 pt-4 border-t border-border/50">
                     <Button
                         type="button"
-                        size="lg"
                         variant="outline"
                         onClick={() => router.back()}
                     >
                         {t('Admin.cancel')}
+                    </Button>
+                    <Button type="submit" disabled={isSubmitting} className="min-w-[150px]">
+                        <Save className="w-4 h-4 mr-2" />
+                        {isSubmitting ? t('Admin.saving') : t('Admin.saveRegion')}
                     </Button>
                 </div>
             </GlassPanel>

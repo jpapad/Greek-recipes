@@ -3,7 +3,7 @@
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Label } from "@/components/ui/label";
 import { Tag } from "@/components/ui/Tag";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 interface FilterPanelProps {
     selectedDifficulty: string | null;
@@ -22,8 +22,8 @@ export function FilterPanel({
     selectedCategory,
     onCategoryChange,
 }: FilterPanelProps) {
-    const { t } = useTranslations();
-    
+    const t = useTranslations();
+
     const difficulties = ["easy", "medium", "hard"];
     const times = [
         { key: "under30m", label: t('Filters.under30m') },

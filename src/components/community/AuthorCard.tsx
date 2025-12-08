@@ -6,7 +6,7 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, UtensilsCrossed, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTranslations } from '@/hooks/useTranslations';
+import { useTranslations } from 'next-intl';
 
 interface AuthorCardProps {
     author: UserProfile & {
@@ -17,7 +17,7 @@ interface AuthorCardProps {
 }
 
 export function AuthorCard({ author, className }: AuthorCardProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
 
     // Get display name: either name, or email prefix, or 'Unknown'
     const displayName = author.name || author.email?.split('@')[0] || t('Common.unknown');

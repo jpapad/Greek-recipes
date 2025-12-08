@@ -91,13 +91,22 @@ export const metadata: Metadata = {
   category: "food",
 };
 
-export default function RootLayout({
+// ... imports
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+
+// ... other imports
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -109,31 +118,28 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
       >
-        <StyleInjector />
-        <LoadingScreen />
-        <Snowfall />
-        <ThemeProvider>
-          <ToastProvider>
-            <ShoppingListProvider>
-              <MealPlanProvider>
-                <Navbar />
-                <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
-                  {children}
-                </main>
-                <Footer />
-                <PWAInstallPrompt />
-              </MealPlanProvider>
-            </ShoppingListProvider>
-          </ToastProvider>
-        </ThemeProvider>
-        
-        {/* Service Worker Registration */}
-        {/* In preview environments sometimes an older Service Worker cached a 401 for manifest.json.
-            To ensure preview users see the updated manifest and SW behavior immediately, run a
-            one-time unregister+cache-clear on vercel preview hosts before registering the new SW.
-            This code only runs when the hostname contains 'vercel.app'. */}
-        {/* Removed one-time preview unregister script to avoid reload loops. */}
+        <NextIntlClientProvider messages={messages}>
+          <StyleInjector />
+          <LoadingScreen />
+          <Snowfall />
+          <ThemeProvider>
+            <ToastProvider>
+              <ShoppingListProvider>
+                <MealPlanProvider>
+                  <Navbar />
+                  <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
+                    {children}
+                  </main>
+                  <Footer />
+                  <PWAInstallPrompt />
+                </MealPlanProvider>
+              </ShoppingListProvider>
+            </ToastProvider>
+          </ThemeProvider>
+        </NextIntlClientProvider>
 
+        {/* Service Worker Registration */}
+        {/* ... script ... */}
         <Script id="register-sw" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {

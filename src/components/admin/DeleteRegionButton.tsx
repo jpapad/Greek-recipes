@@ -5,7 +5,7 @@ import { deleteRegion } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import { useToast } from "@/components/ui/toast";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
@@ -18,7 +18,7 @@ interface DeleteRegionButtonProps {
 }
 
 export function DeleteRegionButton({ id, name, onBeforeDelete, onDeleteFailed, onDeleted }: DeleteRegionButtonProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
     const { showToast } = useToast();

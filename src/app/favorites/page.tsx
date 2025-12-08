@@ -9,10 +9,10 @@ import { Recipe } from "@/lib/types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart, ChefHat } from "lucide-react";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 export default function FavoritesPage() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const { favorites } = useFavorites();
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [loading, setLoading] = useState(true);

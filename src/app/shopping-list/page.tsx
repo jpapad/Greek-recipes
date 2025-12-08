@@ -8,10 +8,10 @@ import Link from "next/link";
 import { CATEGORIES, IngredientCategory } from "@/lib/ingredientCategories";
 import { exportShoppingListToPDF } from "@/lib/pdfExport";
 import { useState } from "react";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 export default function ShoppingListPage() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const { items, toggleItem, toggleCategory, removeItem, clearList, clearChecked, updateQuantity } = useShoppingList();
     const [expandedCategories, setExpandedCategories] = useState<Set<IngredientCategory>>(new Set(Object.keys(CATEGORIES) as IngredientCategory[]));
 
@@ -55,24 +55,24 @@ export default function ShoppingListPage() {
                 <div className="space-y-6">
                     {/* Action buttons */}
                     <div className="flex flex-wrap gap-3 justify-end">
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={handleExportPDF}
                             className="gap-2"
                         >
                             <Download className="w-4 h-4" />
                             Εξαγωγή PDF
                         </Button>
-                        <Button 
-                            variant="outline" 
+                        <Button
+                            variant="outline"
                             onClick={clearChecked}
                             className="gap-2"
                         >
                             <CheckCheck className="w-4 h-4" />
                             Καθαρισμός Επιλεγμένων
                         </Button>
-                        <Button 
-                            variant="destructive" 
+                        <Button
+                            variant="destructive"
                             onClick={clearList}
                             className="gap-2"
                         >
@@ -94,7 +94,7 @@ export default function ShoppingListPage() {
                         return (
                             <GlassPanel key={categoryKey} className="overflow-hidden">
                                 {/* Category Header */}
-                                <div 
+                                <div
                                     className="p-4 bg-white/20 border-b border-white/30 cursor-pointer hover:bg-white/30 transition-colors"
                                     onClick={() => toggleCategoryExpand(categoryKey)}
                                 >
@@ -185,11 +185,10 @@ export default function ShoppingListPage() {
                                                     {/* Item name */}
                                                     <div className="flex-grow">
                                                         <span
-                                                            className={`text-lg ${
-                                                                item.checked
+                                                            className={`text-lg ${item.checked
                                                                     ? "line-through text-muted-foreground"
                                                                     : "text-foreground"
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {item.name}
                                                         </span>

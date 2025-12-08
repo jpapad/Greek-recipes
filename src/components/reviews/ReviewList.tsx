@@ -4,15 +4,15 @@ import { Star, User } from "lucide-react";
 import { Review } from "@/lib/types";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { formatDistanceToNow } from "date-fns";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 interface ReviewListProps {
     reviews: Review[];
 }
 
 export function ReviewList({ reviews }: ReviewListProps) {
-    const { t } = useTranslations();
-    
+    const t = useTranslations();
+
     if (reviews.length === 0) {
         return (
             <div className="text-center py-8 text-muted-foreground">
@@ -44,8 +44,8 @@ export function ReviewList({ reviews }: ReviewListProps) {
                                 <Star
                                     key={star}
                                     className={`w-4 h-4 ${star <= review.rating
-                                            ? "fill-yellow-400 text-yellow-400"
-                                            : "text-gray-300"
+                                        ? "fill-yellow-400 text-yellow-400"
+                                        : "text-gray-300"
                                         }`}
                                 />
                             ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -12,7 +12,7 @@ interface HomeClientProps {
 }
 
 export function HomeClient({ featuredRecipeSlug, featuredRecipeTitle, featuredRecipeDescription }: HomeClientProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
 
     return (
         <>
@@ -35,7 +35,7 @@ export function HomeClient({ featuredRecipeSlug, featuredRecipeTitle, featuredRe
 }
 
 export function HomeSectionHeaders() {
-    const { t } = useTranslations();
+    const t = useTranslations();
 
     return {
         exploreRegions: t('Home.exploreRegions'),

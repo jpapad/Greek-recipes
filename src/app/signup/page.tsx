@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useToast } from "@/components/ui/toast";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 export default function SignupPage() {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const router = useRouter();
     const { showToast } = useToast();
     const [email, setEmail] = useState("");
@@ -39,7 +39,7 @@ export default function SignupPage() {
 
         try {
             const result = await signUp(email, password);
-            
+
             // Check if email confirmation is required
             if (result?.user && result.user.confirmed_at) {
                 // User is auto-confirmed (email verification disabled)
@@ -51,7 +51,7 @@ export default function SignupPage() {
                 // Account created but status unclear
                 showToast(t('Auth.signUpSuccess'), "success");
             }
-            
+
             router.push("/login");
         } catch (err: unknown) {
             if (err instanceof Error) {

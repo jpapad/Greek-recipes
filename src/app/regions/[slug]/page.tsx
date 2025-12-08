@@ -57,7 +57,7 @@ export default async function RegionDetailPage({ params }: PageProps) {
     return (
         <div className="space-y-12 pt-24">
             {/* Hero Section */}
-            <div className="relative h-[300px] md:h-[400px] rounded-3xl overflow-hidden shadow-xl">
+            <div className="relative h-[300px] md:h-[350px] rounded-3xl overflow-hidden shadow-xl">
                 <Image
                     src={region.image_url || "/placeholder-region.jpg"}
                     alt={region.name}
@@ -66,15 +66,17 @@ export default async function RegionDetailPage({ params }: PageProps) {
                     priority
                     sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center p-4 text-center">
-                    <div className="max-w-3xl">
-                        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">{region.name}</h1>
-                        <p className="text-lg md:text-xl text-gray-100 drop-shadow-md">
-                            {region.description}
-                        </p>
-                    </div>
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center p-4 text-center">
+                    <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">{region.name}</h1>
                 </div>
             </div>
+
+            {/* Region Description */}
+            <GlassPanel className="p-8 bg-white/60 backdrop-blur-md">
+                <p className="text-lg md:text-xl text-foreground leading-relaxed">
+                    {region.description}
+                </p>
+            </GlassPanel>
 
             {/* Prefectures in this Region */}
             {prefectures.length > 0 && (

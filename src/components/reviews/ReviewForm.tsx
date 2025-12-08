@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { addReview } from "@/lib/api";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { getUser } from "@/lib/auth";
-import { useTranslations } from "@/hooks/useTranslations";
+import { useTranslations } from "next-intl";
 
 interface ReviewFormProps {
     recipeId: string;
@@ -15,7 +15,7 @@ interface ReviewFormProps {
 }
 
 export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
-    const { t } = useTranslations();
+    const t = useTranslations();
     const [rating, setRating] = useState(0);
     const [comment, setComment] = useState("");
     const [hoveredRating, setHoveredRating] = useState(0);
@@ -77,8 +77,8 @@ export function ReviewForm({ recipeId, onReviewAdded }: ReviewFormProps) {
                         >
                             <Star
                                 className={`w-8 h-8 ${star <= (hoveredRating || rating)
-                                        ? "fill-yellow-400 text-yellow-400"
-                                        : "text-gray-300"
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-gray-300"
                                     }`}
                             />
                         </button>
