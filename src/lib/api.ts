@@ -415,6 +415,15 @@ export async function getPrefectureBySlug(slug: string): Promise<Prefecture | nu
 }
 
 export async function getPrefectureById(id: string): Promise<Prefecture | null> {
+    // Guard: avoid calling Supabase with an obviously-invalid id (e.g. "undefined",
+    // an empty string, or a non-UUID). This prevents server-side errors like
+    // "invalid input syntax for type uuid" observed in preview/edge flows.
+    const uuidExact = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!id || typeof id !== 'string' || !uuidExact.test(id)) {
+        console.warn('getPrefectureById called with invalid id, skipping DB call:', String(id));
+        return null;
+    }
+
     const { data, error } = await supabase
         .from('prefectures')
         .select('*, region:region_id(*)')
