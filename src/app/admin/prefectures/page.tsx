@@ -1,15 +1,17 @@
-import { getPrefectures } from "@/lib/api";
+import { getPrefectures, getCities } from "@/lib/api";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, MapPin } from "lucide-react";
 import Link from "next/link";
 import PrefectureEditButtonClient from "@/components/admin/PrefectureEditButtonClient";
+import { City } from "@/lib/types";
 
 // Force dynamic rendering so admin sees fresh DB data after edits/creates.
 export const dynamic = 'force-dynamic';
 
 export default async function AdminPrefecturesPage() {
     const prefectures = await getPrefectures();
+    const cities = await getCities();
 
     return (
         <div className="space-y-8">
@@ -41,25 +43,52 @@ export default async function AdminPrefecturesPage() {
                         const uuidMatch = rawId.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
                         const safeId = uuidMatch ? uuidMatch[0] : encodeURIComponent(rawId);
 
+                        // Filter cities for this prefecture
+                        const prefectureCities = cities.filter(city => city.prefecture_id === prefecture.id);
+
                         return (
-                        <GlassPanel key={prefecture.id} className="p-6">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h3 className="text-xl font-semibold">{prefecture.name}</h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        Region: {prefecture.region?.name || 'N/A'} • Slug: {prefecture.slug}
-                                    </p>
+                            <GlassPanel key={prefecture.id} className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-semibold">{prefecture.name}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            Region: {prefecture.region?.name || 'N/A'} • Slug: {prefecture.slug}
+                                        </p>
                                         <p className="text-xs text-muted-foreground mt-1">ID: {String(prefecture.id)}</p>
-                                    {prefecture.description && (
-                                        <p className="text-sm mt-2">{prefecture.description}</p>
-                                    )}
+                                        {prefecture.description && (
+                                            <p className="text-sm mt-2">{prefecture.description}</p>
+                                        )}
+
+                                        {/* Cities list */}
+                                        {prefectureCities.length > 0 && (
+                                            <div className="mt-3">
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                                                    <MapPin className="w-4 h-4" />
+                                                    <span>{prefectureCities.length} Cit{prefectureCities.length !== 1 ? 'ies' : 'y'}</span>
+                                                </div>
+                                                <div className="pl-6 space-y-1">
+                                                    {prefectureCities.map(city => (
+                                                        <div key={city.id} className="flex items-center gap-2 text-sm">
+                                                            <span className="text-muted-foreground">•</span>
+                                                            <Link
+                                                                href={`/admin/cities/${city.id}/edit`}
+                                                                className="hover:underline hover:text-primary"
+                                                            >
+                                                                {city.name}
+                                                            </Link>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <PrefectureEditButtonClient prefecture={prefecture} />
+                                    </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    <PrefectureEditButtonClient prefecture={prefecture} />
-                                </div>
-                            </div>
-                        </GlassPanel>
-                    )})
+                            </GlassPanel>
+                        )
+                    })
                 )}
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { getRegionBySlug, getRecipesByRegion } from "@/lib/api";
+import { getRegionBySlug, getRecipesByRegion, getPrefectures } from "@/lib/api";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import PhotoGallery from "@/components/regions/PhotoGallery";
@@ -52,6 +52,7 @@ export default async function RegionDetailPage({ params }: PageProps) {
     }
 
     const recipes = await getRecipesByRegion(region.id);
+    const prefectures = await getPrefectures(region.id);
 
     return (
         <div className="space-y-12 pt-24">
@@ -78,17 +79,44 @@ export default async function RegionDetailPage({ params }: PageProps) {
             {/* Tourist Information Sections */}
             <div className="space-y-8">
                 <PhotoGallery photos={region.photo_gallery || []} title={`Φωτογραφίες από ${region.name}`} />
-                
+
                 <AccessInfo howToGetThere={region.how_to_get_there || ""} />
-                
+
                 <TouristInfoPanel touristInfo={region.tourist_info || ""} />
-                
+
                 <AttractionsList attractions={region.attractions || []} />
-                
+
                 <EventsList events={region.events_festivals || []} />
-                
+
                 <LocalProducts products={region.local_products || []} />
             </div>
+
+            {/* Prefectures in this Region */}
+            {prefectures.length > 0 && (
+                <section>
+                    <h2 className="text-3xl font-bold mb-6 pl-2 border-l-4 border-primary">
+                        Νομοί στην {region.name}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {prefectures.map((prefecture) => (
+                            <GlassPanel key={prefecture.id} className="p-6 hover:shadow-lg transition-shadow">
+                                <h3 className="text-xl font-semibold mb-2">{prefecture.name}</h3>
+                                {prefecture.description && (
+                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                                        {prefecture.description}
+                                    </p>
+                                )}
+                                <a
+                                    href={`/prefectures/${prefecture.slug}`}
+                                    className="text-primary hover:underline text-sm font-medium"
+                                >
+                                    Δείτε περισσότερα →
+                                </a>
+                            </GlassPanel>
+                        ))}
+                    </div>
+                </section>
+            )}
 
             {/* Recipes Grid */}
             <section>
