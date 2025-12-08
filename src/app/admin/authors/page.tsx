@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
-import { getAuthors, updateUserRole } from '@/lib/blog-api';
+import { getAuthors, updateUserRole, searchUsers } from '@/lib/blog-api';
 import type { UserProfile } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
 import { UserPlus, UserMinus } from 'lucide-react';
@@ -11,8 +11,18 @@ import { UserPlus, UserMinus } from 'lucide-react';
 export default function AuthorsManagementPage() {
   const [authors, setAuthors] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const { showToast } = useToast();
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
+
+  const handleSearch = async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const results = await searchUsers(query);
+    setSearchResults(results);
+  };
 
   const loadAuthors = async () => {
     setLoading(true);
@@ -43,15 +53,52 @@ export default function AuthorsManagementPage() {
       <GlassPanel className="p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Προσθήκη Νέου Συντάκτη</h2>
         <p className="text-sm text-muted-foreground mb-4">
-          Για να δώσεις δικαιώματα author σε χρήστη, πρέπει πρώτα να έχει κάνει εγγραφή στην εφαρμογή.
-          Μετά, μπορείς να του δώσεις τον ρόλο από τη λίστα παρακάτω.
+          Αναζήτηση χρήστη με βάση το όνομα (από το προφίλ τους).
         </p>
+
+        <div className="relative max-w-md">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Αναζήτηση με όνομα..."
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-md shadow-md z-10 overflow-hidden">
+              {searchResults.map(user => (
+                <div key={user.user_id} className="p-3 hover:bg-muted/50 flex items-center justify-between transition-colors">
+                  <div className="flex items-center gap-3">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt={user.name} className="w-8 h-8 rounded-full" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-xs">
+                        {user.name?.charAt(0) || '?'}
+                      </div>
+                    )}
+                    <span className="font-medium text-sm">{user.name || 'Χωρίς όνομα'}</span>
+                  </div>
+                  {authors.some(a => a.user_id === user.user_id) ? (
+                    <span className="text-xs text-muted-foreground">Ήδη στη λίστα</span>
+                  ) : (
+                    <Button size="sm" variant="ghost" className="h-8" onClick={() => toggleAuthorRole(user.user_id, false)}>
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Προσθήκη
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </GlassPanel>
 
       {/* Current Authors */}
       <GlassPanel className="p-6">
         <h2 className="text-xl font-semibold mb-4">Τρέχοντες Συντάκτες</h2>
-        
+
         {loading ? (
           <p className="text-muted-foreground">Φόρτωση...</p>
         ) : authors.length === 0 ? (

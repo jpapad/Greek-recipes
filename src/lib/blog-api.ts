@@ -249,8 +249,51 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
   }
 }
 
+export async function searchUsers(query: string): Promise<UserProfile[]> {
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('user_id, display_name, avatar_url, bio')
+      .ilike('display_name', `%${query}%`)
+      .limit(10);
+
+    if (error) throw error;
+
+    // Map display_name to name for consistency with UserProfile type
+    return (data || []).map(p => ({
+      ...p,
+      name: p.display_name
+    }));
+  } catch (error) {
+    console.error('Error searching users:', error);
+    return [];
+  }
+}
+
 export async function updateUserRole(userId: string, updates: Partial<UserProfile>): Promise<UserProfile | null> {
   try {
+    // First check if user exists in user_roles
+    const { data: existing } = await supabase
+      .from('user_roles')
+      .select('user_id')
+      .eq('user_id', userId)
+      .single();
+
+    if (!existing) {
+      // Create new role entry
+      const { data, error } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userId,
+          ...updates
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
     const { data, error } = await supabase
       .from('user_roles')
       .update(updates)
