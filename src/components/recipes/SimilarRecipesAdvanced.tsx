@@ -5,6 +5,7 @@ import { RecipeCard } from "./RecipeCard";
 import { getRecipes } from "@/lib/api";
 import type { Recipe } from "@/lib/types";
 import { Sparkles } from "lucide-react";
+import { flattenIngredients } from "@/lib/recipeHelpers";
 
 interface SimilarRecipesAdvancedProps {
   currentRecipe: Recipe;
@@ -72,24 +73,22 @@ export function SimilarRecipesAdvanced({
     const timeDiff = Math.abs(recipe1.time_minutes - recipe2.time_minutes);
     if (timeDiff <= 15) {
       score += 15;
-    } else if (timeDiff <= 30) {
-      score += 10;
     } else if (timeDiff <= 60) {
       score += 5;
     }
 
     // 5. Shared ingredients (high weight)
     if (recipe1.ingredients && recipe2.ingredients) {
-      const ingredients1 = recipe1.ingredients.map((ing) => 
+      const ingredients1 = flattenIngredients(recipe1.ingredients).map((ing) =>
         ing.toLowerCase().split(" ").filter(word => word.length > 3)
       ).flat();
-      
-      const ingredients2 = recipe2.ingredients.map((ing) => 
+
+      const ingredients2 = flattenIngredients(recipe2.ingredients).map((ing) =>
         ing.toLowerCase().split(" ").filter(word => word.length > 3)
       ).flat();
 
       const sharedIngredients = ingredients1.filter((ing1) =>
-        ingredients2.some((ing2) => 
+        ingredients2.some((ing2) =>
           ing1.includes(ing2) || ing2.includes(ing1)
         )
       );
