@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { getAuthors, updateUserRole, searchUsers } from '@/lib/blog-api';
 import type { UserProfile } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
-import { UserPlus, UserMinus } from 'lucide-react';
+import { UserPlus, UserMinus, Edit2, X, Save } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 export default function AuthorsManagementPage() {
   const [authors, setAuthors] = useState<UserProfile[]>([]);
@@ -15,14 +18,13 @@ export default function AuthorsManagementPage() {
   const { showToast } = useToast();
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
 
-  const handleSearch = async (query: string) => {
-    if (query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-    const results = await searchUsers(query);
-    setSearchResults(results);
-  };
+  // Edit State
+  const [editingAuthor, setEditingAuthor] = useState<UserProfile | null>(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    bio: '',
+    avatar_url: ''
+  });
 
   const loadAuthors = async () => {
     setLoading(true);
@@ -34,6 +36,44 @@ export default function AuthorsManagementPage() {
   useEffect(() => {
     loadAuthors();
   }, []);
+
+  const handleEditClick = (author: UserProfile) => {
+    setEditingAuthor(author);
+    setEditForm({
+      name: author.name || author.email?.split('@')[0] || '',
+      bio: author.bio || '',
+      avatar_url: author.avatar_url || ''
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingAuthor) return;
+
+    const result = await updateUserRole(editingAuthor.user_id, {
+      name: editForm.name,
+      bio: editForm.bio,
+      avatar_url: editForm.avatar_url,
+      // Maintain author status when editing
+      is_author: editingAuthor.is_author
+    });
+
+    if (result) {
+      showToast('Τα στοιχεία ενημερώθηκαν επιτυχώς', 'success');
+      setEditingAuthor(null);
+      loadAuthors();
+    } else {
+      showToast('Σφάλμα κατά την ενημέρωση', 'error');
+    }
+  };
+
+  const handleSearch = async (query: string) => {
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    const results = await searchUsers(query);
+    setSearchResults(results);
+  };
 
   const toggleAuthorRole = async (userId: string, currentStatus: boolean) => {
     const result = await updateUserRole(userId, { is_author: !currentStatus });
@@ -143,6 +183,15 @@ export default function AuthorsManagementPage() {
                 </div>
 
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditClick(author)}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Επεξεργασία
+                  </Button>
+
                   {!author.is_admin && (
                     <Button
                       variant={author.is_author ? 'destructive' : 'default'}
@@ -177,6 +226,65 @@ export default function AuthorsManagementPage() {
           <li>• Μόνο οι admins μπορούν να διαγράφουν άρθρα και να διαχειρίζονται κατηγορίες</li>
         </ul>
       </div>
+
+      {/* Edit Modal */}
+      {editingAuthor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <GlassPanel className="w-full max-w-lg p-6 relative">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">Επεξεργασία Συντάκτη</h3>
+              <Button variant="ghost" size="icon" onClick={() => setEditingAuthor(null)}>
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Όνομα Εμφάνισης</Label>
+                <Input
+                  value={editForm.name}
+                  onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder="π.χ. Μαρία Παπαδοπούλου"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Βιογραφικό</Label>
+                <Textarea
+                  value={editForm.bio}
+                  onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
+                  placeholder="Σύντομο βιογραφικό..."
+                  rows={4}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Avatar URL</Label>
+                <div className="flex gap-3">
+                  <Input
+                    value={editForm.avatar_url}
+                    onChange={e => setEditForm({ ...editForm, avatar_url: e.target.value })}
+                    placeholder="https://..."
+                  />
+                  {editForm.avatar_url && (
+                    <img src={editForm.avatar_url} alt="Preview" className="w-10 h-10 rounded-full object-cover border" />
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-border">
+                <Button variant="outline" onClick={() => setEditingAuthor(null)}>
+                  Ακύρωση
+                </Button>
+                <Button onClick={handleSaveEdit}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Αποθήκευση
+                </Button>
+              </div>
+            </div>
+          </GlassPanel>
+        </div>
+      )}
     </div>
   );
 }
