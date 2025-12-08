@@ -16,6 +16,7 @@ import { DifficultyIcon } from "@/components/ui/DifficultyIcon";
 import { StarRating } from "@/components/ui/StarRating";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useState } from "react";
+import { flattenIngredients } from "@/lib/recipeHelpers";
 
 interface RecipeCardProps {
     recipe: Recipe;
@@ -36,7 +37,7 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
         },
         onSwipeRight: () => {
             if (recipe.ingredients) {
-                addItems(recipe.ingredients, recipe.id, recipe.title);
+                addItems(flattenIngredients(recipe.ingredients), recipe.id, recipe.title);
                 setSwipeFeedback('shopping');
                 setTimeout(() => setSwipeFeedback(null), 1000);
             }
@@ -45,9 +46,9 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
     });
 
     return (
-        <GlassPanel 
-            variant="card" 
-            hoverEffect 
+        <GlassPanel
+            variant="card"
+            hoverEffect
             className={cn(
                 "h-full overflow-hidden flex flex-col relative group transition-all duration-300",
                 "shadow-lg hover:shadow-[0_8px_30px_rgba(16,45,99,0.4),0_12px_40px_rgba(16,45,99,0.25)]",
