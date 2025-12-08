@@ -10,6 +10,7 @@ import { ArrowLeft, ArrowRight, X, CheckCircle2, Timer, Play, Pause, RotateCcw }
 import { cn } from "@/lib/utils";
 import { VoiceCommands } from "@/components/recipes/VoiceCommands";
 import { useTranslations } from "@/hooks/useTranslations";
+import { flattenGroups } from "@/lib/recipeHelpers";
 
 export default function CookModePage() {
     const { t } = useTranslations();
@@ -18,7 +19,7 @@ export default function CookModePage() {
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [currentStep, setCurrentStep] = useState(0);
     const [wakeLock, setWakeLock] = useState<WakeLockSentinel | null>(null);
-    
+
     // Timer states
     const [timerMinutes, setTimerMinutes] = useState(0);
     const [timerSeconds, setTimerSeconds] = useState(0);
@@ -115,7 +116,12 @@ export default function CookModePage() {
 
     if (!recipe) return <div className="p-8 text-center">{t('CookMode.loading')}</div>;
 
-    const steps = Array.isArray(recipe.steps) ? recipe.steps : [JSON.stringify(recipe.steps)];
+    // Flatten steps if they're grouped
+    const steps = Array.isArray(recipe.steps)
+        ? (typeof recipe.steps[0] === 'string'
+            ? recipe.steps as string[]
+            : flattenGroups(recipe.steps as any))
+        : [JSON.stringify(recipe.steps)];
     const progress = ((currentStep + 1) / steps.length) * 100;
 
     return (
@@ -182,7 +188,7 @@ export default function CookModePage() {
                                 onStartTimer={(mins) => startTimer(mins)}
                                 onPauseTimer={pauseTimer}
                             />
-                            
+
                             <Button
                                 variant="outline"
                                 size="sm"
