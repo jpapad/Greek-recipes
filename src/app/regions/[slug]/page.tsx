@@ -76,21 +76,6 @@ export default async function RegionDetailPage({ params }: PageProps) {
                 </div>
             </div>
 
-            {/* Tourist Information Sections */}
-            <div className="space-y-8">
-                <PhotoGallery photos={region.photo_gallery || []} title={`Φωτογραφίες από ${region.name}`} />
-
-                <AccessInfo howToGetThere={region.how_to_get_there || ""} />
-
-                <TouristInfoPanel touristInfo={region.tourist_info || ""} />
-
-                <AttractionsList attractions={region.attractions || []} />
-
-                <EventsList events={region.events_festivals || []} />
-
-                <LocalProducts products={region.local_products || []} />
-            </div>
-
             {/* Prefectures in this Region */}
             {prefectures.length > 0 && (
                 <section>
@@ -117,6 +102,21 @@ export default async function RegionDetailPage({ params }: PageProps) {
                     </div>
                 </section>
             )}
+
+            {/* Tourist Information Sections */}
+            <div className="space-y-8">
+                <PhotoGallery photos={region.photo_gallery || []} title={`Φωτογραφίες από ${region.name}`} />
+
+                <AccessInfo howToGetThere={region.how_to_get_there || ""} />
+
+                <TouristInfoPanel touristInfo={region.tourist_info || ""} />
+
+                <AttractionsList attractions={region.attractions || []} />
+
+                <EventsList events={region.events_festivals || []} />
+
+                <LocalProducts products={region.local_products || []} />
+            </div>
 
             {/* Recipes Grid */}
             <section>
