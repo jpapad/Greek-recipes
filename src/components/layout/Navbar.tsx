@@ -100,10 +100,10 @@ export function Navbar() {
                         {/* Center Logo - Larger Size */}
                         <div className="flex items-center justify-center md:px-8">
                             <Link href="/" className="hover:scale-105 transition-transform group">
-                                <div className={`relative transition-all duration-300 rounded-full border-3 border-white/80 bg-white backdrop-blur-xl shadow-2xl p-3 ${isScrolled ? 'w-24 h-24 md:w-36 md:h-36' : 'w-32 h-32 md:w-60 md:h-60 lg:w-80 lg:h-80'
+                                <div className={`relative transition-all duration-300 rounded-full border-3 border-white/80 bg-white backdrop-blur-xl shadow-2xl p-2 ${isScrolled ? 'w-20 h-20 md:w-28 md:h-28' : 'w-28 h-28 md:w-48 md:h-48 lg:w-56 lg:h-56'
                                     } drop-shadow-[0_0_30px_rgba(255,255,255,0.6)]`}>
                                     {/* Santa Hat */}
-                                    <div className={`absolute -top-4 -right-3 md:-top-8 md:-right-6 transition-all duration-300 z-10 ${isScrolled ? 'w-16 h-16 md:w-24 md:h-24' : 'w-24 h-24 md:w-40 md:h-40 lg:w-48 lg:h-48'
+                                    <div className={`absolute -top-4 -right-3 md:-top-5 md:-right-4 transition-all duration-300 z-10 ${isScrolled ? 'w-12 h-12 md:w-16 md:h-16' : 'w-16 h-16 md:w-28 md:h-28 lg:w-32 lg:h-32'
                                         }`}>
                                         <Image
                                             src="/santa-hat.svg"
