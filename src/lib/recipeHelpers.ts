@@ -69,3 +69,12 @@ export function flattenIngredients(ingredients: IngredientGroup[] | string[] | u
     if (typeof ingredients[0] === 'string') return ingredients as string[];
     return (ingredients as IngredientGroup[]).flatMap(g => g.items);
 }
+
+/**
+ * Flatten step groups to simple string array
+ */
+export function flattenSteps(steps: StepGroup[] | string[] | undefined): string[] {
+    if (!steps) return [];
+    if (typeof steps[0] === 'string') return steps as string[];
+    return (steps as StepGroup[]).flatMap(g => g.items);
+}

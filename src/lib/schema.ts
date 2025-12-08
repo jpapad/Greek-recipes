@@ -1,4 +1,5 @@
 import { Recipe } from "@/lib/types";
+import { flattenIngredients, flattenSteps } from "@/lib/recipeHelpers";
 
 export function generateRecipeSchema(recipe: Recipe) {
     const schema = {
@@ -18,8 +19,8 @@ export function generateRecipeSchema(recipe: Recipe) {
         "recipeYield": `${recipe.servings} μερίδες`,
         "recipeCategory": recipe.category,
         "recipeCuisine": "Ελληνική",
-        "recipeIngredient": recipe.ingredients,
-        "recipeInstructions": recipe.steps.map((step: string, index: number) => ({
+        "recipeIngredient": flattenIngredients(recipe.ingredients),
+        "recipeInstructions": flattenSteps(recipe.steps).map((step: string, index: number) => ({
             "@type": "HowToStep",
             "position": index + 1,
             "text": step
