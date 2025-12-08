@@ -1,6 +1,7 @@
 // Meal Planning API functions for Supabase
 import { supabase } from './supabaseClient';
 import type { MealPlan, MealPlanItem, ShoppingList, ShoppingListItem } from './types';
+import { flattenIngredients } from '@/lib/recipeHelpers';
 
 // ==================== MEAL PLANS ====================
 
@@ -66,7 +67,7 @@ export async function getCurrentWeekMealPlan(userId: string): Promise<MealPlan |
     const today = new Date();
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday
-    
+
     const { data, error } = await supabase
       .from('meal_plans')
       .select(`
@@ -288,7 +289,8 @@ export async function generateShoppingListFromMealPlan(
     for (const item of mealPlan.items) {
       if (!item.recipe || !item.recipe.ingredients) continue;
 
-      for (const ingredient of item.recipe.ingredients) {
+      const ingredients = flattenIngredients(item.recipe.ingredients);
+      for (const ingredient of ingredients) {
         const key = ingredient.toLowerCase().trim();
         if (!ingredientMap.has(key)) {
           ingredientMap.set(key, {
