@@ -190,6 +190,7 @@ export interface UserProfile {
     user_id: string;
     is_admin?: boolean;
     is_author?: boolean;
+    name?: string;
     bio?: string;
     avatar_url?: string;
     social_links?: {
@@ -198,7 +199,6 @@ export interface UserProfile {
         website?: string;
     };
     email?: string;
-    name?: string;
     created_at?: string;
     updated_at?: string;
 }
