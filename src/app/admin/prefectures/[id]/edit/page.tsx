@@ -1,19 +1,23 @@
 import { getPrefectureById } from "@/lib/api";
 import { PrefectureForm } from "@/components/admin/PrefectureForm";
- 
+
 import { supabase } from '@/lib/supabaseClient';
 import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
 import ClientPrefectureLoader from '@/components/admin/ClientPrefectureLoader';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPrefecturePage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
+export default async function EditPrefecturePage({ params, searchParams }: { params: Promise<Record<string, any>>, searchParams?: Promise<Record<string, any>> }) {
+    // Await params and searchParams as they are Promises in Next.js 15
+    const resolvedParams = await params;
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
     // Defensive: Next's internal named capture groups can sometimes use a different
     // key name (e.g. `nxtPid`) in the compiled route. Accept common fallbacks
     // and be tolerant of encoded values, full URLs, or accidental literal
     // strings like "undefined". Extract a UUID if present. Prefer route
     // params, but fall back to `searchParams.id` which we now include on links.
-    let id: string | undefined = params?.id ?? params?.nxtPid ?? Object.values(params || {})[0];
+    let id: string | undefined = resolvedParams?.id ?? resolvedParams?.nxtPid ?? Object.values(resolvedParams || {})[0];
 
     if (typeof id === 'string') {
         id = decodeURIComponent(id).trim();
@@ -30,8 +34,8 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
     // (e.g. 'undefined' or a full URL). If the query `id` is a valid UUID,
     // prefer it (override bad route params). Otherwise fall back to the
     // existing behavior.
-    if (searchParams?.id) {
-        const sp = String(searchParams.id);
+    if (resolvedSearchParams?.id) {
+        const sp = String(resolvedSearchParams.id);
         const spUuid = sp.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
         if (spUuid) {
             id = spUuid[0];
@@ -122,17 +126,17 @@ export default async function EditPrefecturePage({ params, searchParams }: { par
             <p className="text-muted-foreground">No prefecture could be fetched for id <code>{String(id)}</code>.</p>
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
                 <h3 className="font-semibold">Route Params (raw)</h3>
-                <p className="text-xs mt-1">Param keys: {JSON.stringify(Object.keys(params || {}))}</p>
-                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(params, null, 2)}</pre>
+                <p className="text-xs mt-1">Param keys: {JSON.stringify(Object.keys(resolvedParams || {}))}</p>
+                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(resolvedParams, null, 2)}</pre>
                 <h3 className="font-semibold mt-3">Search Params (raw)</h3>
-                <p className="text-xs mt-1">Search param keys: {JSON.stringify(Object.keys(searchParams || {}))}</p>
-                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(searchParams || null, null, 2)}</pre>
+                <p className="text-xs mt-1">Search param keys: {JSON.stringify(Object.keys(resolvedSearchParams || {}))}</p>
+                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(resolvedSearchParams || null, null, 2)}</pre>
             </div>
             <div className="bg-red-50 border border-red-200 p-4 rounded">
                 <h2 className="font-semibold">Diagnostic</h2>
                 <p className="text-sm text-muted-foreground mt-2">The page attempted to fetch the prefecture via server-side Supabase. Below is the raw response from Supabase (for debugging only).</p>
                 <pre className="mt-3 overflow-auto text-xs bg-white p-3 rounded">
-{JSON.stringify({ raw: raw || null, supabaseError: error || null, serverHeaders, serverCookieNames }, null, 2)}
+                    {JSON.stringify({ raw: raw || null, supabaseError: error || null, serverHeaders, serverCookieNames }, null, 2)}
                 </pre>
             </div>
             <div className="p-4 bg-blue-50 border rounded">

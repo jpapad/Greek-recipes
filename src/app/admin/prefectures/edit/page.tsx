@@ -5,10 +5,13 @@ import { headers as nextHeaders, cookies as nextCookies } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
-export default async function EditPrefectureByQueryPage({ searchParams }: { searchParams?: Record<string, any> }) {
+export default async function EditPrefectureByQueryPage({ searchParams }: { searchParams?: Promise<Record<string, any>> }) {
+    // Await searchParams as it's a Promise in Next.js 15
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
     let id: string | undefined = undefined;
-    if (searchParams?.id) {
-        const sp = String(searchParams.id);
+    if (resolvedSearchParams?.id) {
+        const sp = String(resolvedSearchParams.id);
         const m = sp.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
         if (m) id = m[0];
         else id = sp;
@@ -87,14 +90,14 @@ export default async function EditPrefectureByQueryPage({ searchParams }: { sear
             <p className="text-muted-foreground">No prefecture could be fetched for id <code>{String(id)}</code>.</p>
             <div className="bg-yellow-50 border border-yellow-200 p-4 rounded">
                 <h3 className="font-semibold">Search Params (raw)</h3>
-                <p className="text-xs mt-1">Search param keys: {JSON.stringify(Object.keys(searchParams || {}))}</p>
-                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(searchParams || null, null, 2)}</pre>
+                <p className="text-xs mt-1">Search param keys: {JSON.stringify(Object.keys(resolvedSearchParams || {}))}</p>
+                <pre className="mt-2 text-xs p-3 bg-white rounded overflow-auto">{JSON.stringify(resolvedSearchParams || null, null, 2)}</pre>
             </div>
             <div className="bg-red-50 border border-red-200 p-4 rounded">
                 <h2 className="font-semibold">Diagnostic</h2>
                 <p className="text-sm text-muted-foreground mt-2">The page attempted to fetch the prefecture via server-side Supabase. Below is the raw response from Supabase (for debugging only).</p>
                 <pre className="mt-3 overflow-auto text-xs bg-white p-3 rounded">
-{JSON.stringify({ raw: null, supabaseError: { message: 'not found or missing id' }, serverHeaders, serverCookieNames }, null, 2)}
+                    {JSON.stringify({ raw: null, supabaseError: { message: 'not found or missing id' }, serverHeaders, serverCookieNames }, null, 2)}
                 </pre>
             </div>
             <div className="p-4 bg-blue-50 border rounded">

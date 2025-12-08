@@ -20,13 +20,17 @@ function extractIdFromParams(params: Record<string, any>) {
     }
 }
 
-export default async function EditCityPage({ params, searchParams }: { params: Record<string, any>, searchParams?: Record<string, any> }) {
+export default async function EditCityPage({ params, searchParams }: { params: Promise<Record<string, any>>, searchParams?: Promise<Record<string, any>> }) {
+    // Await params and searchParams as they are Promises in Next.js 15
+    const resolvedParams = await params;
+    const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
     const cities = await getCities();
     // Prefer a valid `searchParams.id` when present. If the query `id` is a
     // valid UUID prefer it (override a potentially-bad route param). Otherwise
     // fall back to the route param or the raw query value.
-    const idFromParams = extractIdFromParams(params || {});
-    const idFromQuery = searchParams?.id ? String(searchParams.id) : undefined;
+    const idFromParams = extractIdFromParams(resolvedParams || {});
+    const idFromQuery = resolvedSearchParams?.id ? String(resolvedSearchParams.id) : undefined;
     let id = idFromParams;
     if (idFromQuery) {
         const m = idFromQuery.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/);
@@ -68,7 +72,7 @@ export default async function EditCityPage({ params, searchParams }: { params: R
                     <p className="text-muted-foreground mt-1">Could not find a city matching the provided id.</p>
                 </div>
                 <div className="p-4 bg-red-50 border border-red-100 rounded">
-                    <pre className="text-sm whitespace-pre-wrap">{JSON.stringify({ params, extractedId: id, serverHeaders, serverCookieNames }, null, 2)}</pre>
+                    <pre className="text-sm whitespace-pre-wrap">{JSON.stringify({ params: resolvedParams, extractedId: id, serverHeaders, serverCookieNames }, null, 2)}</pre>
                 </div>
                 <div className="p-4 bg-gray-50 border rounded">
                     <h2 className="font-medium">Available city ids (first 20)</h2>
