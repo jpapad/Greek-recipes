@@ -5,8 +5,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-export default async function CityPage({ params }: { params: { slug: string } }) {
-    const city = await getCityBySlug(params.slug);
+export default async function CityPage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const city = await getCityBySlug(slug);
 
     if (!city) {
         notFound();
@@ -37,8 +38,8 @@ export default async function CityPage({ params }: { params: { slug: string } })
             <GlassPanel className="p-8 bg-white/40">
                 {city.image_url && (
                     <div className="mb-6 rounded-xl overflow-hidden">
-                        <img 
-                            src={city.image_url} 
+                        <img
+                            src={city.image_url}
                             alt={city.name}
                             className="w-full h-64 object-cover"
                         />

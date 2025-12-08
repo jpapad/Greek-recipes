@@ -5,8 +5,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
-export default async function PrefecturePage({ params }: { params: { slug: string } }) {
-    const prefecture = await getPrefectureBySlug(params.slug);
+export default async function PrefecturePage({ params }: { params: Promise<{ slug: string }> }) {
+    const { slug } = await params;
+    const prefecture = await getPrefectureBySlug(slug);
 
     if (!prefecture) {
         notFound();
