@@ -265,6 +265,17 @@ export async function searchUsers(query: string): Promise<UserProfile[]> {
       name: p.display_name
     }));
   } catch (error) {
+    console.error('Error searching users:', error);
+    return [];
+  }
+}
+
+// ==================== COMMENTS ====================
+
+export async function getArticleComments(articleId: string): Promise<ArticleComment[]> {
+  try {
+    const { data, error } = await supabase
+      .from('article_comments')
       .select('*')
       .eq('article_id', articleId)
       .eq('status', 'approved')
