@@ -36,11 +36,11 @@ interface MapState {
 }
 
 // ⚠️ Αν το recipes table έχει άλλα ονόματα πεδίων,
-// προσαρμόζεις αντίστοιχα αυτό το type και το select() πιο κάτω.
+// προσαρμόζεις αυτό το type + το select() στο fetchRecipesForMap.
 type MapRecipe = {
     id: string;
-    title: string; // π.χ. "Μουσακάς"
-    slug: string; // για /recipes/[slug]
+    title: string;
+    slug: string;
     main_image_url?: string | null;
     region_id?: string | null;
     prefecture_id?: string | null;
@@ -79,13 +79,13 @@ export function MapExplorer() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // λίστα συνταγών που αντιστοιχούν στο τελευταίο click
     const [selectedRecipes, setSelectedRecipes] = useState<MapRecipe[]>([]);
     const [selectedRecipesLabel, setSelectedRecipesLabel] = useState<
         string | null
     >(null);
 
-    // helper: cities από Supabase (δεν υπάρχει στο api.ts)
+    // --- Helpers για Supabase ---
+
     async function fetchAllCities(): Promise<City[]> {
         const { data, error } = await supabase
             .from("cities")
@@ -100,11 +100,9 @@ export function MapExplorer() {
         return (data || []) as City[];
     }
 
-    // helper: recipes για τον χάρτη
     async function fetchRecipesForMap(): Promise<MapRecipe[]> {
         const { data, error } = await supabase
             .from("recipes")
-            // ⚠️ Αν τα πεδία λέγονται αλλιώς, προσαρμόζεις εδώ
             .select(
                 "id, title, slug, main_image_url, region_id, prefecture_id, city_id",
             );
@@ -117,7 +115,8 @@ export function MapExplorer() {
         return (data || []) as MapRecipe[];
     }
 
-    // 🔹 Φόρτωση Regions, Prefectures, Cities, Recipes
+    // --- Φόρτωση δεδομένων ---
+
     useEffect(() => {
         async function loadData() {
             try {
@@ -135,30 +134,24 @@ export function MapExplorer() {
                 setRegions(
                     (regionsData || []).filter(
                         (r) =>
-                            r.latitude !== null &&
-                            r.latitude !== undefined &&
-                            r.longitude !== null &&
-                            r.longitude !== undefined,
+                            r.latitude != null &&
+                            r.longitude != null,
                     ),
                 );
 
                 setPrefectures(
                     (prefecturesData || []).filter(
                         (p) =>
-                            p.latitude !== null &&
-                            p.latitude !== undefined &&
-                            p.longitude !== null &&
-                            p.longitude !== undefined,
+                            p.latitude != null &&
+                            p.longitude != null,
                     ),
                 );
 
                 setCities(
                     (citiesData || []).filter(
                         (c) =>
-                            c.latitude !== null &&
-                            c.latitude !== undefined &&
-                            c.longitude !== null &&
-                            c.longitude !== undefined,
+                            c.latitude != null &&
+                            c.longitude != null,
                     ),
                 );
 
@@ -175,7 +168,8 @@ export function MapExplorer() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // 🔹 Τι φαίνεται ανά επίπεδο
+    // --- Visible sets ανά επίπεδο ---
+
     const visibleRegions = useMemo(() => regions, [regions]);
 
     const visiblePrefectures = useMemo(() => {
@@ -192,7 +186,8 @@ export function MapExplorer() {
         );
     }, [cities, mapState.selectedPrefecture]);
 
-    // 🔹 Global counters
+    // --- Global counters ---
+
     const totalRegions = regions.length;
     const totalPrefectures = prefectures.length;
     const totalCities = cities.length;
@@ -220,7 +215,7 @@ export function MapExplorer() {
             ).length
             : 0;
 
-    // 🔹 Helpers για μετρητές συνταγών
+    // --- Συνταγές ανά επίπεδο ---
 
     function getRegionRecipeCount(regionId: string) {
         const regionPrefectureIds = prefectures
@@ -256,7 +251,7 @@ export function MapExplorer() {
         return recipes.filter((r) => r.city_id === cityId).length;
     }
 
-    // 🔹 Επιλογή συνταγών για κάτω λίστα
+    // --- Επιλογή συνταγών για κάτω λίστα ---
 
     function selectRegionRecipes(region: Region) {
         const regionPrefectureIds = prefectures
@@ -305,7 +300,7 @@ export function MapExplorer() {
         setSelectedRecipesLabel(null);
     }
 
-    // 🔹 Handlers
+    // --- Handlers επιπέδων ---
 
     function resetToCountry() {
         setMapState({
@@ -358,13 +353,11 @@ export function MapExplorer() {
     }
 
     function handleCityClick(city: City) {
-        // δεν αλλάζουμε level, απλά δείχνουμε συνταγές
         selectCityRecipes(city);
     }
 
     function goUpOneLevel() {
         if (mapState.level === "prefecture" && mapState.selectedRegion) {
-            // Πίσω στο επίπεδο Περιοχή
             setMapState({
                 level: "region",
                 selectedRegion: mapState.selectedRegion,
@@ -375,10 +368,8 @@ export function MapExplorer() {
                 center: [r.latitude as number, r.longitude as number],
                 zoom: ZOOM_REGION,
             });
-            // Ξαναδείχνουμε συνταγές για την περιοχή
             selectRegionRecipes(r);
         } else if (mapState.level === "region") {
-            // Πίσω στη Χώρα
             resetToCountry();
         }
     }
@@ -426,7 +417,6 @@ export function MapExplorer() {
                         <span className="text-primary">{levelLabel}</span>
                     </div>
 
-                    {/* Global Counters */}
                     <div className="flex flex-wrap gap-1.5 justify-end text-[11px] md:text-xs">
                         <span className="rounded-full bg-primary/10 px-2 py-0.5">
                             Περιοχές: <strong>{totalRegions}</strong>
@@ -480,7 +470,7 @@ export function MapExplorer() {
 
                             <MapViewController view={view} />
 
-                            {/* Επίπεδο Χώρα → μαρκαδόροι για Περιοχές */}
+                            {/* Χώρα → Περιοχές */}
                             {mapState.level === "country" &&
                                 visibleRegions.map((region) => {
                                     const recipeCount = getRegionRecipeCount(region.id);
@@ -514,9 +504,7 @@ export function MapExplorer() {
                                                 <div className="space-y-1 text-sm">
                                                     <div className="font-semibold">{region.name}</div>
                                                     <div className="text-xs text-muted-foreground space-y-0.5">
-                                                        <div>
-                                                            Νομοί: <strong>{regionPrefCount}</strong>
-                                                        </div>
+                                                        <div>Νομοί: <strong>{regionPrefCount}</strong></div>
                                                         <div>
                                                             Πόλεις/Χωριά:{" "}
                                                             <strong>{regionCityCount}</strong>
@@ -540,7 +528,7 @@ export function MapExplorer() {
                                     );
                                 })}
 
-                            {/* Επίπεδο Περιοχή/Νομός → μαρκαδόροι για Νομούς */}
+                            {/* Περιοχή → Νομοί */}
                             {mapState.level !== "country" &&
                                 visiblePrefectures.map((pref) => {
                                     const prefCityCount = cities.filter(
@@ -592,10 +580,11 @@ export function MapExplorer() {
                                     );
                                 })}
 
-                            {/* Επίπεδο Νομός → μαρκαδόροι για Πόλεις/Χωριά */}
+                            {/* Νομός → Πόλεις/Χωριά */}
                             {mapState.level === "prefecture" &&
                                 visibleCities.map((city) => {
                                     const recipeCount = getCityRecipeCount(city.id);
+
                                     return (
                                         <CircleMarker
                                             key={city.id}
@@ -628,7 +617,7 @@ export function MapExplorer() {
                                 })}
                         </MapContainer>
 
-                        {/* Floating panel κάτω αριστερά */}
+                        {/* context panel + back button */}
                         <div className="pointer-events-none absolute left-3 bottom-3 flex flex-col gap-2">
                             <div className="pointer-events-auto rounded-lg bg-background/90 backdrop-blur px-3 py-2 shadow-lg border border-border/70 max-w-xs">
                                 <p className="text-xs font-medium text-muted-foreground">
@@ -638,17 +627,16 @@ export function MapExplorer() {
                                             να δεις νομούς και συνταγές.
                                         </>
                                     )}
-                                    {mapState.level === "region" &&
-                                        mapState.selectedRegion && (
-                                            <>
-                                                Περιοχή{" "}
-                                                <span className="font-semibold text-foreground">
-                                                    {mapState.selectedRegion.name}
-                                                </span>
-                                                : {currentRegionPrefecturesCount} νομοί,{" "}
-                                                {currentRegionCitiesCount} πόλεις/χωριά.
-                                            </>
-                                        )}
+                                    {mapState.level === "region" && mapState.selectedRegion && (
+                                        <>
+                                            Περιοχή{" "}
+                                            <span className="font-semibold text-foreground">
+                                                {mapState.selectedRegion.name}
+                                            </span>
+                                            : {currentRegionPrefecturesCount} νομοί,{" "}
+                                            {currentRegionCitiesCount} πόλεις/χωριά.
+                                        </>
+                                    )}
                                     {mapState.level === "prefecture" &&
                                         mapState.selectedPrefecture && (
                                             <>
@@ -688,9 +676,7 @@ export function MapExplorer() {
                                 <UtensilsCrossed className="h-4 w-4 text-primary" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold">
-                                    {selectedRecipesLabel}
-                                </p>
+                                <p className="text-sm font-semibold">{selectedRecipesLabel}</p>
                                 <p className="text-xs text-muted-foreground">
                                     Βρέθηκαν {selectedRecipes.length} συνταγές.
                                 </p>
@@ -704,7 +690,6 @@ export function MapExplorer() {
                                 variant="ghost"
                                 className="hidden md:inline-flex text-xs h-7"
                             >
-                                {/* ⚠️ Αν έχεις σελίδα /recipes με φίλτρα, μπορείς να περάσεις query params εδώ */}
                                 <Link href="/recipes">
                                     Όλες οι συνταγές
                                     <ChevronRight className="h-3 w-3 ml-1" />
