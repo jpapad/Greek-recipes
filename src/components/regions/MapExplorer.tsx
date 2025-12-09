@@ -448,7 +448,7 @@ export function MapExplorer() {
             <p className="text-xs text-muted-foreground -mt-2">{levelSubtitle}</p>
 
             {/* Χάρτης */}
-            <div className="relative flex-1 rounded-xl overflow-hidden border border-border/60">
+            <div className="relative z-[1] flex-1 rounded-xl overflow-hidden border border-border/60 bg-transparent">
                 {loading ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/60 backdrop-blur">
                         <Loader2 className="h-5 w-5 animate-spin text-primary" />
