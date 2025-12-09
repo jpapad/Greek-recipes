@@ -7,6 +7,8 @@ import { GlassPanel } from "@/components/ui/GlassPanel";
 import { HierarchicalMapSection } from "@/components/regions/HierarchicalMapSection";
 import { useTranslations } from "next-intl";
 import type { Region, Prefecture, City } from "@/lib/types";
+import { MapExplorerClient } from "@/components/regions/MapExplorerClient";
+
 
 export default function RegionsPage() {
     const t = useTranslations();
@@ -61,6 +63,10 @@ export default function RegionsPage() {
                     {t('Region.pageDescription')}
                 </p>
             </GlassPanel>
+
+            <section className="mt-8 lg:mt-10">
+                <MapExplorerClient />
+            </section>
 
             {/* Interactive Hierarchical Map */}
             <HierarchicalMapSection
