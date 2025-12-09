@@ -7,12 +7,8 @@ import { ArrowRight, ChefHat, MapPin, Star, BookOpen, Utensils, Cake, Salad, Cof
 import { Button } from "@/components/ui/button";
 import { HeroSlider } from "@/components/layout/HeroSlider";
 import type { StatsContent, CategoriesContent, NewsletterContent } from "@/lib/types/homepage";
-import dynamic from "next/dynamic";
+import { MapExplorerClient } from "@/components/regions/MapExplorerClient";
 
-const MapExplorer = dynamic(
-  () => import("@/components/regions/MapExplorer").then(mod => mod.MapExplorer),
-  { ssr: false }
-);
 
 // Icon mapping
 const iconMap: Record<string, any> = {
@@ -110,8 +106,9 @@ export default async function Home() {
       </section>
       {/* Interactive Map Section */}
       <section className="mt-12 lg:mt-16">
-        <MapExplorer />
+        <MapExplorerClient />
       </section>
+
 
 
       {/* Featured Categories */}
