@@ -3,12 +3,26 @@ import { getArticles } from "@/lib/blog-api";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import Link from "next/link";
-import { ArrowRight, ChefHat, MapPin, Star, BookOpen, Utensils, Cake, Salad, Coffee } from "lucide-react";
+import {
+  ArrowRight,
+  ChefHat,
+  MapPin,
+  Star,
+  BookOpen,
+  Utensils,
+  Cake,
+  Salad,
+  Coffee,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HeroSlider } from "@/components/layout/HeroSlider";
-import type { StatsContent, CategoriesContent, NewsletterContent } from "@/lib/types/homepage";
+import type {
+  StatsContent,
+  CategoriesContent,
+  NewsletterContent,
+} from "@/lib/types/homepage";
 import { MapExplorerClient } from "@/components/regions/MapExplorerClient";
-
+import GeoExploreHero from "@/components/regions/GeoExploreHero"; // προσοχή: default import
 
 // Icon mapping
 const iconMap: Record<string, any> = {
@@ -19,14 +33,14 @@ const iconMap: Record<string, any> = {
   Utensils,
   Cake,
   Coffee,
-  BookOpen
+  BookOpen,
 };
 
 export default async function Home() {
   const recipes = await getRecipes();
   const regions = await getRegions();
   const homepageSettings = await getHomepageSettings();
-  const articles = await getArticles({ status: 'published', limit: 3 });
+  const articles = await getArticles({ status: "published", limit: 3 });
 
   const recentRecipes = recipes.slice(0, 8);
 
@@ -35,51 +49,109 @@ export default async function Home() {
     title: "Τα Νούμερά μας",
     subtitle: "Η ελληνική κουζίνα σε αριθμούς",
     stats: [
-      { label: "Αυθεντικές Συνταγές", value: `${recipes.length}+`, icon: "ChefHat", color: "from-orange-500 to-pink-500" },
-      { label: "Ελληνικές Περιοχές", value: `${regions.length}`, icon: "MapPin", color: "from-blue-500 to-cyan-500" },
-      { label: "Μέση Αξιολόγηση", value: "4.8", icon: "Star", color: "from-purple-500 to-pink-500" }
-    ]
+      {
+        label: "Αυθεντικές Συνταγές",
+        value: `${recipes.length}+`,
+        icon: "ChefHat",
+        color: "from-orange-500 to-pink-500",
+      },
+      {
+        label: "Ελληνικές Περιοχές",
+        value: `${regions.length}`,
+        icon: "MapPin",
+        color: "from-blue-500 to-cyan-500",
+      },
+      {
+        label: "Μέση Αξιολόγηση",
+        value: "4.8",
+        icon: "Star",
+        color: "from-purple-500 to-pink-500",
+      },
+    ],
   };
 
   const categoriesContent: CategoriesContent = homepageSettings?.categories || {
     title: "Κατηγορίες Φαγητού",
     subtitle: "Εξερευνήστε την ελληνική κουζίνα ανά κατηγορία",
     categories: [
-      { name: "Ορεκτικά", slug: "appetizer", icon: "Salad", color: "from-green-500 to-emerald-500", description: "Νόστιμα ορεκτικά" },
-      { name: "Κυρίως Πιάτα", slug: "main-dish", icon: "Utensils", color: "from-orange-500 to-red-500", description: "Παραδοσιακά πιάτα" },
-      { name: "Γλυκά", slug: "dessert", icon: "Cake", color: "from-pink-500 to-purple-500", description: "Ελληνικά γλυκά" },
-      { name: "Σαλάτες", slug: "salad", icon: "Coffee", color: "from-cyan-500 to-blue-500", description: "Υγιεινές σαλάτες" }
-    ]
+      {
+        name: "Ορεκτικά",
+        slug: "appetizer",
+        icon: "Salad",
+        color: "from-green-500 to-emerald-500",
+        description: "Νόστιμα ορεκτικά",
+      },
+      {
+        name: "Κυρίως Πιάτα",
+        slug: "main-dish",
+        icon: "Utensils",
+        color: "from-orange-500 to-red-500",
+        description: "Παραδοσιακά πιάτα",
+      },
+      {
+        name: "Γλυκά",
+        slug: "dessert",
+        icon: "Cake",
+        color: "from-pink-500 to-purple-500",
+        description: "Ελληνικά γλυκά",
+      },
+      {
+        name: "Σαλάτες",
+        slug: "salad",
+        icon: "Coffee",
+        color: "from-cyan-500 to-blue-500",
+        description: "Υγιεινές σαλάτες",
+      },
+    ],
   };
 
   const newsletterContent: NewsletterContent = homepageSettings?.newsletter || {
     badge: "Newsletter",
     title: "Λάβετε τις καλύτερες συνταγές στο inbox σας",
-    subtitle: "Κάθε εβδομάδα μοιραζόμαστε νέες αυθεντικές ελληνικές συνταγές, tips μαγειρικής και ιστορίες από την παράδοση μας.",
+    subtitle:
+      "Κάθε εβδομάδα μοιραζόμαστε νέες αυθεντικές ελληνικές συνταγές, tips μαγειρικής και ιστορίες από την παράδοση μας.",
     placeholder: "Το email σας...",
     buttonText: "Εγγραφή",
-    privacyText: "🔒 Δεν θα μοιραστούμε ποτέ το email σας με τρίτους"
+    privacyText: "🔒 Δεν θα μοιραστούμε ποτέ το email σας με τρίτους",
   };
 
   // Add recipe counts to categories
-  const categoriesWithCounts = categoriesContent.categories.map(cat => ({
+  const categoriesWithCounts = categoriesContent.categories.map((cat) => ({
     ...cat,
-    count: recipes.filter(r => r.category?.toLowerCase().replace(/\s+/g, '-') === cat.slug).length
+    count: recipes.filter(
+      (r) =>
+        r.category?.toLowerCase().replace(/\s+/g, "-") === cat.slug,
+    ).length,
   }));
 
   return (
     <div className="relative -mt-24">
       {/* Hero Slider */}
-      <HeroSlider recipes={recipes} regions={regions} totalRecipes={recipes.length} />
+      <HeroSlider
+        recipes={recipes}
+        regions={regions}
+        totalRecipes={recipes.length}
+      />
+
+      {/* Geo Explore Hero – Εξερεύνησε την Ελλάδα στο Πιάτο */}
+      <section className="pt-10">
+        <div className="container mx-auto px-4">
+          <GeoExploreHero />
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="py-20 bg-gradient-to-b from-muted/30 to-transparent">
         <div className="container mx-auto px-4">
           {statsContent.title && (
             <div className="text-center mb-12">
-              <h2 className="text-4xl md:text-5xl font-bold mb-3">{statsContent.title}</h2>
+              <h2 className="text-4xl md:text-5xl font-bold mb-3">
+                {statsContent.title}
+              </h2>
               {statsContent.subtitle && (
-                <p className="text-xl text-muted-foreground">{statsContent.subtitle}</p>
+                <p className="text-xl text-muted-foreground">
+                  {statsContent.subtitle}
+                </p>
               )}
             </div>
           )}
@@ -88,15 +160,24 @@ export default async function Home() {
             {statsContent.stats.map((stat, index) => {
               const Icon = iconMap[stat.icon] || ChefHat;
               return (
-                <GlassPanel key={index} className="p-8 text-center space-y-4 hover:scale-105 transition-transform duration-300">
-                  <div className={`w-16 h-16 mx-auto bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center`}>
+                <GlassPanel
+                  key={index}
+                  className="p-8 text-center space-y-4 hover:scale-105 transition-transform duration-300"
+                >
+                  <div
+                    className={`w-16 h-16 mx-auto bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center`}
+                  >
                     <Icon className="w-8 h-8 text-white" />
                   </div>
                   <div>
-                    <div className={`text-5xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+                    <div
+                      className={`text-5xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
+                    >
                       {stat.value}
                     </div>
-                    <div className="text-lg text-muted-foreground mt-2">{stat.label}</div>
+                    <div className="text-lg text-muted-foreground mt-2">
+                      {stat.label}
+                    </div>
                   </div>
                 </GlassPanel>
               );
@@ -104,12 +185,11 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
       {/* Interactive Map Section */}
       <section className="mt-12 lg:mt-16">
         <MapExplorerClient />
       </section>
-
-
 
       {/* Featured Categories */}
       <section className="py-20">
@@ -117,10 +197,11 @@ export default async function Home() {
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-5xl md:text-6xl font-bold">
               <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                {categoriesContent.title.split(' ')[0]}
+                {categoriesContent.title.split(" ")[0]}
+              </span>{" "}
+              <span className="text-foreground">
+                {categoriesContent.title.split(" ").slice(1).join(" ")}
               </span>
-              {" "}
-              <span className="text-foreground">{categoriesContent.title.split(' ').slice(1).join(' ')}</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               {categoriesContent.subtitle}
@@ -128,22 +209,19 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categoriesWithCounts.map((category, index) => {
+            {categoriesWithCounts.map((category) => {
               const Icon = iconMap[category.icon] || Utensils;
               return (
                 <Link
                   key={category.slug}
                   href={`/recipes?category=${category.slug}`}
                   className="group"
-                  style={{
-                    animationDelay: `${index * 100}ms`,
-                    opacity: 0,
-                    animation: 'slideInUp 0.6s ease-out forwards'
-                  }}
                 >
                   <GlassPanel className="p-0 overflow-hidden h-full hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
                     <div className="relative h-48 overflow-hidden">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90`}></div>
+                      <div
+                        className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-90`}
+                      ></div>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Icon className="w-24 h-24 text-white/30" />
                       </div>
@@ -160,7 +238,9 @@ export default async function Home() {
                         {category.name}
                       </h3>
                       {category.description && (
-                        <p className="text-sm text-muted-foreground">{category.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {category.description}
+                        </p>
                       )}
                       <div className="flex items-center justify-center text-muted-foreground text-sm group-hover:text-orange-500 transition-colors">
                         <span>Εξερευνήστε</span>
@@ -214,7 +294,8 @@ export default async function Home() {
                             <span
                               className="px-3 py-1 rounded-full text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
                               style={{
-                                backgroundColor: article.category.color || '#3B82F6',
+                                backgroundColor:
+                                  article.category.color || "#3B82F6",
                               }}
                             >
                               {article.category.name}
@@ -269,10 +350,12 @@ export default async function Home() {
                   </div>
                 )}
                 <h2 className="text-4xl md:text-6xl font-bold">
-                  <span className="text-foreground">{newsletterContent.title.split('συνταγές')[0]}συνταγές</span>
+                  <span className="text-foreground">
+                    {newsletterContent.title.split("συνταγές")[0]}συνταγές
+                  </span>
                   <br />
                   <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                    {newsletterContent.title.split('συνταγές')[1]}
+                    {newsletterContent.title.split("συνταγές")[1]}
                   </span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -280,11 +363,11 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
+              <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx.auto">
                 <input
                   type="email"
                   placeholder={newsletterContent.placeholder}
-                  className="flex-1 px-6 py-4 rounded-full bg-white/50 dark:bg-black/50 backdrop-blur-sm border border-white/40 focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
+                  className="flex-1 px-6 py-4 rounded-full bg.white/50 dark:bg-black/50 backdrop-blur-sm border border-white/40 focus:outline-none focus:ring-2 focus:ring-orange-500 text-lg"
                 />
                 <Button
                   size="lg"
@@ -310,25 +393,34 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 space-y-4">
             <h2 className="text-5xl md:text-6xl font-bold">
-              <span className="text-foreground">Latest</span>
-              {" "}
-              <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">Recipes</span>
+              <span className="text-foreground">Latest</span>{" "}
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+                Recipes
+              </span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx.auto">
               Fresh additions to our collection of authentic Greek cuisine
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {recentRecipes.map((recipe, i) => (
-              <div key={recipe.id} className="animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ animationDelay: `${i * 100}ms` }}>
+              <div
+                key={recipe.id}
+                className="animate-in fade-in slide-in-from-bottom-4 duration-700"
+                style={{ animationDelay: `${i * 100}ms` }}
+              >
                 <RecipeCard recipe={recipe} />
               </div>
             ))}
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" className="rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 border-0" asChild>
+            <Button
+              size="lg"
+              className="rounded-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 border-0"
+              asChild
+            >
               <Link href="/recipes">
                 View All Recipes
                 <ArrowRight className="ml-2 w-5 h-5" />

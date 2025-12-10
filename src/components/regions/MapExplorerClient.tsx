@@ -2,11 +2,17 @@
 
 import dynamic from "next/dynamic";
 
+interface MapExplorerClientProps {
+    initialRegionId?: string;
+}
+
 const MapExplorerInner = dynamic(
-    () => import("./MapExplorer").then((mod) => mod.MapExplorer),
-    { ssr: false }
+    () => import("./MapExplorer").then((m) => m.MapExplorer),
+    {
+        ssr: false,
+    },
 );
 
-export function MapExplorerClient() {
-    return <MapExplorerInner />;
+export function MapExplorerClient(props: MapExplorerClientProps) {
+    return <MapExplorerInner {...props} />;
 }

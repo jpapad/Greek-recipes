@@ -1,21 +1,28 @@
-import { getRegionBySlug, getRecipesByRegion, getPrefectures } from "@/lib/api";
-import { RecipeCard } from "@/components/recipes/RecipeCard";
-import { GlassPanel } from "@/components/ui/GlassPanel";
+import {
+    getRegionBySlug,
+    getRecipesByRegion,
+    getPrefectures,
+    getCities,
+} from "@/lib/api";
 import PhotoGallery from "@/components/regions/PhotoGallery";
 import AttractionsList from "@/components/regions/AttractionsList";
 import EventsList from "@/components/regions/EventsList";
 import LocalProducts from "@/components/regions/LocalProducts";
 import AccessInfo from "@/components/regions/AccessInfo";
 import TouristInfoPanel from "@/components/regions/TouristInfoPanel";
-import Image from "next/image";
+import RegionDetailInteractiveSection from "@/components/regions/RegionDetailInteractiveSection";
+import { GlassPanel } from "@/components/ui/GlassPanel";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import { Metadata } from "next";
 
 interface PageProps {
     params: Promise<{ slug: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+    params,
+}: PageProps): Promise<Metadata> {
     const { slug } = await params;
     const region = await getRegionBySlug(slug);
 
@@ -27,18 +34,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     return {
         title: `${region.name} - Traditional Greek Recipes`,
-        description: region.description || `Discover authentic Greek recipes from ${region.name}`,
+        description:
+            region.description ||
+            `Discover authentic Greek recipes from ${region.name}`,
         openGraph: {
             title: `${region.name} - Traditional Greek Recipes`,
-            description: region.description || `Discover authentic Greek recipes from ${region.name}`,
-            images: region.image_url ? [
-                {
-                    url: region.image_url,
-                    width: 1200,
-                    height: 630,
-                    alt: region.name,
-                },
-            ] : [],
+            description:
+                region.description ||
+                `Discover authentic Greek recipes from ${region.name}`,
+            images: region.image_url
+                ? [
+                    {
+                        url: region.image_url,
+                        width: 1200,
+                        height: 630,
+                        alt: region.name,
+                    },
+                ]
+                : [],
         },
     };
 }
@@ -53,10 +66,30 @@ export default async function RegionDetailPage({ params }: PageProps) {
 
     const recipes = await getRecipesByRegion(region.id);
     const prefectures = await getPrefectures(region.id);
+    const allCities = await getCities(); // προς το παρόν δεν το χρησιμοποιούμε
+
+    const regionLat = (region as any).latitude ?? 38.5;
+    const regionLng = (region as any).longitude ?? 23.5;
+
+    const recipesByPrefecture: Record<string, number> = {};
+    (recipes as any[]).forEach((r) => {
+        const prefId = r.prefecture_id || r.prefectureId;
+        if (!prefId) return;
+        recipesByPrefecture[prefId] = (recipesByPrefecture[prefId] || 0) + 1;
+    });
+
+    const prefecturesForMap = (prefectures as any[]).map((pref) => ({
+        id: pref.id,
+        name: pref.name,
+        slug: pref.slug,
+        lat: pref.latitude ?? regionLat,
+        lng: pref.longitude ?? regionLng,
+        recipeCount: recipesByPrefecture[pref.id] || 0,
+    }));
 
     return (
         <div className="space-y-12 pt-24">
-            {/* Hero Section */}
+            {/* Hero */}
             <div className="relative h-[300px] md:h-[350px] rounded-3xl overflow-hidden shadow-xl">
                 <Image
                     src={region.image_url || "/placeholder-region.jpg"}
@@ -67,66 +100,37 @@ export default async function RegionDetailPage({ params }: PageProps) {
                     sizes="100vw"
                 />
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center p-4 text-center">
-                    <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">{region.name}</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold text-white drop-shadow-lg">
+                        {region.name}
+                    </h1>
                 </div>
             </div>
 
-            {/* Region Description */}
+            {/* Περιγραφή */}
             <GlassPanel className="p-8 bg-white/60 backdrop-blur-md">
                 <p className="text-lg md:text-xl text-foreground leading-relaxed">
                     {region.description}
                 </p>
             </GlassPanel>
 
-            {/* Prefectures in this Region */}
-            {prefectures.length > 0 && (
-                <section>
-                    <h2 className="text-3xl font-bold mb-6 pl-2 border-l-4 border-primary">
-                        Νομοί στην {region.name}
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {prefectures.map((prefecture) => (
-                            <GlassPanel key={prefecture.id} className="p-6 hover:shadow-lg transition-shadow">
-                                <h3 className="text-xl font-semibold mb-2">{prefecture.name}</h3>
-                                {prefecture.description && (
-                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                                        {prefecture.description}
-                                    </p>
-                                )}
-                                <a
-                                    href={`/prefectures/${prefecture.slug}`}
-                                    className="text-primary hover:underline text-sm font-medium"
-                                >
-                                    Δείτε περισσότερα →
-                                </a>
-                            </GlassPanel>
-                        ))}
-                    </div>
-                </section>
-            )}
+            {/* 🔗 Χάρτης + Νομοί + Συνταγές (διαδραστικά) */}
+            <RegionDetailInteractiveSection
+                region={{
+                    id: region.id,
+                    name: region.name,
+                    lat: regionLat,
+                    lng: regionLng,
+                }}
+                prefectures={prefecturesForMap}
+                recipes={recipes}
+            />
 
-            {/* Recipes Grid */}
-            <section>
-                <h2 className="text-3xl font-bold mb-8 pl-2 border-l-4 border-primary">
-                    Recipes from {region.name}
-                </h2>
-
-                {recipes.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {recipes.map((recipe) => (
-                            <RecipeCard key={recipe.id} recipe={recipe} />
-                        ))}
-                    </div>
-                ) : (
-                    <GlassPanel className="p-8 text-center">
-                        <p className="text-muted-foreground">No recipes found for this region yet.</p>
-                    </GlassPanel>
-                )}
-            </section>
-
-            {/* Tourist Information Sections */}
+            {/* Τουριστικές πληροφορίες */}
             <div className="space-y-8">
-                <PhotoGallery photos={region.photo_gallery || []} title={`Φωτογραφίες από ${region.name}`} />
+                <PhotoGallery
+                    photos={region.photo_gallery || []}
+                    title={`Φωτογραφίες από ${region.name}`}
+                />
 
                 <AccessInfo howToGetThere={region.how_to_get_there || ""} />
 
