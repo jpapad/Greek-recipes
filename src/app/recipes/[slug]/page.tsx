@@ -95,11 +95,32 @@ export default async function RecipeDetailPage({ params }: PageProps) {
     ];
     const breadcrumbSchema = generateBreadcrumbSchema(breadcrumbItems);
 
-    // Συντεταγμένες περιοχής (fallback στο κέντρο Ελλάδας αν λείπουν)
-    const regionLat =
-        (recipe.region as any)?.latitude ?? 38.5;
-    const regionLng =
-        (recipe.region as any)?.longitude ?? 23.5;
+    // Σχέσεις για γεωγραφικά
+    const region = (recipe as any).region as
+        | { name: string; slug: string; latitude?: number; longitude?: number }
+        | undefined;
+    const prefecture = (recipe as any).prefecture as
+        | { name: string; slug: string; latitude?: number; longitude?: number }
+        | undefined;
+    const city = (recipe as any).city as
+        | { name: string; slug: string; latitude?: number; longitude?: number }
+        | undefined;
+
+    // Συντεταγμένες: πρώτα πόλη, μετά νομός, μετά περιοχή, αλλιώς fallback
+    const originLat =
+        city?.latitude ??
+        prefecture?.latitude ??
+        region?.latitude ??
+        38.5;
+    const originLng =
+        city?.longitude ??
+        prefecture?.longitude ??
+        region?.longitude ??
+        23.5;
+
+    const regionName = region?.name;
+    const prefectureName = prefecture?.name;
+    const cityName = city?.name;
 
     return (
         <div className="space-y-8 pt-24">
@@ -143,14 +164,13 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                                 {recipe.category}
                             </Badge>
                         )}
-                        {recipe.region && (
-                            <Link href={`/regions/${recipe.region.slug}`}>
+                        {region && (
+                            <Link href={`/regions/${region.slug}`}>
                                 <Badge
                                     variant="outline"
                                     className="text-white border-white/50 hover:bg-white/20 text-lg px-4 py-1 flex items-center gap-2 cursor-pointer"
                                 >
-                                    <MapPin className="w-4 h-4" />{" "}
-                                    {recipe.region.name}
+                                    <MapPin className="w-4 h-4" /> {region.name}
                                 </Badge>
                             </Link>
                         )}
@@ -196,6 +216,86 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     </div>
                 </div>
             </div>
+
+            {/* 🔎 Προέλευση συνταγής + Χάρτης – ΚΑΤΩ από την εικόνα */}
+            {region && (
+                <GlassPanel className="p-6 md:p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
+                        <div className="space-y-3 md:space-y-4">
+                            <h3 className="text-2xl font-bold">
+                                Προέλευση Συνταγής
+                            </h3>
+                            <p className="text-sm md:text-base text-muted-foreground">
+                                Η συνταγή αυτή συνδέεται με{" "}
+                                {cityName && (
+                                    <>
+                                        την περιοχή{" "}
+                                        <span className="font-semibold">
+                                            {cityName}
+                                        </span>
+                                        {prefectureName || regionName ? ", " : "."}{" "}
+                                    </>
+                                )}
+                                {prefectureName && (
+                                    <>
+                                        τον νομό{" "}
+                                        <span className="font-semibold">
+                                            {prefectureName}
+                                        </span>
+                                        {regionName ? ", " : "."}{" "}
+                                    </>
+                                )}
+                                {regionName && (
+                                    <>
+                                        την{" "}
+                                        <span className="font-semibold">
+                                            {regionName}
+                                        </span>
+                                        .
+                                    </>
+                                )}
+                            </p>
+
+                            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                                {region && (
+                                    <Link
+                                        href={`/regions/${region.slug}`}
+                                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 hover:bg-primary/10 text-primary transition-colors"
+                                    >
+                                        <MapPin className="w-4 h-4" />
+                                        {region.name}
+                                    </Link>
+                                )}
+                                {prefecture && (
+                                    <Link
+                                        href={`/prefectures/${prefecture.slug}`}
+                                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 hover:bg-primary/10 text-primary transition-colors"
+                                    >
+                                        {prefecture.name}
+                                    </Link>
+                                )}
+                                {city && (
+                                    <Link
+                                        href={`/cities/${city.slug}`}
+                                        className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary/5 hover:bg-primary/10 text-primary transition-colors"
+                                    >
+                                        {city.name}
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
+                        <div className="h-[260px] md:h-[300px]">
+                            <RecipeOriginMap
+                                lat={originLat}
+                                lng={originLng}
+                                regionName={regionName}
+                                prefectureName={prefectureName}
+                                cityName={cityName}
+                            />
+                        </div>
+                    </div>
+                </GlassPanel>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column: Info & Ingredients */}
@@ -304,47 +404,6 @@ export default async function RecipeDetailPage({ params }: PageProps) {
                     </GlassPanel>
                 </div>
             </div>
-
-            {/* 🔎 Προέλευση συνταγής + Χάρτης */}
-            {recipe.region && (
-                <GlassPanel className="p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
-                        <div className="space-y-3 md:space-y-4">
-                            <h3 className="text-2xl font-bold">
-                                Προέλευση Συνταγής
-                            </h3>
-                            <p className="text-sm md:text-base text-muted-foreground">
-                                Η συνταγή αυτή συνδέεται με την περιοχή{" "}
-                                <span className="font-semibold">
-                                    {recipe.region.name}
-                                </span>
-                                {". "}
-                                Ανακάλυψε περισσότερες γεύσεις από την{" "}
-                                <Link
-                                    href={`/regions/${recipe.region.slug}`}
-                                    className="text-primary hover:underline font-medium"
-                                >
-                                    {recipe.region.name}
-                                </Link>
-                                .
-                            </p>
-                            <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                                <span className="inline-flex items-center gap-1">
-                                    <MapPin className="w-4 h-4" />
-                                    {recipe.region.name}
-                                </span>
-                            </div>
-                        </div>
-                        <div className="h-[260px] md:h-[300px]">
-                            <RecipeOriginMap
-                                lat={regionLat}
-                                lng={regionLng}
-                                regionName={recipe.region.name}
-                            />
-                        </div>
-                    </div>
-                </GlassPanel>
-            )}
 
             {/* AI Recipe Assistant */}
             <AIRecipeAssistant recipe={recipe} />

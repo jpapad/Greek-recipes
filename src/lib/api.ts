@@ -117,7 +117,7 @@ export async function getRecipes(options: GetRecipesOptions = {}): Promise<Recip
 export async function getRecipeBySlug(slug: string): Promise<Recipe | null> {
     const { data, error } = await supabase
         .from('recipes')
-        .select('*, region:regions(*)')
+        .select('*, region:regions(*), prefecture:prefectures(*), city:cities(*)')
         .eq('slug', slug)
         .single();
 
@@ -365,13 +365,13 @@ export async function addReview(review: { recipe_id: string; rating: number; com
 
 export async function getPrefectures(regionId?: string): Promise<Prefecture[]> {
     let query = supabase.from('prefectures').select('*, region:region_id(*)');
-    
+
     if (regionId) {
         query = query.eq('region_id', regionId);
     }
-    
+
     const { data, error } = await query.order('name');
-    
+
     if (error) {
         console.error('Error fetching prefectures:', error);
         return [];
@@ -485,13 +485,13 @@ export async function deletePrefecture(id: string): Promise<boolean> {
 
 export async function getCities(prefectureId?: string): Promise<City[]> {
     let query = supabase.from('cities').select('*, prefecture:prefecture_id(*, region:region_id(*))');
-    
+
     if (prefectureId) {
         query = query.eq('prefecture_id', prefectureId);
     }
-    
+
     const { data, error } = await query.order('name');
-    
+
     if (error) {
         console.error('Error fetching cities:', error);
         return [];
@@ -581,7 +581,7 @@ export async function getFooterSettings(): Promise<any> {
 }
 
 export async function getFooterSettingBySection(section: string): Promise<any> {
-    const { data, error} = await supabase
+    const { data, error } = await supabase
         .from('footer_settings')
         .select('*')
         .eq('section', section)
@@ -694,7 +694,7 @@ export async function getAllHomeSections(): Promise<HomeSection[]> {
 }
 
 export async function getHomeSectionById(id: string): Promise<HomeSection | null> {
-    const { data, error} = await supabase
+    const { data, error } = await supabase
         .from('home_sections')
         .select('*')
         .eq('id', id)
