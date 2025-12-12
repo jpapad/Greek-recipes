@@ -4,9 +4,10 @@ import React, { useRef, useState } from "react";
 import { Recipe } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, Download } from "lucide-react";
 import { DeleteRecipeButton } from "@/components/admin/DeleteRecipeButton";
 import { GlassPanel } from "@/components/ui/GlassPanel";
+import { ImportRecipeModal } from "@/components/admin/ImportRecipeModal";
 
 interface Props {
     initialRecipes: Recipe[];
@@ -14,6 +15,7 @@ interface Props {
 
 export default function RecipesListClient({ initialRecipes }: Props) {
     const [items, setItems] = useState<Recipe[]>(initialRecipes || []);
+    const [importModalOpen, setImportModalOpen] = useState(false);
     // store last removed item to allow restore on failure
     const lastRemovedRef = useRef<{ item: Recipe | null; index: number | null }>({ item: null, index: null });
 
@@ -52,13 +54,28 @@ export default function RecipesListClient({ initialRecipes }: Props) {
                     <h1 className="text-4xl font-bold mb-2">Recipes</h1>
                     <p className="text-muted-foreground">Manage all recipes</p>
                 </div>
-                <Button asChild size="lg">
-                    <Link href="/admin/recipes/new">
-                        <Plus className="w-5 h-5 mr-2" />
-                        Add New Recipe
-                    </Link>
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={() => setImportModalOpen(true)}
+                        variant="outline"
+                        size="lg"
+                    >
+                        <Download className="w-5 h-5 mr-2" />
+                        Import from URL
+                    </Button>
+                    <Button asChild size="lg">
+                        <Link href="/admin/recipes/new">
+                            <Plus className="w-5 h-5 mr-2" />
+                            Add New Recipe
+                        </Link>
+                    </Button>
+                </div>
             </div>
+
+            <ImportRecipeModal
+                open={importModalOpen}
+                onOpenChange={setImportModalOpen}
+            />
 
             <GlassPanel className="p-6">
                 <div className="overflow-x-auto">

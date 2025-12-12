@@ -21,9 +21,10 @@ import { useTranslations } from "next-intl";
 interface RecipeFormProps {
     recipe?: Recipe;
     regions: Region[];
+    initialData?: Partial<Recipe>;
 }
 
-export function RecipeForm({ recipe, regions }: RecipeFormProps) {
+export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
     const t = useTranslations();
     const router = useRouter();
     const { showToast } = useToast();
@@ -36,34 +37,35 @@ export function RecipeForm({ recipe, regions }: RecipeFormProps) {
     const [imageSearchOpen, setImageSearchOpen] = useState(false);
     const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
+    const sourceData = recipe || initialData;
     const [formData, setFormData] = useState({
-        title: recipe?.title || "",
-        slug: recipe?.slug || "",
-        region_id: recipe?.region_id || "",
-        prefecture_id: recipe?.prefecture_id || "",
-        city_id: recipe?.city_id || "",
-        short_description: recipe?.short_description || "",
-        time_minutes: recipe?.time_minutes || 30,
-        difficulty: recipe?.difficulty || "medium",
-        servings: recipe?.servings || 4,
-        image_url: recipe?.image_url || "",
-        category: recipe?.category || "",
-        is_vegetarian: recipe?.is_vegetarian || false,
-        is_vegan: recipe?.is_vegan || false,
-        is_gluten_free: recipe?.is_gluten_free || false,
-        is_dairy_free: recipe?.is_dairy_free || false,
+        title: sourceData?.title || "",
+        slug: sourceData?.slug || "",
+        region_id: sourceData?.region_id || "",
+        prefecture_id: sourceData?.prefecture_id || "",
+        city_id: sourceData?.city_id || "",
+        short_description: sourceData?.short_description || "",
+        time_minutes: sourceData?.time_minutes || 30,
+        difficulty: sourceData?.difficulty || "medium",
+        servings: sourceData?.servings || 4,
+        image_url: sourceData?.image_url || "",
+        category: sourceData?.category || "",
+        is_vegetarian: sourceData?.is_vegetarian || false,
+        is_vegan: sourceData?.is_vegan || false,
+        is_gluten_free: sourceData?.is_gluten_free || false,
+        is_dairy_free: sourceData?.is_dairy_free || false,
     });
 
     const [ingredientGroups, setIngredientGroups] = useState<IngredientGroup[]>(
-        migrateIngredientsToGroups(recipe?.ingredients)
+        migrateIngredientsToGroups(sourceData?.ingredients)
     );
 
     const [stepGroups, setStepGroups] = useState<StepGroup[]>(
-        migrateStepsToGroups(recipe?.steps)
+        migrateStepsToGroups(sourceData?.steps)
     );
 
     const [allergens, setAllergens] = useState<string[]>(
-        recipe?.allergens || []
+        sourceData?.allergens || []
     );
 
     const allergenOptions = [

@@ -24,23 +24,26 @@ export function SearchBar() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close on click outside
+  // Close on Escape key
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (isOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  }, [isOpen]);
 
   // Focus input when modal opens
   useEffect(() => {
@@ -97,7 +100,12 @@ export function SearchBar() {
       />
 
       {/* Search Panel */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl px-4" style={{ zIndex: 10000 }}>
+      <div
+        ref={modalRef}
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl px-4"
+        style={{ zIndex: 10000 }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="bg-white dark:bg-black border-2 border-orange-500 rounded-3xl shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden text-black dark:text-white">
           {/* Search Input */}
           <form onSubmit={handleSubmit} className="p-6 border-b border-gray-100 dark:border-gray-800">
