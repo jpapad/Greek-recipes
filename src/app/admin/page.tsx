@@ -79,7 +79,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {stats.map((stat) => (
                     <Link key={stat.label} href={stat.href}>
                         <GlassPanel className="p-6 hover:scale-105 transition-transform cursor-pointer">

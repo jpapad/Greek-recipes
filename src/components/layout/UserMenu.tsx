@@ -9,7 +9,7 @@ import Link from "next/link";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export function UserMenu() {
-    
+
     const [user, setUser] = useState<SupabaseUser | null>(null);
     const [isOpen, setIsOpen] = useState(false);
 
@@ -69,9 +69,14 @@ export function UserMenu() {
                                     <User className="w-5 h-5 text-primary" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate">{user.email}</p>
+                                    <p className="text-sm font-semibold text-gray-900 truncate">
+                                        {user.user_metadata?.full_name ||
+                                            user.user_metadata?.username ||
+                                            user.email?.split('@')[0]}
+                                    </p>
+                                    <p className="text-xs text-gray-600 truncate">{user.email}</p>
                                     {isAdmin && (
-                                        <span className="inline-flex items-center gap-2 text-xs text-green-700 bg-green-100/60 px-2 py-0.5 rounded">
+                                        <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-100/60 px-2 py-0.5 rounded mt-1">
                                             <Shield className="w-3 h-3 text-green-700" />
                                             <strong className="text-[11px]">Admin</strong>
                                         </span>
@@ -80,14 +85,22 @@ export function UserMenu() {
                             </div>
                         </div>
                         <div className="p-2 space-y-1">
+                            <Link
+                                href="/profile"
+                                onClick={() => setIsOpen(false)}
+                                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-900 font-medium"
+                            >
+                                <User className="w-4 h-4 text-gray-700" />
+                                <span>Profile</span>
+                            </Link>
                             {isAdmin && (
                                 <Link
                                     href="/admin"
                                     onClick={() => setIsOpen(false)}
-                                    className="flex items-center gap-2 px-3 py-2 hover:bg-primary/10 rounded-lg transition-colors text-foreground"
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-green-50 rounded-lg transition-colors text-gray-900 font-medium"
                                 >
                                     <Shield className="w-4 h-4 text-green-600" />
-                                    <span className="font-medium">Admin Panel</span>
+                                    <span>Admin Panel</span>
                                 </Link>
                             )}
                             <button
@@ -95,7 +108,7 @@ export function UserMenu() {
                                     setIsOpen(false);
                                     handleSignOut();
                                 }}
-                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+                                className="w-full flex items-center gap-2 px-3 py-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors font-medium"
                             >
                                 <LogOut className="w-4 h-4" />
                                 <span>Sign Out</span>
