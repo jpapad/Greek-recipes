@@ -24,6 +24,7 @@ export default function NewRecipePage() {
         if (importedData) {
             try {
                 const recipe = JSON.parse(importedData);
+                console.log("Imported recipe data:", recipe);
                 setImportedRecipe(recipe);
                 setShowImportBanner(true);
                 // Clear from sessionStorage

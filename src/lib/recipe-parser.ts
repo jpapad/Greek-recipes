@@ -1,13 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 import type { Recipe, IngredientGroup, StepGroup } from "./types";
 
-// Lazy initialize Gemini to avoid errors on module load
-function getGenAI() {
-    const apiKey = process.env.GEMINI_API_KEY;
+// Lazy initialize OpenAI to avoid errors on module load
+function getOpenAI() {
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-        throw new Error("GEMINI_API_KEY environment variable is not set");
+        throw new Error("OPENAI_API_KEY environment variable is not set");
     }
-    return new GoogleGenerativeAI(apiKey);
+    return new OpenAI({ apiKey });
 }
 
 interface SchemaRecipe {
@@ -294,11 +294,10 @@ function parseServings(servings: string | number): number {
 }
 
 /**
- * Extract recipe using Gemini AI
+ * Extract recipe using OpenAI GPT-4
  */
-export async function extractWithGemini(html: string, url: string): Promise<Partial<Recipe>> {
-    const genAI = getGenAI();
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+export async function extractWithOpenAI(html: string, url: string): Promise<Partial<Recipe>> {
+    const openai = getOpenAI();
 
     // Strip HTML to reduce tokens, keep only text content
     const textContent = html
@@ -345,29 +344,42 @@ Webpage content:
 ${textContent}`;
 
     try {
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        let text = response.text();
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4-turbo-preview",
+            messages: [
+                {
+                    role: "system",
+                    content: "You are a recipe extraction assistant. Extract recipe data and return it as valid JSON."
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ],
+            temperature: 0.3,
+            response_format: { type: "json_object" }
+        });
 
-        console.log("Gemini raw response:", text.substring(0, 500)); // Log first 500 chars
+        const responseText = completion.choices[0].message.content || "{}";
+        console.log("OpenAI raw response:", responseText.substring(0, 500)); // Log first 500 chars
 
-        // Remove markdown code blocks if present
-        text = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-
-        const data = JSON.parse(text);
+        const data = JSON.parse(responseText);
 
         // Add source attribution
         data.source_attribution = url;
 
         return data;
     } catch (error) {
-        console.error("Gemini extraction error:", error);
+        console.error("OpenAI extraction error:", error);
         if (error instanceof Error) {
             console.error("Error message:", error.message);
             console.error("Error stack:", error.stack);
+            // Throw the actual error message for better debugging
+            throw new Error(`OpenAI error: ${error.message}`);
         }
-        throw new Error("Failed to extract recipe using AI");
+        throw error; // Re-throw if not an Error instance
     }
+
 }
 
 /**
@@ -396,7 +408,7 @@ export async function importRecipeFromUrl(url: string): Promise<Partial<Recipe>>
         return schemaRecipe;
     }
 
-    // Fallback to Gemini
-    console.log("Schema.org not found, using Gemini AI");
-    return extractWithGemini(html, url);
+    // Fallback to OpenAI
+    console.log("Schema.org not found, using OpenAI");
+    return extractWithOpenAI(html, url);
 }

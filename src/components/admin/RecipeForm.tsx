@@ -73,6 +73,42 @@ export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
         "Soy", "Sesame", "Peanuts", "Tree Nuts", "Wheat", "Milk"
     ];
 
+    // Update form data when initialData changes
+    useEffect(() => {
+        if (initialData) {
+            console.log("Updating form with initialData:", initialData);
+            setFormData({
+                title: initialData.title || "",
+                slug: initialData.slug || "",
+                region_id: initialData.region_id || "",
+                prefecture_id: initialData.prefecture_id || "",
+                city_id: initialData.city_id || "",
+                short_description: initialData.short_description || "",
+                time_minutes: initialData.time_minutes || 30,
+                difficulty: initialData.difficulty || "medium",
+                servings: initialData.servings || 4,
+                image_url: initialData.image_url || "",
+                category: initialData.category || "",
+                is_vegetarian: initialData.is_vegetarian || false,
+                is_vegan: initialData.is_vegan || false,
+                is_gluten_free: initialData.is_gluten_free || false,
+                is_dairy_free: initialData.is_dairy_free || false,
+            });
+
+            if (initialData.ingredients) {
+                setIngredientGroups(migrateIngredientsToGroups(initialData.ingredients));
+            }
+
+            if (initialData.steps) {
+                setStepGroups(migrateStepsToGroups(initialData.steps));
+            }
+
+            if (initialData.allergens) {
+                setAllergens(initialData.allergens);
+            }
+        }
+    }, [initialData]);
+
     // Load prefectures and cities
     useEffect(() => {
         async function loadData() {
