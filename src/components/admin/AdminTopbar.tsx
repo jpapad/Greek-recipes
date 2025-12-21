@@ -19,13 +19,38 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
     { href: "/admin", label: "Αρχική" },
-    { href: "/admin/recipes", label: "Συνταγές" },
-    { href: "/admin/regions", label: "Περιοχές" },
-    { href: "/admin/prefectures", label: "Νομοί" },
-    { href: "/admin/cities", label: "Πόλεις" },
+    { 
+        label: "Περιεχόμενο",
+        submenu: [
+            { href: "/admin/recipes", label: "Συνταγές" },
+            { href: "/admin/articles", label: "Άρθρα" },
+            { href: "/admin/collections", label: "Συλλογές" },
+            { href: "/admin/categories", label: "Κατηγορίες" },
+            { href: "/admin/pages", label: "Σελίδες" },
+        ]
+    },
+    { 
+        label: "Τοποθεσίες",
+        submenu: [
+            { href: "/admin/regions", label: "Περιοχές" },
+            { href: "/admin/prefectures", label: "Νομοί" },
+            { href: "/admin/cities", label: "Πόλεις" },
+        ]
+    },
+    { 
+        label: "Ρυθμίσεις",
+        submenu: [
+            { href: "/admin/site-settings", label: "Site Settings" },
+            { href: "/admin/homepage", label: "Αρχική Σελίδα" },
+            { href: "/admin/menu", label: "Μενού" },
+            { href: "/admin/footer", label: "Footer" },
+            { href: "/admin/home-sections", label: "Sections" },
+        ]
+    },
     { href: "/admin/media", label: "Μέσα" },
     { href: "/admin/users", label: "Χρήστες" },
-    { href: "/admin/settings", label: "Ρυθμίσεις" },
+    { href: "/admin/authors", label: "Συγγραφείς" },
+    { href: "/admin/import", label: "Import" },
     { href: "/admin/audit", label: "Έλεγχος" },
 ];
 
@@ -79,13 +104,56 @@ export function AdminTopbar({ user }: AdminTopbarProps) {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden lg:flex items-center gap-1">
-                        {navItems.map((item) => {
+                        {navItems.map((item, index) => {
+                            // Check if item has submenu
+                            if ('submenu' in item && item.submenu) {
+                                const isAnySubItemActive = item.submenu.some(
+                                    sub => pathname === sub.href || 
+                                    (sub.href !== "/admin" && pathname.startsWith(sub.href))
+                                );
+                                return (
+                                    <DropdownMenu key={index}>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                className={cn(
+                                                    "px-3 py-2 text-sm font-medium",
+                                                    isAnySubItemActive && "bg-accent text-accent-foreground"
+                                                )}
+                                            >
+                                                {item.label}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="start">
+                                            {item.submenu.map((subItem) => {
+                                                const isSubActive = pathname === subItem.href || 
+                                                    (subItem.href !== "/admin" && pathname.startsWith(subItem.href));
+                                                return (
+                                                    <DropdownMenuItem key={subItem.href} asChild>
+                                                        <Link
+                                                            href={subItem.href}
+                                                            className={cn(
+                                                                "w-full cursor-pointer",
+                                                                isSubActive && "bg-accent text-accent-foreground"
+                                                            )}
+                                                        >
+                                                            {subItem.label}
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                );
+                                            })}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                );
+                            }
+                            
+                            // Regular link
                             const isActive = pathname === item.href || 
-                                           (item.href !== "/admin" && pathname.startsWith(item.href));
+                                           (item.href !== "/admin" && pathname.startsWith(item.href!));
                             return (
                                 <Link
                                     key={item.href}
-                                    href={item.href}
+                                    href={item.href!}
                                     className={cn(
                                         "px-3 py-2 rounded-md text-sm font-medium transition-colors",
                                         isActive
@@ -188,13 +256,44 @@ export function AdminTopbar({ user }: AdminTopbarProps) {
             {mobileMenuOpen && (
                 <div className="lg:hidden border-t bg-background">
                     <nav className="container mx-auto py-4 px-4 flex flex-col gap-2">
-                        {navItems.map((item) => {
+                        {navItems.map((item, index) => {
+                            // Check if item has submenu
+                            if ('submenu' in item && item.submenu) {
+                                return (
+                                    <div key={index} className="space-y-1">
+                                        <div className="px-3 py-2 text-sm font-semibold text-foreground">
+                                            {item.label}
+                                        </div>
+                                        {item.submenu.map((subItem) => {
+                                            const isSubActive = pathname === subItem.href || 
+                                                (subItem.href !== "/admin" && pathname.startsWith(subItem.href));
+                                            return (
+                                                <Link
+                                                    key={subItem.href}
+                                                    href={subItem.href}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className={cn(
+                                                        "px-6 py-2 rounded-md text-sm font-medium transition-colors block",
+                                                        isSubActive
+                                                            ? "bg-primary text-primary-foreground"
+                                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                                    )}
+                                                >
+                                                    {subItem.label}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            }
+                            
+                            // Regular link
                             const isActive = pathname === item.href || 
-                                           (item.href !== "/admin" && pathname.startsWith(item.href));
+                                           (item.href !== "/admin" && pathname.startsWith(item.href!));
                             return (
                                 <Link
                                     key={item.href}
-                                    href={item.href}
+                                    href={item.href!}
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={cn(
                                         "px-3 py-2 rounded-md text-sm font-medium transition-colors",
