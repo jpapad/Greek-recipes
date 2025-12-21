@@ -45,7 +45,7 @@ FROM page_views
 GROUP BY date_trunc('day', created_at)
 ORDER BY day DESC;
 
--- Popular Recipes View
+-- Popular Recipes View (without favorites dependency)
 CREATE MATERIALIZED VIEW IF NOT EXISTS popular_recipes AS
 SELECT 
     r.id,
@@ -53,12 +53,11 @@ SELECT
     r.slug,
     r.image_url,
     COUNT(DISTINCT rv.id) as view_count,
-    COUNT(DISTINCT f.user_id) as favorite_count,
+    0 as favorite_count, -- Placeholder, update manually if favorites table exists
     AVG(rev.rating) as avg_rating,
     COUNT(DISTINCT rev.id) as review_count
 FROM recipes r
 LEFT JOIN recipe_views rv ON r.id = rv.recipe_id
-LEFT JOIN favorites f ON r.id = f.recipe_id
 LEFT JOIN reviews rev ON r.id = rev.recipe_id
 GROUP BY r.id, r.title, r.slug, r.image_url
 ORDER BY view_count DESC;
