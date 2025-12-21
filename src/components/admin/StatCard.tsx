@@ -1,13 +1,29 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+    UtensilsCrossed,
+    MapPin,
+    Building2,
+    Home,
+    Users,
+    FileText,
+} from "lucide-react";
+
+const iconMap = {
+    recipe: UtensilsCrossed,
+    region: MapPin,
+    prefecture: Building2,
+    city: Home,
+    users: Users,
+    articles: FileText,
+} as const;
 
 interface StatCardProps {
     title: string;
     value: number;
-    icon: LucideIcon;
+    iconName: keyof typeof iconMap;
     description?: string;
     trend?: {
         value: number;
@@ -19,11 +35,13 @@ interface StatCardProps {
 export function StatCard({
     title,
     value,
-    icon: Icon,
+    iconName,
     description,
     trend,
     className,
 }: StatCardProps) {
+    const Icon = iconMap[iconName];
+    
     return (
         <Card className={cn("", className)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

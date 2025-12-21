@@ -2,14 +2,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/admin/StatCard";
-import {
-    UtensilsCrossed,
-    MapPin,
-    Building2,
-    Home,
-    Plus,
-    ArrowRight,
-} from "lucide-react";
+import { Plus, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 async function getDashboardStats() {
@@ -64,25 +57,25 @@ export default async function AdminDashboardPage() {
                 <StatCard
                     title="Total Recipes"
                     value={stats.recipes}
-                    icon={UtensilsCrossed}
+                    iconName="recipe"
                     description="Published recipes"
                 />
                 <StatCard
                     title="Regions"
                     value={stats.regions}
-                    icon={MapPin}
+                    iconName="region"
                     description="Greek regions"
                 />
                 <StatCard
                     title="Prefectures"
                     value={stats.prefectures}
-                    icon={Building2}
+                    iconName="prefecture"
                     description="Administrative divisions"
                 />
                 <StatCard
                     title="Cities"
                     value={stats.cities}
-                    icon={Home}
+                    iconName="city"
                     description="Cities & towns"
                 />
             </div>

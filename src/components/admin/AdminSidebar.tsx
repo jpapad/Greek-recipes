@@ -38,10 +38,22 @@ const navItems: NavItem[] = [
     { href: "/admin/audit", icon: FileText, labelKey: "sidebar.audit" },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+    collapsed?: boolean;
+    onCollapsedChange?: (collapsed: boolean) => void;
+}
+
+export function AdminSidebar({ 
+    collapsed: controlledCollapsed, 
+    onCollapsedChange 
+}: AdminSidebarProps = {}) {
     const pathname = usePathname();
     const { t } = useAdminI18n();
-    const [collapsed, setCollapsed] = useState(false);
+    const [internalCollapsed, setInternalCollapsed] = useState(false);
+    
+    // Use controlled state if provided, otherwise use internal state
+    const collapsed = controlledCollapsed ?? internalCollapsed;
+    const setCollapsed = onCollapsedChange ?? setInternalCollapsed;
 
     return (
         <aside
