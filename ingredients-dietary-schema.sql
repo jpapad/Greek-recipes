@@ -67,31 +67,31 @@ CREATE TABLE IF NOT EXISTS recipe_dietary_tags (
 );
 
 -- Insert default dietary tags
-INSERT INTO dietary_tags (name_en, name_el, slug, description, icon, color) VALUES
-('Vegetarian', 'Χορτοφαγική', 'vegetarian', 'Contains no meat or fish', '🌱', '#22c55e'),
-('Vegan', 'Vegan', 'vegan', 'Contains no animal products', '🌿', '#16a34a'),
-('Gluten-Free', 'Χωρίς Γλουτένη', 'gluten-free', 'Contains no gluten', '🌾', '#eab308'),
-('Dairy-Free', 'Χωρίς Γαλακτοκομικά', 'dairy-free', 'Contains no dairy products', '🥛', '#06b6d4'),
-('Keto', 'Keto', 'keto', 'Low-carb, high-fat diet', '🥑', '#8b5cf6'),
-('Paleo', 'Paleo', 'paleo', 'Based on ancient diet patterns', '🦴', '#f59e0b'),
-('Low-Calorie', 'Χαμηλές Θερμίδες', 'low-calorie', 'Under 300 calories per serving', '⚖️', '#10b981'),
-('High-Protein', 'Υψηλή Πρωτεΐνη', 'high-protein', 'Rich in protein', '💪', '#ef4444'),
-('Mediterranean', 'Μεσογειακή', 'mediterranean', 'Traditional Mediterranean diet', '🫒', '#ea580c'),
-('Nut-Free', 'Χωρίς Ξηρούς Καρπούς', 'nut-free', 'Contains no nuts', '🥜', '#dc2626')
+INSERT INTO dietary_tags (name, name_en, name_el, slug, description, icon, color) VALUES
+('Vegetarian', 'Vegetarian', 'Χορτοφαγική', 'vegetarian', 'Contains no meat or fish', '🌱', '#22c55e'),
+('Vegan', 'Vegan', 'Vegan', 'vegan', 'Contains no animal products', '🌿', '#16a34a'),
+('Gluten-Free', 'Gluten-Free', 'Χωρίς Γλουτένη', 'gluten-free', 'Contains no gluten', '🌾', '#eab308'),
+('Dairy-Free', 'Dairy-Free', 'Χωρίς Γαλακτοκομικά', 'dairy-free', 'Contains no dairy products', '🥛', '#06b6d4'),
+('Keto', 'Keto', 'Keto', 'keto', 'Low-carb, high-fat diet', '🥑', '#8b5cf6'),
+('Paleo', 'Paleo', 'Paleo', 'paleo', 'Based on ancient diet patterns', '🦴', '#f59e0b'),
+('Low-Calorie', 'Low-Calorie', 'Χαμηλές Θερμίδες', 'low-calorie', 'Under 300 calories per serving', '⚖️', '#10b981'),
+('High-Protein', 'High-Protein', 'Υψηλή Πρωτεΐνη', 'high-protein', 'Rich in protein', '💪', '#ef4444'),
+('Mediterranean', 'Mediterranean', 'Μεσογειακή', 'mediterranean', 'Traditional Mediterranean diet', '🫒', '#ea580c'),
+('Nut-Free', 'Nut-Free', 'Χωρίς Ξηρούς Καρπούς', 'nut-free', 'Contains no nuts', '🥜', '#dc2626')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Insert common Greek ingredients
-INSERT INTO ingredients (name_el, name_en, category, subcategory, common_units, season) VALUES
-('Ντομάτα', 'Tomato', 'vegetables', 'fruiting', '["kg", "pieces", "cans"]', '{summer}'),
-('Πατάτα', 'Potato', 'vegetables', 'root', '["kg", "pieces"]', '{year-round}'),
-('Κρεμμύδι', 'Onion', 'vegetables', 'bulb', '["kg", "pieces"]', '{year-round}'),
-('Σκόρδο', 'Garlic', 'vegetables', 'bulb', '["cloves", "heads"]', '{year-round}'),
-('Ελαιόλαδο', 'Olive Oil', 'oils', 'vegetable', '["ml", "l", "tbsp", "cup"]', '{year-round}'),
-('Φέτα', 'Feta Cheese', 'dairy', 'cheese', '["g", "kg", "pieces"]', '{year-round}'),
-('Ρίγανη', 'Oregano', 'herbs', 'dried', '["g", "tbsp", "tsp"]', '{summer}'),
-('Λεμόνι', 'Lemon', 'fruits', 'citrus', '["pieces", "ml"]', '{year-round}'),
-('Αρνί', 'Lamb', 'meats', 'red', '["kg", "g"]', '{spring}'),
-('Μελιτζάνα', 'Eggplant', 'vegetables', 'fruiting', '["kg", "pieces"]', '{summer}')
+INSERT INTO ingredients (name, name_el, name_en, category, subcategory, common_units, season) VALUES
+('Tomato', 'Ντομάτα', 'Tomato', 'vegetables', 'fruiting', '["kg", "pieces", "cans"]', '{summer}'),
+('Potato', 'Πατάτα', 'Potato', 'vegetables', 'root', '["kg", "pieces"]', '{year-round}'),
+('Onion', 'Κρεμμύδι', 'Onion', 'vegetables', 'bulb', '["kg", "pieces"]', '{year-round}'),
+('Garlic', 'Σκόρδο', 'Garlic', 'vegetables', 'bulb', '["cloves", "heads"]', '{year-round}'),
+('Olive Oil', 'Ελαιόλαδο', 'Olive Oil', 'oils', 'vegetable', '["ml", "l", "tbsp", "cup"]', '{year-round}'),
+('Feta Cheese', 'Φέτα', 'Feta Cheese', 'dairy', 'cheese', '["g", "kg", "pieces"]', '{year-round}'),
+('Oregano', 'Ρίγανη', 'Oregano', 'herbs', 'dried', '["g", "tbsp", "tsp"]', '{summer}'),
+('Lemon', 'Λεμόνι', 'Lemon', 'fruits', 'citrus', '["pieces", "ml"]', '{year-round}'),
+('Lamb', 'Αρνί', 'Lamb', 'meats', 'red', '["kg", "g"]', '{spring}'),
+('Eggplant', 'Μελιτζάνα', 'Eggplant', 'vegetables', 'fruiting', '["kg", "pieces"]', '{summer}')
 ON CONFLICT DO NOTHING;
 
 -- Create indexes
