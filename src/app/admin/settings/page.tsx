@@ -1,10 +1,6 @@
 import { requireAdminServer } from "@/lib/adminServerGuard";
 import { GlassPanel } from "@/components/ui/GlassPanel";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 export const metadata = {
     title: "Settings | Admin Dashboard",
@@ -19,7 +15,7 @@ export default async function AdminSettingsPage() {
     const { data: settings, error } = await supabase
         .from('site_settings')
         .select('*')
-        .single();
+        .order('setting_group', { ascending: true });
 
     return (
         <div className="space-y-6">
@@ -85,165 +81,100 @@ USING (EXISTS (
                     </div>
                 ) : (
                     <div className="space-y-8">
-                        {/* General Settings */}
-                        <section>
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                                General Settings
-                            </h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="site_name">Site Name</Label>
-                                    <Input
-                                        id="site_name"
-                                        defaultValue="Greek Recipes"
-                                        placeholder="Site name"
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="site_description">Site Description</Label>
-                                    <Textarea
-                                        id="site_description"
-                                        defaultValue="Authentic Greek Recipes and Culinary Traditions"
-                                        placeholder="Site description"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="contact_email">Contact Email</Label>
-                                    <Input
-                                        id="contact_email"
-                                        type="email"
-                                        defaultValue="info@greekrecipes.com"
-                                        placeholder="contact@example.com"
-                                    />
-                                </div>
-                            </div>
-                        </section>
+                        {/* Group settings by setting_group */}
+                        {Array.isArray(settings) && settings.length > 0 ? (
+                            <>
+                                {/* Design Settings */}
+                                {settings.filter(s => s.setting_group === 'design').length > 0 && (
+                                    <section>
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                                            Design Settings
+                                        </h2>
+                                        <div className="space-y-6">
+                                            {settings
+                                                .filter(s => s.setting_group === 'design')
+                                                .map(setting => (
+                                                    <div key={setting.id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                                                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                                                            {setting.label}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                                            {setting.description}
+                                                        </p>
+                                                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                                                            <pre className="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto">
+                                                                {JSON.stringify(setting.value, null, 2)}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </section>
+                                )}
 
-                        {/* Registration Settings */}
-                        <section className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                                User Settings
-                            </h2>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="allow_registration"
-                                        defaultChecked
-                                        className="w-4 h-4 rounded"
-                                    />
-                                    <Label htmlFor="allow_registration" className="cursor-pointer">
-                                        Allow new user registration
-                                    </Label>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="email_verification"
-                                        defaultChecked
-                                        className="w-4 h-4 rounded"
-                                    />
-                                    <Label htmlFor="email_verification" className="cursor-pointer">
-                                        Require email verification
-                                    </Label>
-                                </div>
-                            </div>
-                        </section>
+                                {/* SEO Settings */}
+                                {settings.filter(s => s.setting_group === 'seo').length > 0 && (
+                                    <section>
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                                            SEO Settings
+                                        </h2>
+                                        <div className="space-y-6">
+                                            {settings
+                                                .filter(s => s.setting_group === 'seo')
+                                                .map(setting => (
+                                                    <div key={setting.id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                                                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                                                            {setting.label}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                                            {setting.description}
+                                                        </p>
+                                                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                                                            <pre className="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto">
+                                                                {JSON.stringify(setting.value, null, 2)}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </section>
+                                )}
 
-                        {/* Upload Settings */}
-                        <section className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                                Upload Settings
-                            </h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="max_upload_size">Max Upload Size (MB)</Label>
-                                    <Input
-                                        id="max_upload_size"
-                                        type="number"
-                                        defaultValue="10"
-                                        min="1"
-                                        max="50"
-                                    />
-                                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                                        Maximum file size for image uploads
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Maintenance Mode */}
-                        <section className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                                Maintenance
-                            </h2>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="checkbox"
-                                        id="maintenance_mode"
-                                        className="w-4 h-4 rounded"
-                                    />
-                                    <Label htmlFor="maintenance_mode" className="cursor-pointer">
-                                        Enable maintenance mode
-                                    </Label>
-                                </div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    When enabled, the site will display a maintenance message to non-admin users.
-                                    Admins can still access the site normally.
+                                {/* All Other Settings */}
+                                {settings.filter(s => !['design', 'seo'].includes(s.setting_group)).length > 0 && (
+                                    <section>
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                                            Other Settings
+                                        </h2>
+                                        <div className="space-y-6">
+                                            {settings
+                                                .filter(s => !['design', 'seo'].includes(s.setting_group))
+                                                .map(setting => (
+                                                    <div key={setting.id} className="border-b border-gray-200 dark:border-gray-700 pb-4">
+                                                        <h3 className="font-medium text-gray-900 dark:text-white mb-2">
+                                                            {setting.label}
+                                                        </h3>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                                                            {setting.description}
+                                                        </p>
+                                                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                                                            <pre className="text-xs text-gray-700 dark:text-gray-300 overflow-x-auto">
+                                                                {JSON.stringify(setting.value, null, 2)}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </>
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-gray-600 dark:text-gray-400">
+                                    No settings found. Please run the SQL migration above.
                                 </p>
                             </div>
-                        </section>
-
-                        {/* API Settings */}
-                        <section className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                                API Configuration
-                            </h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <Label htmlFor="openai_key">OpenAI API Key</Label>
-                                    <Input
-                                        id="openai_key"
-                                        type="password"
-                                        placeholder="sk-..."
-                                    />
-                                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                                        For AI-powered recipe suggestions and translations
-                                    </p>
-                                </div>
-                                <div>
-                                    <Label htmlFor="unsplash_key">Unsplash API Key</Label>
-                                    <Input
-                                        id="unsplash_key"
-                                        type="password"
-                                        placeholder="Access Key"
-                                    />
-                                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-                                        For recipe image search
-                                    </p>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Save Button */}
-                        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-                            <Button variant="outline">
-                                Reset to Defaults
-                            </Button>
-                            <Button>
-                                Save Settings
-                            </Button>
-                        </div>
-
-                        {/* Note */}
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                            <p className="text-sm text-blue-800 dark:text-blue-300">
-                                <strong>Note:</strong> This is a placeholder UI. Connect to the <code>site_settings</code> table
-                                and implement save/update functionality using Server Actions or API routes.
-                            </p>
-                        </div>
+                        )}
                     </div>
                 )}
             </GlassPanel>
