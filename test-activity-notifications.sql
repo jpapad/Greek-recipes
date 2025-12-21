@@ -26,19 +26,22 @@ SELECT log_activity(
     '{}'::jsonb
 );
 
--- 2. Create test notifications for the current admin user
--- Get the current user's ID first
+-- 2. Create test notifications for an admin user
+-- Get an admin user's ID from the database
 DO $$
 DECLARE
-    current_user_id UUID;
+    admin_user_id UUID;
 BEGIN
-    -- Get the current authenticated user's ID
-    SELECT auth.uid() INTO current_user_id;
+    -- Get the first admin user's ID from profiles table
+    SELECT id INTO admin_user_id 
+    FROM profiles 
+    WHERE is_admin = true 
+    LIMIT 1;
     
-    IF current_user_id IS NOT NULL THEN
+    IF admin_user_id IS NOT NULL THEN
         -- Create a few test notifications
         PERFORM create_notification(
-            current_user_id,
+            admin_user_id,
             'success',
             'Συνταγή δημοσιεύτηκε',
             'Η συνταγή "Μουσακάς" δημοσιεύτηκε με επιτυχία!',
@@ -47,7 +50,7 @@ BEGIN
         );
         
         PERFORM create_notification(
-            current_user_id,
+            admin_user_id,
             'info',
             'Νέο σχόλιο',
             'Ένας χρήστης άφησε σχόλιο στη συνταγή "Παστίτσιο"',
@@ -56,7 +59,7 @@ BEGIN
         );
         
         PERFORM create_notification(
-            current_user_id,
+            admin_user_id,
             'warning',
             'Προσοχή',
             'Υπάρχουν 3 σχόλια που περιμένουν έγκριση',
@@ -64,31 +67,33 @@ BEGIN
             '⚠️'
         );
         
-        RAISE NOTICE 'Test notifications created for user: %', current_user_id;
+        RAISE NOTICE 'Test notifications created for admin user: %', admin_user_id;
     ELSE
-        RAISE EXCEPTION 'No authenticated user found. Please run this as an authenticated admin user.';
+        RAISE WARNING 'No admin user found in profiles table. Please create an admin user first.';
     END IF;
 END $$;
 
--- 3. Create test comments (you'll need to replace with actual recipe_id and user_id)
--- First, let's get a recipe ID
+-- 3. Create test comments using an admin user
 DO $$
 DECLARE
     test_recipe_id UUID;
-    current_user_id UUID;
+    admin_user_id UUID;
 BEGIN
     -- Get a recipe ID (first recipe in database)
     SELECT id INTO test_recipe_id FROM recipes LIMIT 1;
     
-    -- Get current user ID
-    SELECT auth.uid() INTO current_user_id;
+    -- Get an admin user ID from profiles table
+    SELECT id INTO admin_user_id 
+    FROM profiles 
+    WHERE is_admin = true 
+    LIMIT 1;
     
-    IF test_recipe_id IS NOT NULL AND current_user_id IS NOT NULL THEN
-        -- Insert a test comment
+    IF test_recipe_id IS NOT NULL AND admin_user_id IS NOT NULL THEN
+        -- Insert test comments
         INSERT INTO recipe_comments (recipe_id, user_id, content, status)
         VALUES (
             test_recipe_id,
-            current_user_id,
+            admin_user_id,
             'Τέλεια συνταγή! Τη δοκίμασα και βγήκε πολύ νόστιμη. Ευχαριστώ!',
             'pending'
         );
@@ -96,7 +101,7 @@ BEGIN
         INSERT INTO recipe_comments (recipe_id, user_id, content, status)
         VALUES (
             test_recipe_id,
-            current_user_id,
+            admin_user_id,
             'Μπορώ να χρησιμοποιήσω γάλα χωρίς λακτόζη;',
             'pending'
         );
@@ -104,14 +109,19 @@ BEGIN
         INSERT INTO recipe_comments (recipe_id, user_id, content, status)
         VALUES (
             test_recipe_id,
-            current_user_id,
+            admin_user_id,
             'Εξαιρετική! 5 αστέρια!',
             'approved'
         );
         
-        RAISE NOTICE 'Test comments created for recipe: %', test_recipe_id;
+        RAISE NOTICE 'Test comments created for recipe: % by admin: %', test_recipe_id, admin_user_id;
     ELSE
-        RAISE WARNING 'Could not create test comments. Recipe or user not found.';
+        IF test_recipe_id IS NULL THEN
+            RAISE WARNING 'No recipes found in database. Please create at least one recipe first.';
+        END IF;
+        IF admin_user_id IS NULL THEN
+            RAISE WARNING 'No admin user found in profiles table. Please create an admin user first.';
+        END IF;
     END IF;
 END $$;
 
