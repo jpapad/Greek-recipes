@@ -5,8 +5,13 @@
 DROP MATERIALIZED VIEW IF EXISTS popular_recipes CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS user_activity_summary CASCADE;
 
+-- Drop and recreate tables to ensure clean state
+DROP TABLE IF EXISTS search_queries CASCADE;
+DROP TABLE IF EXISTS recipe_views CASCADE;
+DROP TABLE IF EXISTS page_views CASCADE;
+
 -- Page Views Tracking
-CREATE TABLE IF NOT EXISTS page_views (
+CREATE TABLE page_views (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     page_path TEXT NOT NULL,
     page_title TEXT,
@@ -19,7 +24,7 @@ CREATE TABLE IF NOT EXISTS page_views (
 );
 
 -- Recipe Views Tracking
-CREATE TABLE IF NOT EXISTS recipe_views (
+CREATE TABLE recipe_views (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     recipe_id UUID REFERENCES recipes(id) ON DELETE CASCADE,
     user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -29,7 +34,7 @@ CREATE TABLE IF NOT EXISTS recipe_views (
 );
 
 -- Search Queries Tracking
-CREATE TABLE IF NOT EXISTS search_queries (
+CREATE TABLE search_queries (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     query TEXT NOT NULL,
     results_count INTEGER,
