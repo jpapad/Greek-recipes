@@ -2,11 +2,27 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/**
+ * Helper to require environment variables at runtime
+ * @throws Error if environment variable is missing
+ */
+function requireEnv(key: string): string {
+    const value = process.env[key];
+    if (!value) {
+        throw new Error(`Missing required environment variable: ${key}`);
+    }
+    return value;
+}
+
+/**
+ * Creates a Supabase client configured for server-side usage with Next.js 16+
+ * Handles async cookies() API and proper cookie management
+ */
 export async function getSupabaseServerClient() {
     const cookieStore = await cookies();
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL');
+    const anon = requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
     return createServerClient(url, anon, {
         cookies: {
@@ -15,18 +31,14 @@ export async function getSupabaseServerClient() {
                 return cookieStore.getAll();
             },
             setAll(cookiesToSet) {
-                // Σε Server Components μπορεί να μην επιτρέπεται set cookies.
-                // Το κάνουμε safe/conditional για να μην σπάει το build.
-                const setCookie = (cookieStore as any).set?.bind(cookieStore);
-
-                if (!setCookie) return;
-
+                // In Server Components, setting cookies may not be allowed.
+                // Make this safe/conditional to avoid breaking the build.
                 try {
                     cookiesToSet.forEach(({ name, value, options }) => {
-                        setCookie(name, value, options);
+                        cookieStore.set(name, value, options);
                     });
                 } catch {
-                    // ignore
+                    // Ignore cookie setting errors in read-only contexts
                 }
             },
         },

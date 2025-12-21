@@ -40,13 +40,37 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/admin')) {
         if (!user) {
             const loginUrl = new URL('/login', request.url)
-            // κράτα και query string αν θες:
             loginUrl.searchParams.set('redirect', request.nextUrl.pathname + request.nextUrl.search)
             return NextResponse.redirect(loginUrl, { headers: { 'cache-control': 'no-store' } })
         }
 
-        // ΠΡΟΤΕΙΝΟΜΕΝΟ: app_metadata role, όχι user_metadata
-        const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.is_admin === true
+        // Check admin status from multiple sources (for compatibility)
+        // Priority: profiles table > app_metadata > user_metadata
+        let isAdmin = false;
+
+        try {
+            // First check profiles table (authoritative source)
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single();
+
+            if (profile?.is_admin === true) {
+                isAdmin = true;
+            }
+        } catch (error) {
+            // If profile check fails, fall back to metadata
+            console.error('Middleware: Failed to check profile admin status', error);
+        }
+
+        // Fallback to metadata if profile check didn't work
+        if (!isAdmin) {
+            isAdmin = user.app_metadata?.role === 'admin' || 
+                      user.app_metadata?.is_admin === true ||
+                      user.user_metadata?.is_admin === true ||
+                      user.user_metadata?.is_admin === 'true';
+        }
 
         if (!isAdmin) {
             const loginUrl = new URL('/login', request.url)
