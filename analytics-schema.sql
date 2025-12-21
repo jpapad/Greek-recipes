@@ -1,6 +1,10 @@
 -- Analytics System for Greek Recipes App
 -- Tracks page views, recipe views, user activity
 
+-- Drop existing materialized views first
+DROP MATERIALIZED VIEW IF EXISTS popular_recipes CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS user_activity_summary CASCADE;
+
 -- Page Views Tracking
 CREATE TABLE IF NOT EXISTS page_views (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -35,18 +39,18 @@ CREATE TABLE IF NOT EXISTS search_queries (
 );
 
 -- User Activity Summary (Materialized View)
-CREATE MATERIALIZED VIEW IF NOT EXISTS user_activity_summary AS
+CREATE MATERIALIZED VIEW user_activity_summary AS
 SELECT 
-    date_trunc('day', created_at) as day,
-    COUNT(DISTINCT session_id) as unique_visitors,
+    date_trunc('day', pv.created_at) as day,
+    COUNT(DISTINCT pv.session_id) as unique_visitors,
     COUNT(*) as total_page_views,
-    COUNT(DISTINCT user_id) as registered_users
-FROM page_views
-GROUP BY date_trunc('day', created_at)
+    COUNT(DISTINCT pv.user_id) as registered_users
+FROM page_views pv
+GROUP BY date_trunc('day', pv.created_at)
 ORDER BY day DESC;
 
 -- Popular Recipes View (without favorites dependency)
-CREATE MATERIALIZED VIEW IF NOT EXISTS popular_recipes AS
+CREATE MATERIALIZED VIEW popular_recipes AS
 SELECT 
     r.id,
     r.title,
