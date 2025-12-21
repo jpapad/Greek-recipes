@@ -103,13 +103,19 @@ WITH CHECK (true);
 CREATE POLICY "Public read approved comments" ON recipe_comments FOR SELECT TO public
 USING (status = 'approved');
 
+CREATE POLICY "Admins read all comments" ON recipe_comments FOR SELECT TO authenticated
+USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));
+
 CREATE POLICY "Users create comments" ON recipe_comments FOR INSERT TO authenticated
 WITH CHECK (user_id = auth.uid());
 
 CREATE POLICY "Users update own comments" ON recipe_comments FOR UPDATE TO authenticated
 USING (user_id = auth.uid() AND status = 'pending');
 
-CREATE POLICY "Admins moderate comments" ON recipe_comments FOR ALL TO authenticated
+CREATE POLICY "Admins moderate comments" ON recipe_comments FOR UPDATE TO authenticated
+USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));
+
+CREATE POLICY "Admins delete comments" ON recipe_comments FOR DELETE TO authenticated
 USING (EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.is_admin = true));
 
 -- Moderation rules: Admins only
