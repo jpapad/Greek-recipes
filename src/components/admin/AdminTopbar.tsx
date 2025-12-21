@@ -25,6 +25,8 @@ const navItems = [
     { href: "/admin/cities", label: "Πόλεις" },
     { href: "/admin/media", label: "Μέσα" },
     { href: "/admin/users", label: "Χρήστες" },
+    { href: "/admin/settings", label: "Ρυθμίσεις" },
+    { href: "/admin/audit", label: "Έλεγχος" },
 ];
 
 interface AdminTopbarProps {
