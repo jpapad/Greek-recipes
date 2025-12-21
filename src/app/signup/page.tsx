@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 
 export default function SignupPage() {
     const t = useTranslations();
     const router = useRouter();
-    const { showToast } = useToast();
+    const { toast } = useToast();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,13 +43,13 @@ export default function SignupPage() {
             // Check if email confirmation is required
             if (result?.user && result.user.confirmed_at) {
                 // User is auto-confirmed (email verification disabled)
-                showToast(t('Auth.signUpSuccess'), "success");
+                toast({ title: t('Auth.signUpSuccess'), variant: 'success' });
             } else if (result?.user && !result.user.confirmed_at) {
                 // Email verification required
-                showToast(t('Auth.signUpSuccess'), "success");
+                toast({ title: t('Auth.signUpSuccess'), variant: 'success' });
             } else {
                 // Account created but status unclear
-                showToast(t('Auth.signUpSuccess'), "success");
+                toast({ title: t('Auth.signUpSuccess'), variant: 'success' });
             }
 
             router.push("/login");

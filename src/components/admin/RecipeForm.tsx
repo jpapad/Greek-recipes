@@ -15,7 +15,7 @@ import { ImageSearchModal } from "@/components/admin/ImageSearchModal";
 import { GroupedIngredientsEditor } from "@/components/admin/GroupedIngredientsEditor";
 import { GroupedStepsEditor } from "@/components/admin/GroupedStepsEditor";
 import { Plus, X, Save, Search, Sparkles } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { useTranslations } from "next-intl";
 
 interface RecipeFormProps {
@@ -27,7 +27,7 @@ interface RecipeFormProps {
 export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
     const t = useTranslations();
     const router = useRouter();
-    const { showToast } = useToast();
+    const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [slugError, setSlugError] = useState("");
     const [prefectures, setPrefectures] = useState<Prefecture[]>([]);
@@ -158,7 +158,7 @@ export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
         if (existingRecipe && existingRecipe.id !== recipe?.id) {
             setSlugError("This slug already exists. Please use a different one.");
             setIsSubmitting(false);
-            showToast("Slug already exists", "error");
+            toast({ title: "Slug already exists", variant: 'destructive' });
             return;
         }
 
@@ -194,14 +194,14 @@ export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
             if (recipe?.id) {
                 const result = await updateRecipe(recipe.id, recipeData);
                 if (result) {
-                    showToast("Recipe updated successfully!", "success");
+                    toast({ title: "Recipe updated successfully!", variant: 'success' });
                 } else {
                     throw new Error("Failed to update recipe");
                 }
             } else {
                 const result = await createRecipe(recipeData);
                 if (result) {
-                    showToast("Recipe created successfully!", "success");
+                    toast({ title: "Recipe created successfully!", variant: 'success' });
                 } else {
                     throw new Error("Failed to create recipe");
                 }
@@ -210,7 +210,7 @@ export function RecipeForm({ recipe, regions, initialData }: RecipeFormProps) {
             router.refresh();
         } catch (error) {
             console.error("Error saving recipe:", error);
-            showToast("Failed to save recipe. Please try again.", "error");
+            toast({ title: "Failed to save recipe. Please try again.", variant: 'destructive' });
             setIsSubmitting(false);
         }
     };

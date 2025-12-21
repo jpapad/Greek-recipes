@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
  
 
 interface CollectionFormProps {
@@ -30,13 +30,13 @@ export function CollectionForm({ onSave, initialData, onCancel }: CollectionForm
     const [description, setDescription] = useState(initialData?.description || '');
     const [isPublic, setIsPublic] = useState(initialData?.is_public || false);
     const [saving, setSaving] = useState(false);
-    const { showToast } = useToast();
+    const { toast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!name.trim()) {
-            showToast('Το όνομα είναι υποχρεωτικό', 'error');
+            toast({ title: 'Το όνομα είναι υποχρεωτικό', variant: 'destructive' });
             return;
         }
 
@@ -48,9 +48,9 @@ export function CollectionForm({ onSave, initialData, onCancel }: CollectionForm
                 is_public: isPublic,
                 recipe_ids: initialData?.recipe_ids || []
             });
-            showToast('Η συλλογή αποθηκεύτηκε επιτυχώς!', 'success');
+            toast({ title: 'Η συλλογή αποθηκεύτηκε επιτυχώς!', variant: 'success' });
         } catch (error) {
-            showToast('Σφάλμα κατά την αποθήκευση', 'error');
+            toast({ title: 'Σφάλμα κατά την αποθήκευση', variant: 'destructive' });
             console.error(error);
         } finally {
             setSaving(false);

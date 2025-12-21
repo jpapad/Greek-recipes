@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 
 interface DeleteRegionButtonProps {
@@ -21,18 +21,18 @@ export function DeleteRegionButton({ id, name, onBeforeDelete, onDeleteFailed, o
     const t = useTranslations();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
-    const { showToast } = useToast();
+    const { toast } = useToast();
     const [showConfirm, setShowConfirm] = useState(false);
 
     const handleDelete = async () => {
-        showToast(t('Admin.deleting') || 'Deleting...', 'info');
+        toast({ title: t('Admin.deleting') || 'Deleting...', variant: 'default' });
 
         setIsDeleting(true);
         onBeforeDelete?.();
         const success = await deleteRegion(id);
 
         if (success) {
-            showToast(t('Admin.deleted') || 'Deleted', 'success');
+            toast({ title: t('Admin.deleted') || 'Deleted', variant: 'success' });
             setShowConfirm(false);
             if (onDeleted) {
                 onDeleted?.();
@@ -40,7 +40,7 @@ export function DeleteRegionButton({ id, name, onBeforeDelete, onDeleteFailed, o
                 router.refresh();
             }
         } else {
-            showToast(t('Admin.error') || 'Error deleting', 'error');
+            toast({ title: t('Admin.error') || 'Error deleting', variant: 'destructive' });
             setIsDeleting(false);
             onDeleteFailed?.();
         }

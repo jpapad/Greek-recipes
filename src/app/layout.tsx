@@ -8,7 +8,7 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { ShoppingListProvider } from "@/context/ShoppingListContext";
 import { MealPlanProvider } from "@/context/MealPlanContext";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { ToastProvider } from "@/components/ui/toast";
+import { Toaster } from "@/components/ui/toaster";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { Snowfall } from "@/components/ui/Snowfall";
 import Script from "next/script";
@@ -119,18 +119,17 @@ export default async function RootLayout({
           <LoadingScreen />
           <Snowfall />
           <ThemeProvider>
-            <ToastProvider>
-              <ShoppingListProvider>
-                <MealPlanProvider>
-                  <Navbar />
-                  <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
-                    {children}
-                  </main>
-                  <Footer />
-                  <PWAInstallPrompt />
-                </MealPlanProvider>
-              </ShoppingListProvider>
-            </ToastProvider>
+            <ShoppingListProvider>
+              <MealPlanProvider>
+                <Navbar />
+                <main className="flex-grow pt-24 pb-10 px-4 md:px-8 max-w-7xl mx-auto w-full">
+                  {children}
+                </main>
+                <Footer />
+                <PWAInstallPrompt />
+                <Toaster />
+              </MealPlanProvider>
+            </ShoppingListProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
 

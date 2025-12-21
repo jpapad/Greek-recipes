@@ -1,71 +1,97 @@
-"use client";
+"use client"
 
-import { createContext, useContext, useState, ReactNode } from "react";
-import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import * as React from "react"
+import { X } from "lucide-react"
+import { cn } from "@/lib/utils"
 
-type ToastType = "success" | "error" | "info";
-
-interface Toast {
-    id: string;
-    message: string;
-    type: ToastType;
+export interface ToastProps extends React.HTMLAttributes<HTMLDivElement> {
+    variant?: "default" | "destructive" | "success"
 }
 
-interface ToastContextType {
-    showToast: (message: string, type: ToastType) => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
-
-export function ToastProvider({ children }: { children: ReactNode }) {
-    const [toasts, setToasts] = useState<Toast[]>([]);
-
-    const showToast = (message: string, type: ToastType) => {
-        const id = crypto.randomUUID();
-        setToasts((prev) => [...prev, { id, message, type }]);
-
-        setTimeout(() => {
-            setToasts((prev) => prev.filter((toast) => toast.id !== id));
-        }, 5000);
-    };
-
-    const removeToast = (id: string) => {
-        setToasts((prev) => prev.filter((toast) => toast.id !== id));
-    };
-
-    return (
-        <ToastContext.Provider value={{ showToast }}>
-            {children}
-            <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
-                {toasts.map((toast) => (
-                    <div
-                        key={toast.id}
-                        className={cn(
-                            "px-6 py-4 rounded-lg shadow-lg backdrop-blur-md flex items-center gap-3 min-w-[300px] animate-in slide-in-from-right",
-                            toast.type === "success" && "bg-green-500/90 text-white",
-                            toast.type === "error" && "bg-red-500/90 text-white",
-                            toast.type === "info" && "bg-blue-500/90 text-white"
-                        )}
-                    >
-                        <span className="flex-1">{toast.message}</span>
-                        <button
-                            onClick={() => removeToast(toast.id)}
-                            className="hover:opacity-70 transition-opacity"
-                        >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-                ))}
-            </div>
-        </ToastContext.Provider>
-    );
-}
-
-export function useToast() {
-    const context = useContext(ToastContext);
-    if (!context) {
-        throw new Error("useToast must be used within ToastProvider");
+const Toast = React.forwardRef<HTMLDivElement, ToastProps>(
+    ({ className, variant = "default", ...props }, ref) => {
+        return (
+            <div
+                ref={ref}
+                className={cn(
+                    "pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all",
+                    variant === "default" && "bg-background border",
+                    variant === "destructive" &&
+                    "destructive group border-destructive bg-destructive text-destructive-foreground",
+                    variant === "success" && "bg-green-50 border-green-200 text-green-900",
+                    className
+                )}
+                {...props}
+            />
+        )
     }
-    return context;
+)
+Toast.displayName = "Toast"
+
+const ToastAction = React.forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
+    <button
+        ref={ref}
+        className={cn(
+            "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+            className
+        )}
+        {...props}
+    />
+))
+ToastAction.displayName = "ToastAction"
+
+const ToastClose = React.forwardRef<
+    HTMLButtonElement,
+    React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
+    <button
+        ref={ref}
+        className={cn(
+            "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100",
+            className
+        )}
+        toast-close=""
+        {...props}
+    >
+        <X className="h-4 w-4" />
+    </button>
+))
+ToastClose.displayName = "ToastClose"
+
+const ToastTitle = React.forwardRef<
+    HTMLParagraphElement,
+    React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+    <div
+        ref={ref}
+        className={cn("text-sm font-semibold", className)}
+        {...props}
+    />
+))
+ToastTitle.displayName = "ToastTitle"
+
+const ToastDescription = React.forwardRef<
+    HTMLParagraphElement,
+    React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+    <div
+        ref={ref}
+        className={cn("text-sm opacity-90", className)}
+        {...props}
+    />
+))
+ToastDescription.displayName = "ToastDescription"
+
+type ToastActionElement = React.ReactElement<typeof ToastAction>
+
+export {
+    Toast,
+    ToastAction,
+    ToastClose,
+    ToastTitle,
+    ToastDescription,
+    type ToastActionElement,
 }

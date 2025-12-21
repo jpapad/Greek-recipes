@@ -7,20 +7,20 @@ import { Input } from "@/components/ui/input";
  
 import { Label } from "@/components/ui/label";
 import { Upload, FileText, AlertCircle } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminImportPage() {
     const [file, setFile] = useState<File | null>(null);
     const [importing, setImporting] = useState(false);
     const [preview, setPreview] = useState<any[] | null>(null);
-    const { showToast } = useToast();
+    const { toast } = useToast();
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
 
         if (!selectedFile.name.endsWith('.csv') && !selectedFile.name.endsWith('.json')) {
-            showToast('Μόνο αρχεία CSV ή JSON επιτρέπονται', 'error');
+            toast({ title: 'Μόνο αρχεία CSV ή JSON επιτρέπονται', variant: 'destructive' });
             return;
         }
 
@@ -47,14 +47,14 @@ export default function AdminImportPage() {
                 setPreview(rows);
             }
         } catch (error) {
-            showToast('Σφάλμα ανάγνωσης αρχείου', 'error');
+            toast({ title: 'Σφάλμα ανάγνωσης αρχείου', variant: 'destructive' });
             console.error(error);
         }
     };
 
     const handleImport = async () => {
         if (!file) {
-            showToast('Επιλέξτε αρχείο πρώτα', 'error');
+            toast({ title: 'Επιλέξτε αρχείο πρώτα', variant: 'destructive' });
             return;
         }
 
@@ -63,11 +63,11 @@ export default function AdminImportPage() {
             // TODO: Implement bulk import
             // Parse file and insert into database
             await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate
-            showToast('Η εισαγωγή ολοκληρώθηκε επιτυχώς!', 'success');
+            toast({ title: 'Η εισαγωγή ολοκληρώθηκε επιτυχώς!', variant: 'success' });
             setFile(null);
             setPreview(null);
         } catch (error) {
-            showToast('Σφάλμα κατά την εισαγωγή', 'error');
+            toast({ title: 'Σφάλμα κατά την εισαγωγή', variant: 'destructive' });
             console.error(error);
         } finally {
             setImporting(false);

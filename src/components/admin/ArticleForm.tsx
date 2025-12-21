@@ -13,7 +13,7 @@ import { getRecipes } from '@/lib/api';
 import { createArticle, updateArticle, getArticleCategories } from '@/lib/blog-api';
 import type { Article, ArticleCategory, Recipe } from '@/lib/types';
 import { getUser } from '@/lib/auth';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 import { X, Plus } from 'lucide-react';
 
 // Dynamic import to avoid SSR issues with Tiptap
@@ -28,7 +28,7 @@ interface ArticleFormProps {
 
 export function ArticleForm({ article }: ArticleFormProps) {
   const router = useRouter();
-  const { showToast } = useToast();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<ArticleCategory[]>([]);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -122,7 +122,7 @@ export function ArticleForm({ article }: ArticleFormProps) {
     try {
       const user = await getUser();
       if (!user) {
-        showToast('Πρέπει να συνδεθείτε', 'error');
+        toast({ title: 'Πρέπει να συνδεθείτε', variant: 'destructive' });
         return;
       }
 
@@ -151,15 +151,15 @@ export function ArticleForm({ article }: ArticleFormProps) {
       }
 
       if (result) {
-        showToast(article ? 'Το άρθρο ενημερώθηκε!' : 'Το άρθρο δημιουργήθηκε!', 'success');
+        toast({ title: article ? 'Το άρθρο ενημερώθηκε!' : 'Το άρθρο δημιουργήθηκε!', variant: 'success' });
         router.push('/admin/articles');
         router.refresh();
       } else {
-        showToast('Σφάλμα κατά την αποθήκευση', 'error');
+        toast({ title: 'Σφάλμα κατά την αποθήκευση', variant: 'destructive' });
       }
     } catch (error) {
       console.error('Error saving article:', error);
-      showToast('Σφάλμα κατά την αποθήκευση', 'error');
+      toast({ title: 'Σφάλμα κατά την αποθήκευση', variant: 'destructive' });
     } finally {
       setLoading(false);
     }

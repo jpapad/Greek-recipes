@@ -14,7 +14,6 @@ import { Search, Bell, User, LogOut, Globe, Moon, Sun } from "lucide-react";
 import { useAdminI18n } from "@/context/AdminI18nContext";
 import { signOut } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 
 interface AdminTopbarProps {
@@ -29,11 +28,17 @@ interface AdminTopbarProps {
 export function AdminTopbar({ user }: AdminTopbarProps) {
     const { t, locale, setLocale } = useAdminI18n();
     const router = useRouter();
-    const { theme, setTheme } = useTheme();
+    const [theme, setThemeState] = useState<"light" | "dark">("light");
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        // Load theme from localStorage
+        const savedTheme = localStorage.getItem("theme") as "light" | "dark" | null;
+        if (savedTheme) {
+            setThemeState(savedTheme);
+            document.documentElement.classList.toggle("dark", savedTheme === "dark");
+        }
     }, []);
 
     const handleSignOut = async () => {
@@ -46,7 +51,10 @@ export function AdminTopbar({ user }: AdminTopbarProps) {
     };
 
     const toggleTheme = () => {
-        setTheme(theme === "dark" ? "light" : "dark");
+        const newTheme = theme === "dark" ? "light" : "dark";
+        setThemeState(newTheme);
+        localStorage.setItem("theme", newTheme);
+        document.documentElement.classList.toggle("dark", newTheme === "dark");
     };
 
     return (

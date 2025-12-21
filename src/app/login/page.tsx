@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, ArrowRight, Facebook } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 function LoginForm() {
     const t = useTranslations();
     const searchParams = useSearchParams();
-    const { showToast } = useToast();
+    const { toast } = useToast();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -32,7 +32,7 @@ function LoginForm() {
             const result = await signIn(email, password);
 
             if (result?.user) {
-                showToast(t('Auth.signInSuccess'), "success");
+                toast({ title: t('Auth.signInSuccess'), variant: 'success' });
 
                 const redirectTo = searchParams.get('redirect') || '/';
 

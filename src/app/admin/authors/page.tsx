@@ -5,7 +5,7 @@ import { GlassPanel } from '@/components/ui/GlassPanel';
 import { Button } from '@/components/ui/button';
 import { getAuthors, updateUserRole, searchUsers } from '@/lib/blog-api';
 import type { UserProfile } from '@/lib/types';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 import { UserPlus, UserMinus, Edit2, X, Save, Search, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 export default function AuthorsManagementPage() {
   const [authors, setAuthors] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
+  const { toast } = useToast();
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,14 +110,17 @@ export default function AuthorsManagementPage() {
     });
 
     if (result) {
-      showToast(
-        modalMode === 'add' ? 'Ο συντάκτης προστέθηκε επιτυχώς' : 'Τα στοιχεία ενημερώθηκαν',
-        'success'
-      );
+      toast({
+        title: modalMode === 'add' ? 'Ο συντάκτης προστέθηκε επιτυχώς' : 'Τα στοιχεία ενημερώθηκαν',
+        variant: 'success'
+      });
       closeModal();
       loadAuthors();
     } else {
-      showToast('Σφάλμα κατά την αποθήκευση', 'error');
+      toast({
+        title: 'Σφάλμα κατά την αποθήκευση',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -125,10 +128,16 @@ export default function AuthorsManagementPage() {
     // Quick remove author role
     const result = await updateUserRole(userId, { is_author: false });
     if (result) {
-      showToast('Ο ρόλος αφαιρέθηκε', 'success');
+      toast({
+        title: 'Ο ρόλος αφαιρέθηκε',
+        variant: 'success'
+      });
       loadAuthors();
     } else {
-      showToast('Σφάλμα κατά την ενημέρωση', 'error');
+      toast({
+        title: 'Σφάλμα κατά την ενημέρωση',
+        variant: 'destructive'
+      });
     }
   };
 
