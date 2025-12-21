@@ -16,6 +16,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "./NotificationBell";
 
 const navItems = [
     { href: "/admin", label: "Αρχική" },
@@ -42,6 +43,13 @@ const navItems = [
         submenu: [
             { href: "/admin/ingredients", label: "Ingredients Library" },
             { href: "/admin/dietary-tags", label: "Dietary Tags" },
+        ]
+    },
+    {
+        label: "Moderation",
+        submenu: [
+            { href: "/admin/activity", label: "Activity Timeline" },
+            { href: "/admin/comments", label: "Comments" },
         ]
     },
     { 
@@ -179,6 +187,9 @@ export function AdminTopbar({ user }: AdminTopbarProps) {
 
                 {/* Right Side Actions */}
                 <div className="flex items-center gap-2">
+                    {/* Notifications Bell */}
+                    <NotificationBell />
+
                     {/* Theme Toggle */}
                     <Button
                         variant="ghost"
