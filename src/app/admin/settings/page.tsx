@@ -46,22 +46,25 @@ export default async function AdminSettingsPage() {
 {`-- Run in Supabase SQL Editor:
 CREATE TABLE IF NOT EXISTS public.site_settings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    key TEXT UNIQUE NOT NULL,
+    setting_key TEXT UNIQUE NOT NULL,
+    setting_group TEXT NOT NULL DEFAULT 'general',
+    label TEXT NOT NULL,
     value JSONB NOT NULL,
     description TEXT,
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_by UUID REFERENCES auth.users(id)
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Initial settings
-INSERT INTO site_settings (key, value, description) VALUES
-('site_name', '"Greek Recipes"', 'Site title'),
-('site_description', '"Authentic Greek Recipes"', 'Site description'),
-('maintenance_mode', 'false', 'Enable maintenance mode'),
-('allow_registration', 'true', 'Allow new user registration'),
-('contact_email', '"info@greekrecipes.com"', 'Contact email'),
-('max_upload_size_mb', '10', 'Maximum file upload size')
-ON CONFLICT (key) DO NOTHING;
+INSERT INTO site_settings (setting_key, setting_group, label, value, description) VALUES
+('site_name', 'general', 'Site Name', '"Greek Recipes"', 'Site title'),
+('site_description', 'general', 'Site Description', '"Authentic Greek Recipes"', 'Site description'),
+('maintenance_mode', 'general', 'Maintenance Mode', 'false', 'Enable maintenance mode'),
+('allow_registration', 'general', 'Allow Registration', 'true', 'Allow new user registration'),
+('contact_email', 'general', 'Contact Email', '"info@greekrecipes.com"', 'Contact email'),
+('max_upload_size_mb', 'general', 'Max Upload Size (MB)', '10', 'Maximum file upload size')
+ON CONFLICT (setting_key) DO NOTHING;
 
 -- RLS Policies
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
@@ -72,7 +75,11 @@ USING (true);
 
 CREATE POLICY "Admins can update settings"
 ON site_settings FOR UPDATE
-USING (public.is_admin());`}
+USING (EXISTS (
+    SELECT 1 FROM profiles
+    WHERE profiles.id = auth.uid()
+    AND profiles.is_admin = true
+));`}
                             </pre>
                         </div>
                     </div>
