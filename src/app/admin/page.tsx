@@ -2,7 +2,7 @@ import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StatCard } from "@/components/admin/StatCard";
-import { Plus, ArrowRight } from "lucide-react";
+import { Plus, ArrowRight, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 
 async function getDashboardStats() {
