@@ -37,6 +37,13 @@ const navItems = [
             { href: "/admin/cities", label: "Πόλεις" },
         ]
     },
+    {
+        label: "Ingredients & Tags",
+        submenu: [
+            { href: "/admin/ingredients", label: "Ingredients Library" },
+            { href: "/admin/dietary-tags", label: "Dietary Tags" },
+        ]
+    },
     { 
         label: "Ρυθμίσεις",
         submenu: [
@@ -45,11 +52,13 @@ const navItems = [
             { href: "/admin/menu", label: "Μενού" },
             { href: "/admin/footer", label: "Footer" },
             { href: "/admin/home-sections", label: "Sections" },
+            { href: "/admin/seo", label: "SEO Tools" },
         ]
     },
     { href: "/admin/media", label: "Μέσα" },
     { href: "/admin/users", label: "Χρήστες" },
     { href: "/admin/authors", label: "Συγγραφείς" },
+    { href: "/admin/analytics", label: "Analytics" },
     { href: "/admin/import", label: "Import" },
     { href: "/admin/audit", label: "Έλεγχος" },
 ];
