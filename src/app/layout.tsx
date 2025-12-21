@@ -12,6 +12,8 @@ import { ToastProvider } from "@/components/ui/toast";
 import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
 import { Snowfall } from "@/components/ui/Snowfall";
 import Script from "next/script";
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -91,12 +93,6 @@ export const metadata: Metadata = {
   category: "food",
 };
 
-// ... imports
-import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
-
-// ... other imports
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -138,23 +134,24 @@ export default async function RootLayout({
           </ThemeProvider>
         </NextIntlClientProvider>
 
-        {/* Service Worker Registration */}
-        {/* ... script ... */}
-        <Script id="register-sw" strategy="afterInteractive">
-          {`
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                  .then((registration) => {
-                    console.log('SW registered: ', registration);
-                  })
-                  .catch((error) => {
-                    console.log('SW registration failed: ', error);
-                  });
-              });
-            }
-          `}
-        </Script>
+        {/* Service Worker Registration (PROD only) */}
+        {process.env.NODE_ENV === "production" && (
+          <Script id="register-sw" strategy="afterInteractive">
+            {`
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((error) => {
+              console.log('SW registration failed: ', error);
+            });
+        });
+      }
+    `}
+          </Script>
+        )}
       </body>
     </html>
   );

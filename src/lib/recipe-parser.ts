@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import type { Recipe, IngredientGroup, StepGroup } from "./types";
+import { trackUsage } from "./track-openai-usage";
 
 // Lazy initialize OpenAI to avoid errors on module load
 function getOpenAI() {
@@ -362,6 +363,12 @@ ${textContent}`;
 
         const responseText = completion.choices[0].message.content || "{}";
         console.log("OpenAI raw response:", responseText.substring(0, 500)); // Log first 500 chars
+
+        // Track token usage
+        const usage = completion.usage;
+        if (usage) {
+            trackUsage(usage.prompt_tokens, usage.completion_tokens);
+        }
 
         const data = JSON.parse(responseText);
 

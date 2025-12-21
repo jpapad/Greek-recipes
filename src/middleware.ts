@@ -2,33 +2,20 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-    // Early-return for static/public assets to avoid running auth logic
-    const pathname = request.nextUrl.pathname;
-    if (
-        pathname.startsWith('/_next') ||
-        pathname.startsWith('/api') ||
-        pathname === '/manifest.json' ||
-        pathname === '/manifest.webmanifest' ||
-        pathname === '/sw.js' ||
-        pathname.startsWith('/_next/static') ||
-        pathname.match(/\.(?:svg|png|jpg|jpeg|gif|webp|woff2?)$/)
-    ) {
-        return NextResponse.next();
-    }
+    const pathname = request.nextUrl.pathname
+
+    // Locale -> pass as REQUEST header (useful for server components/handlers)
+    const locale = request.cookies.get('NEXT_LOCALE')?.value || 'el'
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-locale', locale)
 
     let response = NextResponse.next({
-        request: {
-            headers: request.headers,
-        },
+        request: { headers: requestHeaders },
     })
 
-    // Handle locale from cookie
-    const locale = request.cookies.get('NEXT_LOCALE')?.value || 'el';
-    response.headers.set('x-locale', locale);
-
-    // Ensure the login page isn't cached at the edge (avoid stale cached login HTML)
-    if (pathname === '/login' || pathname.startsWith('/login?') || pathname.startsWith('/login/')) {
-        response.headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
+    // Optional: never cache login
+    if (pathname === '/login') {
+        response.headers.set('cache-control', 'no-store')
         return response
     }
 
@@ -37,91 +24,38 @@ export async function middleware(request: NextRequest) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
             cookies: {
-                get(name: string) {
-                    return request.cookies.get(name)?.value
+                get: (name) => request.cookies.get(name)?.value,
+                set: (name, value, options) => {
+                    response.cookies.set({ name, value, ...options })
                 },
-                set(name: string, value: string, options: Record<string, unknown>) {
-                    request.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
-                    response.cookies.set({
-                        name,
-                        value,
-                        ...options,
-                    })
-                },
-                remove(name: string, options: Record<string, unknown>) {
-                    request.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
-                    response = NextResponse.next({
-                        request: {
-                            headers: request.headers,
-                        },
-                    })
-                    response.cookies.set({
-                        name,
-                        value: '',
-                        ...options,
-                    })
+                remove: (name, options) => {
+                    response.cookies.set({ name, value: '', ...options })
                 },
             },
         }
     )
 
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    // Protect /admin routes
-    if (request.nextUrl.pathname.startsWith('/admin')) {
-        console.log('🔒 Admin route protection active')
-        console.log('📧 User email:', user?.email || 'Not logged in')
-        console.log('👤 User metadata:', JSON.stringify(user?.user_metadata, null, 2))
-        
+    if (pathname.startsWith('/admin')) {
         if (!user) {
-            console.log('❌ No user found - redirecting to login')
             const loginUrl = new URL('/login', request.url)
-            loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-            return NextResponse.redirect(loginUrl, {
-                headers: {
-                    // Prevent edge or service caching of the unauthenticated redirect
-                    'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
-                },
-            })
+            // κράτα και query string αν θες:
+            loginUrl.searchParams.set('redirect', request.nextUrl.pathname + request.nextUrl.search)
+            return NextResponse.redirect(loginUrl, { headers: { 'cache-control': 'no-store' } })
         }
 
-        // Check if user is admin - be more flexible with the check
-        const isAdmin = user.user_metadata?.is_admin === true || user.user_metadata?.is_admin === 'true'
-        console.log('🔑 Is Admin?', isAdmin)
-        console.log('📋 Full user_metadata:', user.user_metadata)
-        console.log('🔍 is_admin value:', user.user_metadata?.is_admin)
-        console.log('🔍 is_admin type:', typeof user.user_metadata?.is_admin)
-        
+        // ΠΡΟΤΕΙΝΟΜΕΝΟ: app_metadata role, όχι user_metadata
+        const isAdmin = user.app_metadata?.role === 'admin' || user.app_metadata?.is_admin === true
+
         if (!isAdmin) {
-            console.log('⛔ User is not admin - redirecting to login')
-            console.log('💡 To fix: Run SET_ADMIN_NOW.sql in Supabase SQL Editor with your email')
-            console.log('💡 Then logout and login again to refresh session')
             const loginUrl = new URL('/login', request.url)
             loginUrl.searchParams.set('error', 'admin_access_required')
-            loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-            return NextResponse.redirect(loginUrl, {
-                headers: {
-                    'cache-control': 'no-store, no-cache, must-revalidate, max-age=0',
-                },
-            })
+            loginUrl.searchParams.set('redirect', request.nextUrl.pathname + request.nextUrl.search)
+            return NextResponse.redirect(loginUrl, { headers: { 'cache-control': 'no-store' } })
         }
-        
-        console.log('✅ Admin access granted')
-        // Ensure admin responses are not cached at the edge
-        response.headers.set('cache-control', 'no-store, no-cache, must-revalidate, max-age=0')
+
+        response.headers.set('cache-control', 'no-store')
     }
 
     return response
@@ -129,8 +63,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-            '/admin/:path*',
-            // Run middleware for most routes but exclude static assets and common public files
-            '/((?!_next/static|_next/image|favicon.ico|manifest.json|manifest.webmanifest|robots.txt|sitemap.xml|sw.js|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+        '/admin/:path*',
+        '/((?!_next/static|_next/image|favicon.ico|manifest.json|manifest.webmanifest|robots.txt|sitemap.xml|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ],
 }

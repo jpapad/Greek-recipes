@@ -123,31 +123,28 @@ async function cacheFirst(request, cacheName) {
 // Network-first strategy
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
+
   try {
     const response = await fetch(request);
 
-    // Treat non-OK responses as failures so we don't cache/serve 4xx/5xx
-    if (!response || !response.ok) {
-      throw new Error('Network error or non-OK response');
+    // Cache only successful responses
+    if (response && response.ok) {
+      cache.put(request, response.clone());
     }
 
-    // Only cache successful responses
-    cache.put(request, response.clone());
+    // IMPORTANT: return the response even if it's 404/500
+    // so you see the real Next.js error page instead of "Offline".
     return response;
   } catch (err) {
-    // If network failed or returned non-OK, try to serve cached value instead
     const cached = await cache.match(request);
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
 
-    // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
-      const offlinePage = await cache.match('/offline');
+    if (request.mode === "navigate") {
+      const offlinePage = await cache.match("/offline");
       if (offlinePage) return offlinePage;
     }
 
-    return new Response('Offline', { status: 503 });
+    return new Response("Offline", { status: 503 });
   }
 }
 

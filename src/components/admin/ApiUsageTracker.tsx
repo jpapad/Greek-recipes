@@ -19,49 +19,35 @@ export function ApiUsageTracker() {
     requestsToday: 0,
     lastReset: new Date().toISOString().split("T")[0],
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load stats from localStorage
-    const loadStats = () => {
+    // Fetch real usage data from API
+    const fetchUsage = async () => {
       try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const data = JSON.parse(stored);
-          const today = new Date().toISOString().split("T")[0];
-
-          // Reset if it's a new day
-          if (data.lastReset !== today) {
-            const newStats = {
-              tokensToday: 0,
-              requestsToday: 0,
-              lastReset: today,
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
-            setStats(newStats);
-          } else {
-            setStats(data);
-          }
+        const response = await fetch("/api/openai-usage");
+        if (response.ok) {
+          const data = await response.json();
+          setStats({
+            tokensToday: data.daily_tokens,
+            requestsToday: data.total_requests,
+            lastReset: data.last_reset
+          });
         }
       } catch (error) {
-        console.error("Failed to load usage stats:", error);
+        console.error("Failed to fetch usage stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadStats();
+    // Initial fetch
+    fetchUsage();
 
-    // Listen for updates from API calls
-    const handleStorageChange = () => {
-      loadStats();
-    };
+    // Poll every 5 seconds to get updates
+    const interval = setInterval(fetchUsage, 5000);
 
-    window.addEventListener("storage", handleStorageChange);
-    // Custom event for same-tab updates
-    window.addEventListener("usage-updated", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("usage-updated", handleStorageChange);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   const percentageUsed = (stats.tokensToday / DAILY_LIMIT) * 100;
@@ -175,9 +161,9 @@ export function ApiUsageTracker() {
           <p>• Μέσος όρος: ~500 tokens ανά tourist data generation</p>
           <p>• Tracking: Μόνο αυτή η εφαρμογή (Greek Recipes)</p>
           <p className="pt-2">
-            <a 
-              href="https://platform.openai.com/usage" 
-              target="_blank" 
+            <a
+              href="https://platform.openai.com/usage"
+              target="_blank"
               rel="noopener noreferrer"
               className="text-purple-400 hover:text-purple-300 underline"
             >
