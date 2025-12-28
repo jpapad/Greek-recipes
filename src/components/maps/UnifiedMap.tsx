@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, CircleMarker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
-import type { GeoJsonObject, Feature, Point } from 'geojson';
+import type { FeatureCollection, Feature, Point } from 'geojson';
 import { Region, Prefecture, City } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Home, Loader2 } from 'lucide-react';
@@ -68,7 +68,7 @@ export default function UnifiedMap({
   const [mapCenter, setMapCenter] = useState<[number, number]>([38.5, 23.5]);
   const [mapZoom, setMapZoom] = useState<number>(6);
   
-  const [geojsonData, setGeojsonData] = useState<GeoJsonObject | null>(null);
+  const [geojsonData, setGeojsonData] = useState<FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null);
   const [history, setHistory] = useState<Array<{ level: ViewLevel; regionId: string | null; prefectureId: string | null; cityId: string | null }>>([]);
@@ -109,7 +109,7 @@ export default function UnifiedMap({
         }
 
         const response = await fetch(path);
-        const data: GeoJsonObject = await response.json();
+        const data: FeatureCollection = await response.json();
         
         // Filter by parent if needed
         if (filterField && filterValue) {
@@ -135,7 +135,7 @@ export default function UnifiedMap({
 
   // Calculate bounds when GeoJSON changes
   useEffect(() => {
-    if (useGeoJSON && geojsonData && geojsonData.type === 'FeatureCollection') {
+    if (useGeoJSON && geojsonData) {
       const geoJsonLayer = L.geoJSON(geojsonData);
       const layerBounds = geoJsonLayer.getBounds();
       if (layerBounds.isValid()) {
@@ -160,7 +160,7 @@ export default function UnifiedMap({
       zoomToBoundsOnClick: true,
     });
 
-    if (geojsonData.type === 'FeatureCollection') {
+    if (geojsonData) {
       geojsonData.features.forEach((feature: any) => {
         if (feature.geometry.type === 'Point') {
           const props = feature.properties;

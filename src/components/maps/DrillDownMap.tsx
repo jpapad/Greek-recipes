@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.markercluster';
-import type { GeoJsonObject, Feature, Point } from 'geojson';
+import type { FeatureCollection, Feature, Point } from 'geojson';
 import { 
   MapLevel, 
   MAP_LEVELS, 
@@ -38,7 +38,7 @@ function MapUpdater({ bounds }: { bounds: L.LatLngBounds | null }) {
 export default function DrillDownMap({ className }: DrillDownMapProps) {
   const [currentLevel, setCurrentLevel] = useState<MapLevel>('regions');
   const [selectedParentId, setSelectedParentId] = useState<string | null>(null);
-  const [geojsonData, setGeojsonData] = useState<GeoJsonObject | null>(null);
+  const [geojsonData, setGeojsonData] = useState<FeatureCollection | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null);
   const [history, setHistory] = useState<Array<{ level: MapLevel; parentId: string | null }>>([]);
@@ -54,13 +54,13 @@ export default function DrillDownMap({ className }: DrillDownMapProps) {
       try {
         const config = MAP_LEVELS[currentLevel];
         const response = await fetch(config.geojsonPath);
-        const data: GeoJsonObject = await response.json();
+        const data: FeatureCollection = await response.json();
         
         // Filter data by parent ID if applicable
         if (config.parentField && selectedParentId) {
-          const filtered = {
+          const filtered: FeatureCollection = {
             ...data,
-            features: (data as any).features.filter((feature: Feature) => 
+            features: data.features.filter((feature: Feature) => 
               feature.properties?.[config.parentField as string] === selectedParentId
             ),
           };
@@ -80,7 +80,7 @@ export default function DrillDownMap({ className }: DrillDownMapProps) {
 
   // Calculate bounds when GeoJSON changes
   useEffect(() => {
-    if (geojsonData && geojsonData.type === 'FeatureCollection') {
+    if (geojsonData) {
       const geoJsonLayer = L.geoJSON(geojsonData);
       const layerBounds = geoJsonLayer.getBounds();
       if (layerBounds.isValid()) {
@@ -106,7 +106,7 @@ export default function DrillDownMap({ className }: DrillDownMapProps) {
       zoomToBoundsOnClick: true,
     });
 
-    if (geojsonData.type === 'FeatureCollection') {
+    if (geojsonData) {
       geojsonData.features.forEach((feature: any) => {
         if (feature.geometry.type === 'Point') {
           const props = feature.properties as SettlementProperties;
@@ -147,7 +147,7 @@ export default function DrillDownMap({ className }: DrillDownMapProps) {
     const config = MAP_LEVELS[currentLevel];
     
     if (config.nextLevel) {
-      const featureId = feature.properties?.[config.idField as string];
+      const featureId = (feature.properties as any)?.[config.idField as string];
       
       // Save current state to history
       setHistory(prev => [...prev, { level: currentLevel, parentId: selectedParentId }]);
