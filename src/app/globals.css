@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Leaflet CSS */
+@import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -583,6 +588,50 @@
   50% {
     transform: rotate(5deg);
   }
+}
+
+/* Leaflet Custom Styles */
+.custom-tooltip {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 0.75rem !important;
+  font-weight: 600 !important;
+  color: #1f2937 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.custom-tooltip::before {
+  border-top-color: #e5e7eb !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Marker Cluster Custom Styles */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(59, 130, 246, 0.6) !important;
+}
+
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: rgba(37, 99, 235, 0.8) !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.custom-marker-icon {
+  background: transparent !important;
+  border: none !important;
 }
 
 .animate-swing {
